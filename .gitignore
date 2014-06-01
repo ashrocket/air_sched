@@ -1,0 +1,57 @@
+## MAC OS
+.DS_Store
+
+## WINDOWS
+.Thumbs.db
+
+## TEXTMATE
+*.tmproj
+tmtags
+
+## EMACS
+*~
+\#*
+.\#*
+
+## VIM
+*.swp
+# IDEA / RUBYMINE
+.idea
+
+## RVM
+.rvmrc
+.ruby-version
+.ruby-gemset
+
+## PROJECT::GENERAL
+tags
+coverage
+rdoc
+doc
+.yardoc
+pkg
+
+## PROJECT::SPECIFIC
+.bundle
+spec/rails
+*.sqlite3-journal
+Gemfile.lock
+Gemfile-*.lock
+capybara*
+viewcumber
+test-rails*
+public
+.rspec
+.rails-version
+.rbenv-version
+spec/dummy/bin/*
+spec/dummy/app/uploaders
+spec/dummy/app/workers
+spec/dummy/data
+spec/dummy/config/initializers/mastiff.rb
+spec/dummy/config/sidekiq.yml
+spec/dummy/db/development.sqlite3
+spec/dummy/db/test.sqlite3
+spec/dummy/log/development.log
+spec/dummy/log/test.log
+spec/dummy/tmp/

@@ -31,7 +31,6 @@ div.dataTables_paginate ul.pagination {
 	white-space: nowrap;
 }
 
-table.dataTable,
 table.dataTable td,
 table.dataTable th {
 	-webkit-box-sizing: content-box;
@@ -61,6 +60,11 @@ table.dataTable thead .sorting_desc { background: url('../images/sort_desc.png')
 
 table.dataTable thead .sorting_asc_disabled { background: url('../images/sort_asc_disabled.png') no-repeat center right; }
 table.dataTable thead .sorting_desc_disabled { background: url('../images/sort_desc_disabled.png') no-repeat center right; }
+
+table.dataTable thead > tr > th {
+	padding-left: 18px;
+	padding-right: 18px;
+}
 
 table.dataTable th:active {
 	outline: none;
@@ -93,6 +97,31 @@ div.dataTables_scrollBody tbody tr:first-child td {
 div.dataTables_scrollFoot table {
 	margin-top: 0 !important;
 	border-top: none;
+}
+
+/* Frustratingly the border-collapse:collapse used by Bootstrap makes the column
+   width calculations when using scrolling impossible to align columns. We have
+   to use separate
+ */
+table.table-bordered.dataTable {
+	border-collapse: separate !important;
+}
+table.table-bordered thead th,
+table.table-bordered thead td {
+	border-left-width: 0;
+	border-top-width: 0;
+}
+table.table-bordered tbody th,
+table.table-bordered tbody td {
+	border-left-width: 0;
+	border-bottom-width: 0;
+}
+table.table-bordered th:last-child,
+table.table-bordered td:last-child {
+	border-right-width: 0;
+}
+div.dataTables_scrollHead table.table-bordered {
+	border-bottom-width: 0;
 }
 
 
@@ -185,6 +214,7 @@ div.DTFC_RightHeadWrapper table,
 div.DTFC_RightFootWrapper table,
 table.DTFC_Cloned tr.even {
     background-color: white;
+    margin-bottom: 0;
 }
  
 div.DTFC_RightHeadWrapper table ,
@@ -206,7 +236,7 @@ div.DTFC_LeftHeadWrapper table thead tr:last-child td:first-child {
 div.DTFC_RightBodyWrapper table,
 div.DTFC_LeftBodyWrapper table {
     border-top: none;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
 }
  
 div.DTFC_RightBodyWrapper tbody tr:first-child th,
@@ -219,5 +249,13 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td {
 div.DTFC_RightFootWrapper table,
 div.DTFC_LeftFootWrapper table {
     border-top: none;
+}
+
+
+/*
+ * FixedHeader styles
+ */
+div.FixedHeader_Cloned table {
+	margin: 0 !important
 }
 

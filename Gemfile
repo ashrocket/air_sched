@@ -10,15 +10,12 @@ gem 'chronic'
 
 # Template language gems
 # Use SCSS for stylesheets
+gem 'coffee-rails', '~> 4.0'
 gem 'sass-rails', '~> 4.0'
 gem 'quiet_assets', :group => :development
 gem 'bootstrap-sass', '~> 3.1.0'
-# Use Uglifier as compressor for JavaScript assets
-# Use CoffeeScript for .js.coffee assets and views
 gem 'uglifier', '>= 1.3.0'
-gem 'coffee-rails', '~> 4.0'
 gem 'haml-rails'
-gem 'turbolinks'
 
 
 # Use jquery as the JavaScript library
@@ -37,8 +34,6 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
 #gem 'spring',        group: :development
 
-gem 'byebug'
-
 gem 'redis-objects', '~> 0.9'
 gem 'sidekiq', '2.17.7'
 gem 'sinatra', '>= 1.3.0', :require => nil
@@ -46,3 +41,19 @@ gem 'sidetiq', '0.5.0'
 
 gem 'mastiff', path: '../mastiff'
 
+
+group :development, :test do
+    gem 'better_errors'
+    gem 'binding_of_caller'
+    gem 'byebug'
+    #gem 'debugger', group: [:development, :test]
+    gem 'rspec',  '~> 3.0.0.beta2'
+    gem 'rspec-rails',  '~> 3.0.0.beta2'
+
+
+    gem 'cucumber'
+    gem 'cucumber-rails', :require=>false
+    gem "factory_girl_rails"
+
+
+end

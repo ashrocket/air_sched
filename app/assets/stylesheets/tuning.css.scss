@@ -1,0 +1,45 @@
+body.tuning.index{
+  //font-size: 24px;
+  //// Headings
+  //// -------------------------
+  //
+  //h1, h2, h3, h4, h5, h6,
+  //.h1, .h2, .h3, .h4, .h5, .h6 {
+  //  //font-family: $headings-font-family;
+  //  //font-weight: $headings-font-weight;
+  //  //font-size:
+  //  //line-height: $headings-line-height;
+  //  //color: $headings-color;
+  //
+  //  small,
+  //  .small {
+  //    font-weight: normal;
+  //    line-height: 1;
+  //    //color: $headings-small-color;
+  //  }
+  //}
+
+  .btn {
+    margin: 5px auto;
+
+  }
+}
+.admin-mode-form {
+ display: inline-block;
+  //margin-left: 20px;
+}
+.admin-hub-form {
+ display: inline-block;
+  //margin-left: 20px;
+  select {
+    margin: 10px auto;
+  }
+}
+.admin-cxx-form {
+ display: inline-block;
+  //margin-left: 20px;
+  select {
+    margin: 10px auto;
+  }
+
+}

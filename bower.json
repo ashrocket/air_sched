@@ -1,0 +1,25 @@
+{
+  "name": "schedman",
+  "version": "1.0",
+  "authors": [
+    "ashrocket <ashley@raiteri.net>"
+  ],
+  "description": "Flight Schedule combinations from Air Black Box",
+  "keywords": [
+    "travel",
+    "air",
+    "flight",
+    "trip"
+  ],
+  "license": "MIT",
+  "homepage": "http://airblackbox.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor/assets/components",
+    "test",
+    "tests"
+  ]
+}

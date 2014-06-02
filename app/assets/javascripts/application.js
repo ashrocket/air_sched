@@ -26,12 +26,10 @@
 //= require datatables-tabletools/js/dataTables.tableTools
 //= require datatables-plugins/api/fnReloadAjax
 //= require datatables-plugins/integration/bootstrap/3/dataTables.bootstrap
-
 //= require jquery-file-upload/js/jquery.fileupload
 
 //= require bootstrap-datepicker/js/bootstrap-datepicker
 //= require dates
 //= require bootstrap_init
-//= require mastiff
 
 

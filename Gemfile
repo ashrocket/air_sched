@@ -39,6 +39,13 @@ gem 'sidekiq', '2.17.7'
 gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'sidetiq', '0.5.0'
 
+gem 'devise', '3.2.4'
+gem 'activeadmin', github: 'gregbell/active_admin'
+
+gem 'rails-settings-cached'
+gem 'roo'
+
+
 gem 'mastiff', path: '../mastiff'
 
 

@@ -4,6 +4,7 @@ class CreateOagSchedules < ActiveRecord::Migration
      create_table :oag_schedules do |t|
        t.string :cxr
        t.string :hub
+       t.string :key
        t.datetime :eff_date
        t.datetime :disc_date
 

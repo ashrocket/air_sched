@@ -6,8 +6,8 @@
 development:
   adapter: mysql2
   encoding: utf8
-  database: schedman
-  username: schedman_admin
+  database: air_sched
+  username: air_sched_admin
   password: airline1
   host: localhost
   port: 3306
@@ -18,8 +18,8 @@ development:
 test: &test
   adapter: mysql2
   encoding: utf8
-  database: schedman_test
-  username: schedman_admin
+  database: air_sched_test
+  username: air_sched_admin
   password: airline1
   host: localhost
   port: 3306
@@ -27,8 +27,8 @@ test: &test
 production:
   adapter: mysql2
   encoding: utf8
-  database: schedman
-  username: schedman_admin
+  database: air_sched
+  username: air_sched_admin
   password: airline1
   host: localhost
   port: 3306

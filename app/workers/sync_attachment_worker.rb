@@ -9,9 +9,9 @@ class SyncAttachmentWorker
     if msg.uploader and msg.stored_filename
          attachment_path = File.join( msg.uploader.store_dir,  msg.stored_filename)
     end
-    report = OagReport.first_or_create(msg_id: message_id, msg_status: 'received', filepath: attachment_path)
+    report = OagReport.where(msg_id: message_id).first_or_create(attachment_path: attachment_path)
+    report.load_status  = { email_status: 'cached', attachment_status: 'unstored', report_status: 'queued'}
     report.received   = Time.now
-    report.mail_type  ='unknown'
     report.save
 
     msg.sync_message_attachments

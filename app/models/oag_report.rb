@@ -1,14 +1,33 @@
 class OagReport < ActiveRecord::Base
+  serialize :load_status, JSON
 
-  def create_from_msg msg
-       @msg_id     =
-       @msg_status = 'received'
-       @received   = Time.now
-       @mail_type  = 'unknown'
-       if msg.uploader and msg.stored_filename
-         @filename = File.join( msg.uploader.store_dir,  msg.stored_filename)
-       end
-       save
+
+  def report_path
+    load_status["report_path"]
   end
+
+  def report_file_string
+    puts "Processing Report ' #{report_path} '  file}"
+    unless report_path and File.exist? report_path
+      if File.exist?(attachment_path)
+        Oag::Process.process_oag_file(self)
+      end
+    end
+    if report_path and File.exist? report_path
+      return  File.readlines(report_path).join
+    end
+  end
+
+  def estimated_key
+      report_name = File.basename report_path
+      key_type    = report_name[0..2]
+
+      if key_type.eql? 'HUB'
+        matches = report_name[3..-1].match /[^a-zA-Z0-9]?([A-z]{3})/
+      else
+        matches = report_name[3..-1].match /[^a-zA-Z0-9]?([A-z]{2})/
+      end
+      return  matches.captures.first
+    end
 
 end

@@ -8,10 +8,8 @@ class ProcessAttachmentWorker
 
     report = OagReport.where(msg_id: message_id).first
     if report
-      report.filesize = File.stat(report.filepath).size
-      report.save
       Oag::Process.process_oag_file(report)
-
+      ScheduleImportWorker.perform_async(report.id)
     end
 
     #Do Something here with the message

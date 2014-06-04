@@ -35,22 +35,68 @@ module Oag
     #end
 
     def process_oag_file report
-      ext = File.extname(report.filepath)
+      if File.exist? report.attachment_path
+        report.load_status["attachment_status"]  = 'stored'
+        attach_size = File.stat(report.attachment_path).size
+        report.attachment_size = attach_size
+        report.load_status["attachment_size"]  = attach_size
+      end
 
-      if ext.eql? '.zip'
-        Zip::InputStream::open(report.filepath) {|io|
+      ext = File.extname(report.attachment_path)
+
+      if ext.eql? '.csv'
+        if File.exists? report.attachment_path
+          report.load_status["attachment_status"]  = 'uncompressed'
+          report.load_status["report_path"]        = report.attachment_path
+          report.load_status["report_size"]        = report.load_status["attachment_size"]
+        end
+      elsif ext.eql? '.zip'
+        Zip::InputStream::open(report.attachment_path) {|io|
            entry = io.get_next_entry
            uncompressed_filename   = entry.name.squish.gsub(" ", "_")
-           uncompressed_path       = File.join( File.dirname(report.filepath), uncompressed_filename )
+           uncompressed_path       = File.join( File.dirname(report.attachment_path), uncompressed_filename )
+            puts "Decompressing #{report.attachment_path} to #{uncompressed_path}"
            File.open(uncompressed_path, 'wb'){|f| f << io.read}
-           File.delete(report.filepath)
-           report.uncompressed = File.stat(uncompressed_path).size
-           report.filepath     = uncompressed_path
-           report.save
-        }
 
+           report.load_status["report_path"] = uncompressed_path
+           report.load_status["report_size"] = File.stat(uncompressed_path).size
+           report.save
+
+        }
       end
     end
+
+
+
+    def import_oag_file report
+        begin
+          Oag::Import.parse_and_load_report report
+
+        rescue Exception => ex
+               Rails.logger.info ex.message
+               Rails.logger.info report.inspect
+        end
+        #Airport.refresh_from_hub report_key
+        #
+        #
+        #DirectFlight.load_by_hub(report_key)
+        #Destination.load_by_hub(report_key)
+        #CnxPair.load_by_hub(report_key)
+        #apt = Airport.find_by(code: report_key)
+        #hub = Hub.where(code: report_key).first_or_create
+        #hub.name = apt.name
+        #hub.active = true
+        #hub.save
+        #if job[:archive].blank?
+        #  job[:archive] = "#{job[:tmpfile]}.zip"
+        #  unless File.exists? job[:archive]
+        #    Oag::Util.compress_report(job[:archive], job[:tmpfile])
+        #  end
+        #end
+        #FileUtils.mv job[:archive], File.join("data","oag","processed", "." )
+
+    end
+
 
   #
   #  def process_hub job

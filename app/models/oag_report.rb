@@ -7,7 +7,6 @@ class OagReport < ActiveRecord::Base
   end
 
   def report_file_string
-    puts "Processing Report ' #{report_path} '  file}"
     unless report_path and File.exist? report_path
       if File.exist?(attachment_path)
         Oag::Process.process_oag_file(self)

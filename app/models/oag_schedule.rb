@@ -97,9 +97,10 @@ class OagSchedule < ActiveRecord::Base
     raise(RuntimeError, "HUB Indeterminate") if  hub1 != hub2
     hub = hub1
     self.where(:hub => hub).delete_all
-    puts "Loading #{schedules.count} schedules into Schedule tables for #{hub} airport."
+    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{hub} airport."
+
     expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    puts "There are  #{expired.count} expired schedules in the file  for #{hub} airport."
+    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{hub} airport."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
 
     schedule_records = []
@@ -115,16 +116,58 @@ class OagSchedule < ActiveRecord::Base
             raise RuntimeError e
         end
       end
-      puts "Loading  #{schedule_records.count} valid schedules into the DB  for #{hub} airport."
+      Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{hub} airport."
       loaded += schedule_records.count
       OagSchedule.import schedule_records
       schedule_records = []
     end
-    puts "--- Loaded  #{loaded} valid schedules into the DB for #{hub} airport. ---"
+    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{hub} airport. ---"
 
 
 
   end
+
+  def process_schedules report, csvdata, options={}
+
+    key       = report.estimated_key
+    schedules = self.load_schedule(csvdata, options={})
+
+    orig_airports = schedules.collect{ |n| n[:origin_apt] }
+    dest_airports = schedules.collect{ |n| n[:dest_apt] }
+    self.where(:key => key).delete_all
+
+    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{key}"
+
+    expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
+    report.load_status["expired_schedules_count"] = expired.count
+
+    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{key}."
+    schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
+    report.load_status["schedules_count"] = schedules.count
+
+    schedule_records = []
+    loaded = 0
+    schedules.in_groups_of(500) do |schedule_group|
+    schedule_group.compact.each do |sched|
+      begin
+        schedule_records << self.new(sched.merge(:key => key))
+      rescue Exception => e
+          puts sched
+          Rails.logger.error sched
+          Rails.logger.error e.message
+          raise RuntimeError e
+      end
+    end
+    Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{key}."
+    loaded += schedule_records.count
+    OagSchedule.import schedule_records
+    schedule_records = []
+  end
+  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{key} ---"
+
+  end
+
+
 
   def load_large_cxx_schedule cxx, csvdata, options={}
     schedules = []
@@ -134,9 +177,9 @@ class OagSchedule < ActiveRecord::Base
     schedules.flatten!
     csvdata = nil
     self.where(:cxr => cxx).delete_all
-    puts "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
+    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
     expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    puts "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
+    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
 
     loaded = 0
@@ -155,22 +198,22 @@ class OagSchedule < ActiveRecord::Base
            end
 
      end
-     puts "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
+     Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
      loaded += schedule_records.count
 
      OagSchedule.import schedule_records
      schedule_records = []
     end
-    puts "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
+    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
   end
 
   def load_cxx_schedule cxx, csvdata, options={}
 
     schedules = self.load_schedule(csvdata, options={})
     self.where(:cxr => cxx).delete_all
-    puts "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
+    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
     expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    puts "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
+    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
 
     loaded = 0
@@ -189,13 +232,13 @@ class OagSchedule < ActiveRecord::Base
             end
 
       end
-      puts "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
+      Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
       loaded += schedule_records.count
 
       OagSchedule.import schedule_records
       schedule_records = []
     end
-    puts "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
+    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
 
   end
   def mkt_cxrs row

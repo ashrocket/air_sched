@@ -55,7 +55,6 @@ module Oag
            entry = io.get_next_entry
            uncompressed_filename   = entry.name.squish.gsub(" ", "_")
            uncompressed_path       = File.join( File.dirname(report.attachment_path), uncompressed_filename )
-            puts "Decompressing #{report.attachment_path} to #{uncompressed_path}"
            File.open(uncompressed_path, 'wb'){|f| f << io.read}
 
            report.load_status["report_path"] = uncompressed_path

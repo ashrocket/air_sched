@@ -1,8 +1,7 @@
 class CreateDirectFlights < ActiveRecord::Migration
   def change
     create_table :direct_flights do |t|
-      t.string :cxx
-      t.string :hub
+      t.string :report_key
       t.string :origin
       t.string :dest
       t.string :carriers

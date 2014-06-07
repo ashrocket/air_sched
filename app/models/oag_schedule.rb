@@ -29,8 +29,7 @@ class OagSchedule < ActiveRecord::Base
 
 
 
-  scope :cxr,       lambda {|cxr| where("cxr = ?",  cxr)}
-  scope :hub,       lambda {|hub| where("hub = ?",  hub)}
+  scope :keyed,     lambda {|report_key| where("report_key = ?",  report_key)}
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}
   scope :effective, lambda {|theDay| where('? BETWEEN eff_date and disc_date', theDay ) }
   scope :arriving,        lambda {|dest|   where(:dest_apt => dest)            }
@@ -86,231 +85,151 @@ class OagSchedule < ActiveRecord::Base
 #    (time_string[2,2].to_i.minutes + time_string[0,2].to_i.hours) / 60
 #  end
 
-  def load_hub_schedule hub, csvdata, options={}
 
-    schedules = self.load_schedule(csvdata, options={})
-    #Compute Hub Airport
-    orig_airports = schedules.collect{ |n| n[:origin_apt] }
-    hub1 = orig_airports.group_by { |n| n }.values.max_by(&:size).first
-    dest_airports = schedules.collect{ |n| n[:dest_apt] }
-    hub2 = dest_airports.group_by { |n| n }.values.max_by(&:size).first
-    raise(RuntimeError, "HUB Indeterminate") if  hub1 != hub2
-    hub = hub1
-    self.where(:hub => hub).delete_all
-    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{hub} airport."
-
-    expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{hub} airport."
-    schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-
-    schedule_records = []
-    loaded = 0
-    schedules.in_groups_of(500) do |schedule_group|
-      schedule_group.compact.each do |sched|
-        begin
-          schedule_records << self.new(sched.merge(:hub => hub))
-        rescue Exception => e
-            puts sched
-            Rails.logger.error sched
-            Rails.logger.error e.message
-            raise RuntimeError e
-        end
-      end
-      Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{hub} airport."
-      loaded += schedule_records.count
-      OagSchedule.import schedule_records
-      schedule_records = []
-    end
-    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{hub} airport. ---"
-
-
-
-  end
-
-  def process_schedules report, csvdata, options={}
-
-    key       = report.estimated_key
-    schedules = self.load_schedule(csvdata, options={})
-
-    orig_airports = schedules.collect{ |n| n[:origin_apt] }
-    dest_airports = schedules.collect{ |n| n[:dest_apt] }
-    self.where(:key => key).delete_all
-
-    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{key}"
-
-    expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status["expired_schedules_count"] = expired.count
-
-    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{key}."
-    schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status["schedules_count"] = schedules.count
-
-    schedule_records = []
-    loaded = 0
-    schedules.in_groups_of(500) do |schedule_group|
-    schedule_group.compact.each do |sched|
-      begin
-        schedule_records << self.new(sched.merge(:key => key))
-      rescue Exception => e
-          puts sched
-          Rails.logger.error sched
-          Rails.logger.error e.message
-          raise RuntimeError e
-      end
-    end
-    Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{key}."
-    loaded += schedule_records.count
-    OagSchedule.import schedule_records
-    schedule_records = []
-  end
-  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{key} ---"
-
-  end
+  #def load_large_cxx_schedule cxx, csvdata, options={}
+  #  schedules = []
+  #  csvdata.each do |csv_data_set|
+  #    schedules << self.load_schedule(csv_data_set, options={})
+  #  end
+  #  schedules.flatten!
+  #  csvdata = nil
+  #  self.where(:cxr => cxx).delete_all
+  #  Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
+  #  expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
+  #  Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
+  #  schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
+  #
+  #  loaded = 0
+  #
+  #  schedule_records = []
+  #  schedules.in_groups_of(500) do |schedule_group|
+  #   schedule_group.compact.each do |sched|
+  #         begin
+  #           schedule_records << self.new(sched.merge(:cxr => cxx))
+  #         rescue Exception => e
+  #             puts sched
+  #             puts e
+  #             Rails.logger.error sched
+  #             Rails.logger.error e.message
+  #             raise e
+  #         end
+  #
+  #   end
+  #   Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
+  #   loaded += schedule_records.count
+  #
+  #   OagSchedule.import schedule_records
+  #   schedule_records = []
+  #  end
+  #  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
+  #end
+  #
+  #def load_cxx_schedule cxx, csvdata, options={}
+  #
+  #  schedules = self.load_schedule(csvdata, options={})
+  #  self.where(:cxr => cxx).delete_all
+  #  Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
+  #  expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
+  #  Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
+  #  schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
+  #
+  #  loaded = 0
+  #
+  #  schedule_records = []
+  #  schedules.in_groups_of(500) do |schedule_group|
+  #    schedule_group.compact.each do |sched|
+  #          begin
+  #            schedule_records << self.new(sched.merge(:cxr => cxx))
+  #          rescue Exception => e
+  #              puts sched
+  #              puts e
+  #              Rails.logger.error sched
+  #              Rails.logger.error e.message
+  #              raise e
+  #          end
+  #
+  #    end
+  #    Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
+  #    loaded += schedule_records.count
+  #
+  #    OagSchedule.import schedule_records
+  #    schedule_records = []
+  #  end
+  #  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
+  #
+  #end
 
 
-
-  def load_large_cxx_schedule cxx, csvdata, options={}
-    schedules = []
-    csvdata.each do |csv_data_set|
-      schedules << self.load_schedule(csv_data_set, options={})
-    end
-    schedules.flatten!
-    csvdata = nil
-    self.where(:cxr => cxx).delete_all
-    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
-    expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
-    schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-
-    loaded = 0
-
-    schedule_records = []
-    schedules.in_groups_of(500) do |schedule_group|
-     schedule_group.compact.each do |sched|
-           begin
-             schedule_records << self.new(sched.merge(:cxr => cxx))
-           rescue Exception => e
-               puts sched
-               puts e
-               Rails.logger.error sched
-               Rails.logger.error e.message
-               raise e
-           end
-
-     end
-     Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
-     loaded += schedule_records.count
-
-     OagSchedule.import schedule_records
-     schedule_records = []
-    end
-    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
-  end
-
-  def load_cxx_schedule cxx, csvdata, options={}
-
-    schedules = self.load_schedule(csvdata, options={})
-    self.where(:cxr => cxx).delete_all
-    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{cxx} carrier."
-    expired = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{cxx} carrier."
-    schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-
-    loaded = 0
-
-    schedule_records = []
-    schedules.in_groups_of(500) do |schedule_group|
-      schedule_group.compact.each do |sched|
-            begin
-              schedule_records << self.new(sched.merge(:cxr => cxx))
-            rescue Exception => e
-                puts sched
-                puts e
-                Rails.logger.error sched
-                Rails.logger.error e.message
-                raise e
-            end
-
-      end
-      Rails.logger.info "Loading  #{schedule_records.count} valid schedules into the DB  for #{cxx} carrier."
-      loaded += schedule_records.count
-
-      OagSchedule.import schedule_records
-      schedule_records = []
-    end
-    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{cxx} carrier. ---"
-
-  end
   def mkt_cxrs row
     mkt_cxrs = [row[:dupcar1], row[:dupcar2], row[:dupcar3], row[:dupcar4],
                 row[:dupcar5], row[:dupcar6], row[:dupcar7], row[:dupcar8]].compact
     mkt_cxrs.delete_if{|v| v.eql?"0"}
     mkt_cxrs.join ';'
   end
-  def load_schedule csvdata, options={}
-    schedules = []
-
-    csvdata.each do |row|
-
-
-
-       #case row[:dupmarker]
-       #when /D|P/
-       #end
-
-       sched =
-       {
-           :eff_date     =>  row[:efffrom],  :disc_date 	  => row[:effto],
-           :airline_code => row[:carrier1],  :airline_name	=> row[:carrier1name],
-           :flight_num   => row[:flightno1],
-           :shared_airline_code => row[:shairldes], :shared_airline_name => row[:shrairlinedesname],
-           :origin_apt => row[:depairport], :dest_apt => row[:arrairport],
-           :origin_apt_name => row[:depairportname],
-           :origin_apt_city => row[:depcityname],
-           :dest_apt_name => row[:arrairportname],
-           :dest_apt_city => row[:arrcityname],
-           :dep_time_local   => row[:localdeptime], :arr_time_local   => row[:localarrtime],
-           :next_day_arrival => row[:localarrday],
-           :dep_op_days => row[:localdaysofop], :arr_op_days => row[:arrdaysofop],
-           :duration    => row[:elapsedtime],
-           :stops => row[:stops],  :restrictions => row[:restrictions],
-           :mkt => row[:routing], :mkt_cxrs => mkt_cxrs(row),
-           :via_apts => row[:intairports]
-
-       }
-       sched[:op] = true if row[:opcar].eql? 'O'
-       case row[:opcar]
-       when /O/
-         if not sched[:shared_airline_code].blank?
-           sched[:op_cxr_code] = sched[:shared_airline_code]
-           sched[:op_cxr_name] = sched[:shared_airline_name]
-         else
-           sched[:op_cxr_code]   = sched[:airline_code]
-           sched[:op_cxr_name]   = sched[:airline_name]
-           sched[:op_flight_num] = sched[:flight_num]
-
-         end
-       when /N/
-         if not row[:dupcar1].blank?
-           op_data = row[:dupcar1].split ' '
-           sched[:op_cxr_code] = op_data[0]
-           sched[:op_flight_num] = op_data[1]
-           if sched[:op_cxr_code].eql? sched[:shared_airline_code]
-                sched[:op_cxr_name] = sched[:shared_airline_name]
-           else
-                sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
-           end
-
-         else
-          sched[:op_cxr_code] = sched[:shared_airline_code]
-          sched[:op_cxr_name] = sched[:shared_airline_name]
-         end
-       end
-       schedules << sched
-    end
-    schedules
-
-  end
+  #def load_schedule csvdata, options={}
+  #  schedules = []
+  #
+  #  csvdata.each do |row|
+  #
+  #
+  #
+  #     #case row[:dupmarker]
+  #     #when /D|P/
+  #     #end
+  #
+  #     sched =
+  #     {
+  #         :eff_date     =>  row[:efffrom],  :disc_date 	  => row[:effto],
+  #         :airline_code => row[:carrier1],  :airline_name	=> row[:carrier1name],
+  #         :flight_num   => row[:flightno1],
+  #         :shared_airline_code => row[:shairldes], :shared_airline_name => row[:shrairlinedesname],
+  #         :origin_apt => row[:depairport], :dest_apt => row[:arrairport],
+  #         :origin_apt_name => row[:depairportname],
+  #         :origin_apt_city => row[:depcityname],
+  #         :dest_apt_name => row[:arrairportname],
+  #         :dest_apt_city => row[:arrcityname],
+  #         :dep_time_local   => row[:localdeptime], :arr_time_local   => row[:localarrtime],
+  #         :next_day_arrival => row[:localarrday],
+  #         :dep_op_days => row[:localdaysofop], :arr_op_days => row[:arrdaysofop],
+  #         :duration    => row[:elapsedtime],
+  #         :stops => row[:stops],  :restrictions => row[:restrictions],
+  #         :mkt => row[:routing], :mkt_cxrs => mkt_cxrs(row),
+  #         :via_apts => row[:intairports]
+  #
+  #     }
+  #     sched[:op] = true if row[:opcar].eql? 'O'
+  #     case row[:opcar]
+  #     when /O/
+  #       if not sched[:shared_airline_code].blank?
+  #         sched[:op_cxr_code] = sched[:shared_airline_code]
+  #         sched[:op_cxr_name] = sched[:shared_airline_name]
+  #       else
+  #         sched[:op_cxr_code]   = sched[:airline_code]
+  #         sched[:op_cxr_name]   = sched[:airline_name]
+  #         sched[:op_flight_num] = sched[:flight_num]
+  #
+  #       end
+  #     when /N/
+  #       if not row[:dupcar1].blank?
+  #         op_data = row[:dupcar1].split ' '
+  #         sched[:op_cxr_code] = op_data[0]
+  #         sched[:op_flight_num] = op_data[1]
+  #         if sched[:op_cxr_code].eql? sched[:shared_airline_code]
+  #              sched[:op_cxr_name] = sched[:shared_airline_name]
+  #         else
+  #              sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
+  #         end
+  #
+  #       else
+  #        sched[:op_cxr_code] = sched[:shared_airline_code]
+  #        sched[:op_cxr_name] = sched[:shared_airline_name]
+  #       end
+  #     end
+  #     schedules << sched
+  #  end
+  #  schedules
+  #
+  #end
 
   def build_connections(dep_date, mode_key, d, stops, maxct, earliest_arrival_time, is_next_day_arrival)
     #offset_time     = (earliest_arrival_time.seconds_until_end_of_day() + 1 )/60

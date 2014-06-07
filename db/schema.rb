@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140602031136) do
+ActiveRecord::Schema.define(version: 20140103000090) do
 
   create_table "airlines", force: true do |t|
     t.string "code"
@@ -47,35 +47,17 @@ ActiveRecord::Schema.define(version: 20140602031136) do
   add_index "carriers", ["slug"], name: "index_carriers_on_slug", unique: true, using: :btree
 
   create_table "cnx_pairs", force: true do |t|
-    t.string "cxr"
-    t.string "hub"
-    t.string "origin"
+    t.string "report_key",  limit: 12
+    t.string "origin",      limit: 4
     t.string "origin_name"
-    t.string "dest"
+    t.string "dest",        limit: 4
     t.string "dest_name"
   end
 
-  add_index "cnx_pairs", ["origin", "dest", "origin_name", "dest_name"], name: "cnx_pairs_o_and_d", using: :btree
-
-  create_table "delayed_jobs", force: true do |t|
-    t.integer  "priority",   default: 0, null: false
-    t.integer  "attempts",   default: 0, null: false
-    t.text     "handler",                null: false
-    t.text     "last_error"
-    t.datetime "run_at"
-    t.datetime "locked_at"
-    t.datetime "failed_at"
-    t.string   "locked_by"
-    t.string   "queue"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
+  add_index "cnx_pairs", ["report_key", "origin", "dest", "origin_name", "dest_name"], name: "cnx_pairs_o_and_d", using: :btree
 
   create_table "destinations", force: true do |t|
-    t.string "hub"
-    t.string "cxx"
+    t.string "report_key"
     t.string "origin"
     t.string "origin_code"
     t.string "cxrs1"
@@ -87,8 +69,7 @@ ActiveRecord::Schema.define(version: 20140602031136) do
   end
 
   create_table "direct_flights", force: true do |t|
-    t.string "cxx"
-    t.string "hub"
+    t.string "report_key"
     t.string "origin"
     t.string "dest"
     t.string "carriers"
@@ -124,18 +105,20 @@ ActiveRecord::Schema.define(version: 20140602031136) do
 
   create_table "oag_reports", force: true do |t|
     t.string   "msg_id"
+    t.string   "report_key"
     t.text     "load_status"
+    t.string   "report_status",     default: "uninitialized"
+    t.string   "attachment_status", default: "unstored"
     t.datetime "received"
     t.string   "attachment_path"
     t.integer  "attachment_size"
+    t.boolean  "complete",          default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "oag_schedules", force: true do |t|
-    t.string   "cxr"
-    t.string   "hub"
-    t.string   "key"
+    t.string   "report_key"
     t.datetime "eff_date"
     t.datetime "disc_date"
     t.string   "airline_code"
@@ -169,19 +152,28 @@ ActiveRecord::Schema.define(version: 20140602031136) do
   end
 
   add_index "oag_schedules", ["airline_code", "flight_num"], name: "oag_flight_id", using: :btree
-  add_index "oag_schedules", ["cxr", "disc_date"], name: "oag_cxr_disc_date", using: :btree
-  add_index "oag_schedules", ["cxr", "eff_date", "disc_date", "origin_apt", "dep_time_local"], name: "oag_cxr_origins", using: :btree
-  add_index "oag_schedules", ["cxr", "eff_date", "disc_date"], name: "oag_cxr_eff_disc_dates", using: :btree
-  add_index "oag_schedules", ["cxr", "eff_date"], name: "oag_cxr_eff_date", using: :btree
   add_index "oag_schedules", ["dep_time_local", "flight_num"], name: "oag_flight_id_time", using: :btree
   add_index "oag_schedules", ["dest_apt"], name: "index_oag_schedules_on_dest_apt", using: :btree
-  add_index "oag_schedules", ["hub", "disc_date"], name: "oag_disc_date", using: :btree
-  add_index "oag_schedules", ["hub", "eff_date", "disc_date", "origin_apt", "dep_time_local"], name: "oag_origins", using: :btree
-  add_index "oag_schedules", ["hub", "eff_date", "disc_date"], name: "oag_eff_disc_dates", using: :btree
-  add_index "oag_schedules", ["hub", "eff_date"], name: "oag_eff_date", using: :btree
   add_index "oag_schedules", ["mkt"], name: "index_oag_schedules_on_mkt", using: :btree
   add_index "oag_schedules", ["origin_apt", "dest_apt"], name: "oag_comp_mkt", using: :btree
   add_index "oag_schedules", ["origin_apt"], name: "index_oag_schedules_on_origin_apt", using: :btree
+  add_index "oag_schedules", ["report_key", "disc_date"], name: "oag_disc_date", using: :btree
+  add_index "oag_schedules", ["report_key", "eff_date", "disc_date", "origin_apt", "dep_time_local"], name: "oag_origins", using: :btree
+  add_index "oag_schedules", ["report_key", "eff_date", "disc_date"], name: "oag_eff_disc_dates", using: :btree
+  add_index "oag_schedules", ["report_key", "eff_date"], name: "oag_eff_date", using: :btree
+
+  create_table "report_keys", force: true do |t|
+    t.string   "report_key"
+    t.string   "name"
+    t.string   "city"
+    t.boolean  "active"
+    t.string   "slug"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "report_keys", ["report_key"], name: "index_report_keys_on_report_key", unique: true, using: :btree
+  add_index "report_keys", ["slug"], name: "index_report_keys_on_slug", unique: true, using: :btree
 
   create_table "settings", force: true do |t|
     t.string   "var",                   null: false

@@ -1,10 +1,8 @@
 require 'thread'
+require 'mastiff'
 
 module Oag
-  module Process
-  extend self
-
-
+  class Process
     #def job_from_filename(job_type, filename)
     #   test_string = filename.upcase
     #   matches = test_string.match(/#{job_type}[^a-zA-Z0-9]?([a-zA-Z0-9]+)/)
@@ -33,191 +31,140 @@ module Oag
     #      process_cxx job
     #  end
     #end
-
-    def process_oag_file report
-      if File.exist? report.attachment_path
-        report.load_status["attachment_status"]  = 'stored'
-        attach_size = File.stat(report.attachment_path).size
-        report.attachment_size = attach_size
-        report.load_status["attachment_size"]  = attach_size
-      end
-
-      ext = File.extname(report.attachment_path)
-
-      if ext.eql? '.csv'
-        if File.exists? report.attachment_path
-          report.load_status["attachment_status"]  = 'uncompressed'
-          report.load_status["report_path"]        = report.attachment_path
-          report.load_status["report_size"]        = report.load_status["attachment_size"]
+    def refresh_airports report
+        origins      = OagSchedule.keyed(report.report_key).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
+        destinations = OagSchedule.keyed(report.report_key).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
+        airports = (origins + destinations).uniq!
+        airports.each do |airport|
+           apt = Airport.where(code: airport[0]).first_or_create!
+           apt.name = airport[1]
+           apt.city = airport[2]
+           apt.save
         end
-      elsif ext.eql? '.zip'
-        Zip::InputStream::open(report.attachment_path) {|io|
-           entry = io.get_next_entry
-           uncompressed_filename   = entry.name.squish.gsub(" ", "_")
-           uncompressed_path       = File.join( File.dirname(report.attachment_path), uncompressed_filename )
-           File.open(uncompressed_path, 'wb'){|f| f << io.read}
+        report.report_status = 'airports_refreshed'
 
-           report.load_status["report_path"] = uncompressed_path
-           report.load_status["report_size"] = File.stat(uncompressed_path).size
-           report.save
-
-        }
-      end
     end
 
+    def refresh_direct_flights(report)
+        DirectFlight.keyed(report.report_key).delete_all
+        direct_flight_records = []
 
+        schedules = OagSchedule.keyed(report.report_key).select(:origin_apt, :dest_apt, :airline_code, :mkt_cxrs ).distinct
+        grouped_schedules = schedules.group_by{|flt| [flt.origin_apt, flt.dest_apt] }.map{ |apt_pair,sched_a|
+                                       [apt_pair, (sched_a.map{|sched| sched.airline_code } +
+                                             sched_a.map{|sched| sched.mkt_carriers}.flatten(1)).uniq]}
+        grouped_schedules.sort!
+        grouped_schedules.each do |combo|
+          direct_flight_records << DirectFlight.new(report_key: report.report_key, origin: combo[0][0], dest: combo[0][1], carriers: combo[1])
+        end
+        DirectFlight.import direct_flight_records
+        report.report_status = 'direct_flights_refreshed'
+
+    end
+
+    def refresh_destinations report
+        Destination.keyed(report.report_key).delete_all
+        direct_flights = DirectFlight.keyed(report.report_key).to_a
+        cnx = []
+        connections = []
+        # Let's cache the results to limit DB Hits.
+        cache = {}
+
+        origins      = DirectFlight.keyed(report.report_key).pluck(:origin).uniq
+        direct_pairs = DirectFlight.keyed(report.report_key).pluck(:origin, :dest)
+        direct_pairs.sort!
+        direct_pairs_hash = direct_pairs.group_by{|pair| pair[0]}
+
+        origins.each do |o_apt|
+          if cache.has_key? o_apt
+            hub_apts = cache[o_apt].dup
+          else
+            hub_apts = direct_flights.select{|r| r.origin.eql? o_apt}.map{|r| r.dest}.uniq
+            cache[o_apt] =  hub_apts.dup
+          end
+
+          hub_apts.each do |hub|
+            if cache.has_key? hub
+              dest_apts = cache[hub].dup
+            else
+              dest_apts = direct_flights.select{|r| r.origin.eql? hub}.map{|r| r.dest}.uniq
+
+              cache[hub] =  dest_apts.dup
+            end
+
+            dest_apts.delete_if{|apt| apt.eql? o_apt}
+            dest_apts.each do |dest|
+              cnx << [o_apt,hub,dest] unless o_apt.eql? dest
+            end
+          end
+        end
+        Rails.logger.info "Unique Connection Pairs not filtered for Direct Flight Exclusion rule #{cnx.count}"
+        cnx.delete_if{|row| direct_pairs_hash[row[0]].include? [row[0],row[2]] }
+        Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count}"
+        tot = cnx.count
+        cnx.in_groups_of(1000) do |cnx_group|
+          puts "Building #{cnx_group.count} connections out of #{tot} remaining"
+          tot -= 1000
+          cnx_group.compact.each do |row|
+           o_name = Airport.cached_name(row[0])
+           h_name = Airport.cached_name(row[1])
+           d_name = Airport.cached_name(row[2])
+           connections << Destination.new(report_key: report.report_key, origin: o_name, origin_code: row[0],
+                                          hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2]
+
+           )
+          end
+          Destination.import connections
+          connections = []
+        end
+        report.report_status = 'destinations_refreshed'
+
+    end
+
+    def refresh_cnx_pairs(report)
+          pairs = []
+          connections = []
+          CnxPair.keyed(report.report_key).delete_all
+
+          pairs =  Destination.keyed(report.report_key).pluck(:origin_code, :dest_code).uniq
+          tot = pairs.count
+          pairs.in_groups_of(1000) do |pair_group|
+            puts "Building #{pair_group.count} connection pairs out of #{tot} remaining"
+            tot -= 1000
+            pair_group.compact.each do |pair|
+               o_name =  Airport.cached_name(pair[0])
+               d_name = Airport.cached_name(pair[1])
+               connections << CnxPair.new(origin: pair[0], origin_name: o_name, dest: pair[1], dest_name: d_name)
+            end
+            CnxPair.import connections
+            connections = []
+          end
+          report.report_status = 'connections_refreshed'
+
+    end
+    def finalize report
+        File.delete report.attachment_path
+        File.delete report.report_path
+        Mastiff::Email.finalize([report.msg_id])
+        report.load_status["attachment_status"] = 'processed'
+        report.report_status                    = 'finished'
+        report.save
+    end
 
     def import_oag_file report
         begin
-          Oag::Import.parse_and_load_report report
-
+          importer = Oag::Import.new
+          importer.parse_and_load_report report
+          report.report_status = 'schedules_loaded'
         rescue Exception => ex
+               byebug
                Rails.logger.info ex.message
                Rails.logger.info report.inspect
         end
-        #Airport.refresh_from_hub report_key
-        #
-        #
-        #DirectFlight.load_by_hub(report_key)
-        #Destination.load_by_hub(report_key)
-        #CnxPair.load_by_hub(report_key)
-        #apt = Airport.find_by(code: report_key)
-        #hub = Hub.where(code: report_key).first_or_create
-        #hub.name = apt.name
-        #hub.active = true
-        #hub.save
-        #if job[:archive].blank?
-        #  job[:archive] = "#{job[:tmpfile]}.zip"
-        #  unless File.exists? job[:archive]
-        #    Oag::Util.compress_report(job[:archive], job[:tmpfile])
-        #  end
-        #end
-        #FileUtils.mv job[:archive], File.join("data","oag","processed", "." )
+
 
     end
 
 
-  #
-  #  def process_hub job
-  #      if job[:tmpfile].blank?
-  #        job[:tmpfile] = job[:archive][0..-5]
-  #        ext = File.extname(job[:tmpfile])
-  #        unless ext.eql? '.csv'
-  #          job[:tmpfile] = "#{job[:tmpfile]}.csv"
-  #        end
-  #
-  #        unless File.exists? job[:tmpfile]
-  #          Oag::Util.uncompress_report(job[:archive], job[:tmpfile])
-  #        end
-  #      end
-  #
-  #
-  #      csv_string = File.readlines(job[:tmpfile]).join
-  #      begin
-  #         Oag::Import.parse_hub job[:key], csv_string
-  #      rescue Exception => ex
-  #             Rails.logger.info ex.message
-  #             Rails.logger.info job
-  #      end
-  #      Airport.refresh_from_hub job[:key]
-  #
-  #
-  #      DirectFlight.load_by_hub(job[:key])
-  #      Destination.load_by_hub(job[:key])
-  #      CnxPair.load_by_hub(job[:key])
-  #      apt = Airport.find_by(code: job[:key])
-  #      hub = Hub.where(code: job[:key]).first_or_create
-  #      hub.name = apt.name
-  #      hub.active = true
-  #      hub.save
-  #      if job[:archive].blank?
-  #        job[:archive] = "#{job[:tmpfile]}.zip"
-  #        unless File.exists? job[:archive]
-  #          Oag::Util.compress_report(job[:archive], job[:tmpfile])
-  #        end
-  #      end
-  #      FileUtils.mv job[:archive], File.join("data","oag","processed", "." )
-  #      File.delete job[:tmpfile]
-  #
-  #  end
-  #
-  #  def process_cxx job
-  #      if job[:tmpfile].blank?
-  #        job[:tmpfile] = job[:archive][0..-5]
-  #        ext = File.extname(job[:tmpfile])
-  #        unless ext.eql? '.csv'
-  #          job[:tmpfile] = "#{job[:tmpfile]}.csv"
-  #        end
-  #
-  #        unless File.exists? job[:tmpfile]
-  #          Oag::Util.uncompress_report(job[:archive], job[:tmpfile])
-  #        end
-  #      end
-  #      linecount = %x{wc -l < "#{job[:tmpfile]}"}.to_i
-  #      if linecount < 100000
-  #        csv_string = File.readlines(job[:tmpfile]).join
-  #        begin
-  #           Oag::Import.parse_cxx job[:key], csv_string
-  #        rescue Exception => ex
-  #               Rails.logger.info ex.message
-  #               Rails.logger.info job
-  #        end
-  #      else
-  #        begin
-  #          Oag::Import.parse_large_cxx job[:key], job[:tmpfile]
-  #        rescue Exception => ex
-  #               Rails.logger.info ex.message
-  #               Rails.logger.info job
-  #        end
-  #      end
-  #
-  #      Airport.refresh_from_cxx job[:key]
-  #
-  #      DirectFlight.load(job[:key])
-  #
-  #      Destination.load(job[:key])
-  #
-  #      CnxPair.load(job[:key])
-  #
-  #      cxr = Airline.find_by(code: job[:key])
-  #      cxx = Carrier.find_or_create_by(code: job[:key])
-  #
-  #      cxx.name    = cxr.name
-  #      cxx.country = cxr.country
-  #      cxx.active = true
-  #      cxx.save
-  #      if job[:archive].blank?
-  #        job[:archive] = "#{job[:tmpfile]}.zip"
-  #        unless File.exists? job[:archive]
-  #          Oag::Util.compress_report(job[:archive], job[:tmpfile])
-  #        end
-  #      end
-  #      FileUtils.mv job[:archive], File.join("data","oag","processed", "." )
-  #      File.delete job[:tmpfile]
-  #  end
-  #
-  #
-  #  def handle job
-  #      case job[:job]
-  #      when "REJ"
-  #        File.delete job[:archive]
-  #        File.delete job[:tmpfile]
-  #      when "HUB"
-  #        process_hub job
-  #
-  #      when "CXX"
-  #        process_cxx job
-  #
-  #      end
-  #      #url = S3Uploader.save task_details[:archive]
-  #      #OAGReport.first_or_create!(:url => url,
-  #      #                           :filename => report.filename,
-  #      #                           :datecode => message.date.strftime("%Y%m%d"),
-  #      #                           :report_type => report_type)
-  #
-  #  end
-  #
-  #
-  #
   end
 end

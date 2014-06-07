@@ -7,11 +7,13 @@ class SyncAttachmentWorker
     msg = Mastiff::Email::Message.get(message_id)
 
     if msg.uploader and msg.stored_filename
-         attachment_path = File.join( msg.uploader.store_dir,  msg.stored_filename)
+         att_path = File.join( msg.uploader.store_dir,  msg.stored_filename)
     end
-    report = OagReport.where(msg_id: message_id).first_or_create(attachment_path: attachment_path)
-    report.load_status  = { email_status: 'cached', attachment_status: 'unstored', report_status: 'queued'}
-    report.received   = Time.now
+    report = OagReport.where(msg_id: message_id).first_or_create
+    report.attachment_path   = att_path
+    report.attachment_status = File.exist?(att_path) ? 'stored' : 'unstored'
+    report.load_status       = { email_status: 'cached', attachment_status: ''}
+    report.received          = msg.header[:date]
     report.save
 
     msg.sync_message_attachments

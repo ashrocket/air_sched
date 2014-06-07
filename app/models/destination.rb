@@ -10,8 +10,9 @@ class Destination < ActiveRecord::Base
   # :cxr2
   # :dest
   # :dest_code
-  scope :cxx,  lambda {|cxx| where("cxx = ?",  cxx)}
-  scope :hub,       lambda {|hub| where("hub = ?",  hub)}
+  scope :keyed,  lambda {|report_key| where("report_key = ?",  report_key)}
+  #scope :cxx,  lambda {|cxx| where("cxx = ?",  cxx)}
+  #scope :hub,       lambda {|hub| where("hub = ?",  hub)}
   class << self
     #
     # Scopes
@@ -64,60 +65,60 @@ class Destination < ActiveRecord::Base
   # -----
   # Data base loader
   # ----
-  def load cxr
-      where(cxx: cxr).delete_all
-      direct_flights = DirectFlight.cxx(cxr).to_a
-      cnx = []
-      connections = []
-      # Let's cache the results to limit DB Hits.
-      cache = {}
-
-      origins      = DirectFlight.cxx(cxr).pluck(:origin).uniq
-      direct_pairs = DirectFlight.cxx(cxr).pluck(:origin, :dest)
-      direct_pairs.sort!
-      direct_pairs_hash = direct_pairs.group_by{|pair| pair[0]}
-      origins.each do |o_apt|
-        if cache.has_key? o_apt
-          hub_apts = cache[o_apt].dup
-        else
-          hub_apts = direct_flights.select{|r| r.origin.eql? o_apt}.map{|r| r.dest}.uniq
-          cache[o_apt] =  hub_apts.dup
-        end
-
-
-        hub_apts.each do |hub|
-          if cache.has_key? hub
-            dest_apts = cache[hub].dup
-          else
-            dest_apts = direct_flights.select{|r| r.origin.eql? hub}.map{|r| r.dest}.uniq
-
-            cache[hub] =  dest_apts.dup
-          end
-
-          dest_apts.delete_if{|apt| apt.eql? o_apt}
-          dest_apts.each do |dest|
-            cnx << [o_apt,hub,dest] unless o_apt.eql? dest
-          end
-        end
-      end
-      Rails.logger.info "Unique Connection Pairs not filtered for Direct Flight Exclusion rule #{cnx.count}"
-      cnx.delete_if{|row| direct_pairs_hash[row[0]].include? [row[0],row[2]] }
-      Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count}"
-      tot = cnx.count
-      cnx.in_groups_of(1000) do |cnx_group|
-        puts "Building #{cnx_group.count} connections out of #{tot} remaining"
-        tot -= 1000
-        cnx_group.compact.each do |row|
-         o_name = Airport.cached_name(row[0])
-         h_name = Airport.cached_name(row[1])
-         d_name = Airport.cached_name(row[2])
-         connections << self.new(cxx: cxr, origin: o_name, origin_code: row[0], hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2], cxrs1: [cxr].join(","), cxrs2: [cxr].join(","))
-        end
-        Destination.import connections
-        connections = []
-      end
-
-  end
+  #def load cxr
+  #    where(cxx: cxr).delete_all
+  #    direct_flights = DirectFlight.cxx(cxr).to_a
+  #    cnx = []
+  #    connections = []
+  #    # Let's cache the results to limit DB Hits.
+  #    cache = {}
+  #
+  #    origins      = DirectFlight.cxx(cxr).pluck(:origin).uniq
+  #    direct_pairs = DirectFlight.cxx(cxr).pluck(:origin, :dest)
+  #    direct_pairs.sort!
+  #    direct_pairs_hash = direct_pairs.group_by{|pair| pair[0]}
+  #    origins.each do |o_apt|
+  #      if cache.has_key? o_apt
+  #        hub_apts = cache[o_apt].dup
+  #      else
+  #        hub_apts = direct_flights.select{|r| r.origin.eql? o_apt}.map{|r| r.dest}.uniq
+  #        cache[o_apt] =  hub_apts.dup
+  #      end
+  #
+  #
+  #      hub_apts.each do |hub|
+  #        if cache.has_key? hub
+  #          dest_apts = cache[hub].dup
+  #        else
+  #          dest_apts = direct_flights.select{|r| r.origin.eql? hub}.map{|r| r.dest}.uniq
+  #
+  #          cache[hub] =  dest_apts.dup
+  #        end
+  #
+  #        dest_apts.delete_if{|apt| apt.eql? o_apt}
+  #        dest_apts.each do |dest|
+  #          cnx << [o_apt,hub,dest] unless o_apt.eql? dest
+  #        end
+  #      end
+  #    end
+  #    Rails.logger.info "Unique Connection Pairs not filtered for Direct Flight Exclusion rule #{cnx.count}"
+  #    cnx.delete_if{|row| direct_pairs_hash[row[0]].include? [row[0],row[2]] }
+  #    Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count}"
+  #    tot = cnx.count
+  #    cnx.in_groups_of(1000) do |cnx_group|
+  #      puts "Building #{cnx_group.count} connections out of #{tot} remaining"
+  #      tot -= 1000
+  #      cnx_group.compact.each do |row|
+  #       o_name = Airport.cached_name(row[0])
+  #       h_name = Airport.cached_name(row[1])
+  #       d_name = Airport.cached_name(row[2])
+  #       connections << self.new(cxx: cxr, origin: o_name, origin_code: row[0], hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2], cxrs1: [cxr].join(","), cxrs2: [cxr].join(","))
+  #      end
+  #      Destination.import connections
+  #      connections = []
+  #    end
+  #
+  #end
   def load_by_hub hub
     where(hub: hub).delete_all
       direct_flights = DirectFlight.hub(hub).to_a

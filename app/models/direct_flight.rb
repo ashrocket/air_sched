@@ -15,6 +15,9 @@ class DirectFlight < ActiveRecord::Base
     def hub apt
       where("hub = ?",  apt)
     end
+    def keyed report_key
+      where("report_key = ?",  report_key)
+    end
     def pair o,d
       where(origin: o, dest: d)
     end
@@ -112,6 +115,9 @@ class DirectFlight < ActiveRecord::Base
         end
         DirectFlight.import direct_flight_records
     end
+
+
+
   end #   class << self
 
 end

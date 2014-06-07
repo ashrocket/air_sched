@@ -17,28 +17,30 @@ class Airport < ActiveRecord::Base
     cached(code).name
   end
 
-  def refresh_from_cxx cxx
-    origins      = OagSchedule.cxr(cxx).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
-    destinations = OagSchedule.cxr(cxx).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
-    airports = (origins + destinations).uniq!
-    airports.each do |airport|
-       apt = self.where(code: airport[0]).first_or_create!
-       apt.name = airport[1]
-       apt.city = airport[2]
-       apt.save
-     end
-  end
-  def refresh_from_hub hub
-    origins      = OagSchedule.hub(hub).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
-    destinations = OagSchedule.hub(hub).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
-    airports = (origins + destinations).uniq!
-    airports.each do |airport|
-       apt = self.where(code: airport[0]).first_or_create!
-       apt.name = airport[1]
-       apt.city = airport[2]
-       apt.save
-     end
-  end
+  #def refresh_from_cxx cxx
+  #  origins      = OagSchedule.cxr(cxx).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
+  #  destinations = OagSchedule.cxr(cxx).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
+  #  airports = (origins + destinations).uniq!
+  #  airports.each do |airport|
+  #     apt = self.where(code: airport[0]).first_or_create!
+  #     apt.name = airport[1]
+  #     apt.city = airport[2]
+  #     apt.save
+  #   end
+  #end
+  #def refresh_from_hub hub
+  #  origins      = OagSchedule.hub(hub).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
+  #  destinations = OagSchedule.hub(hub).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
+  #  airports = (origins + destinations).uniq!
+  #  airports.each do |airport|
+  #     apt = self.where(code: airport[0]).first_or_create!
+  #     apt.name = airport[1]
+  #     apt.city = airport[2]
+  #     apt.save
+  #   end
+  #end
+
+
 
 
   end # End Class methods

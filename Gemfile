@@ -47,7 +47,8 @@ gem 'rails-settings-cached'
 gem 'roo'
 
 
-gem 'mastiff', path: '../mastiff'
+gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
+#gem 'mastiff', path: '../mastiff'
 
 
 group :development, :test do

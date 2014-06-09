@@ -1,6 +1,7 @@
 class OagReport < ActiveRecord::Base
   serialize :load_status, JSON
 
+  scope :incomplete,  -> { where(complete: false) }
 
   def report_path
     load_status["report_path"]
@@ -22,7 +23,7 @@ class OagReport < ActiveRecord::Base
       key_type    = report_name[0..2]
 
       if (['HUB','CXX', 'ABB'].include?(key_type))
-        matches = report_name[3..-1].match /^(.*?)_/
+        matches = report_name[3..-1].match /[^A-Za-z](.*)_/
         return  matches.captures.first
       end
       return nil

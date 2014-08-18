@@ -32,6 +32,8 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  Sidekiq.default_worker_options = { :queue => :schedule_loader }
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 end

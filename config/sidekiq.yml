@@ -3,3 +3,4 @@
   - default
   - email_queue
   - report_queue
+:logfile: log/air_sched_sidekiq.log

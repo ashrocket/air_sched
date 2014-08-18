@@ -53,6 +53,7 @@ spec/dummy/db/development.sqlite3
 spec/dummy/db/test.sqlite3
 log/development.log
 log/sidekiq.log
+log/air_sched_sidekiq.log
 spec/dummy/log/development.log
 log/test.log
 spec/dummy/log/test.log

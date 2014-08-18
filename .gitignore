@@ -52,6 +52,7 @@ spec/dummy/config/sidekiq.yml
 spec/dummy/db/development.sqlite3
 spec/dummy/db/test.sqlite3
 log/development.log
+log/sidekiq.log
 spec/dummy/log/development.log
 log/test.log
 spec/dummy/log/test.log

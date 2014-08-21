@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
   resource :mail, :controller => 'emails', only: [:index] do
            get '/', action: :index
            get 'msg_ids',  format: 'json'

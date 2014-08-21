@@ -5,17 +5,19 @@ class ProcessAttachmentWorker
   sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
 
   def perform(message_id)
-    msg = Mastiff::Email::Message.get(message_id)
+    if AppSwitch.on?('autoload')
+      msg = Mastiff::Email::Message.get(message_id)
 
-    report = OagReport.where(msg_id: message_id).first
-    if report
-      unless report.load_status["attachment_status"].eql?('uncompressed')
-        report.process_oag_file
-        report.report_status =  'queued' if report.report_status.eql? 'uninitialized'
-        report.save
+      report = OagReport.where(msg_id: message_id).first
+      if report
+        unless report.load_status["attachment_status"].eql?('uncompressed')
+          report.process_oag_file
+          report.report_status =  'queued' if report.report_status.eql? 'uninitialized'
+          report.save
+        end
+        ScheduleImportWorker.perform_async(report.id)
       end
-      ScheduleImportWorker.perform_async(report.id)
-    end
+    end  
 
     #Do Something here with the message
     #

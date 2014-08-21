@@ -42,7 +42,7 @@ module Oag
            apt.save
         end
         report.report_status = 'airports_refreshed'
-
+        report.save
     end
 
     def refresh_direct_flights(report)
@@ -59,7 +59,7 @@ module Oag
         end
         DirectFlight.import direct_flight_records
         report.report_status = 'direct_flights_refreshed'
-
+        report.save
     end
 
     def refresh_destinations report
@@ -118,7 +118,7 @@ module Oag
           connections = []
         end
         report.report_status = 'destinations_refreshed'
-
+        report.save
     end
 
     def refresh_cnx_pairs(report)
@@ -140,8 +140,10 @@ module Oag
             connections = []
           end
           report.report_status = 'connections_refreshed'
+          report.save
 
     end
+    #TODO provide the option to store the processed files in the processed folder
     def finalize report
         File.delete report.attachment_path
         File.delete report.report_path
@@ -156,6 +158,7 @@ module Oag
           importer = Oag::Import.new
           importer.parse_and_load_report report
           report.report_status = 'schedules_loaded'
+          report.save
         rescue Exception => ex
                byebug
                Rails.logger.info ex.message

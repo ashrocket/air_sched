@@ -165,7 +165,7 @@ class OagSchedule < ActiveRecord::Base
       end
       trips[:rt]    = rt_voyages
       if req.owrt.eql? "RT"
-       r_hubs  = Destination..hubs(req.data_key, req.dest_code,  req.origin_code)
+       r_hubs  = Destination.hubs(req.data_key, req.dest_code,  req.origin_code)
        r_hubs.each do |selected_hub|
          voyage = {hub: selected_hub}
          voyage[:journeys] = connections_via_hub(req.data_key, req.dest_code, req.origin_code, selected_hub, req.depart, req.mct, req.maxct, req.stops, req.cxrs)

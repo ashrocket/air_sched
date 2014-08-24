@@ -12,7 +12,7 @@
         .panel-body
           The following flight combinations will get you from #{@search_request.origin} to #{@search_request.dest}
         = render partial: "search/results", locals: {results: @search_results[:one_hub_trips][:ob], direction: "ob"}
-      - unless @search_results[:rt].blank?
+      - unless @search_results[:one_hub_trips][:rt].blank?
         .panel-heading Return Flight Options
         = render partial: "search/results", locals: {results: @search_results[:one_hub_trips][:rt], direction: "rt"}
   .row

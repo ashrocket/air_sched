@@ -132,7 +132,7 @@ class OagSchedule < ActiveRecord::Base
 
 
         if conn_flights.blank?
-           errors << "No Connecting Schedules found between #{hub} and #{d} on #{travel_date} to #{maxmaxct} minutes"
+           errors << "No Connecting Schedules found between #{hub} and #{d} on #{travel_date} to #{maxct} minutes"
         end
         selected_connections = {}
         mct_invalid = {}

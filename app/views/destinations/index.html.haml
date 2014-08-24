@@ -31,7 +31,7 @@
     - @destinations.each do |dest|
       .row
         .col-sm-12
-          = "#{dest.origin} #{dest.origin_code} #{dest.hub_name} #{dest.hub_code} #{dest.dest} #{dest.dest_code}"
+          = "#{dest.origin_code}-#{dest.hub_code}-#{dest.dest_code}  #{dest.origin} #{dest.hub_name} #{dest.dest} "
 
 %br
 

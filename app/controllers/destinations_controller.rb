@@ -5,7 +5,7 @@ class DestinationsController < ApplicationController
 
   # GET /destinations
   def index
-    @destinations = Destination.all
+    @destinations = Destination.keyed(ABBConfig.data_key)
   end
 
   # GET /destinations/1

@@ -1,17 +1,37 @@
-%h1 Listing destinations
+.container
+  .row
+    %br
+    %br
+  .row
+    .col-sm-2
+      %h5
+        Explore
+    .col-sm-2
+      - search_link = search_index_url
+      %a.btn.btn-default#search_flights{href: "#{search_link}", role:"button"}
+        %i.fa.fa-plane
+        Search
+    .col-sm-2
+      %a.btn.btn-default#settings{href: "#{admin_dashboard_url}"}
+        %i.fa.fa-gear
+        Settings
+  .row
+    %br
+  .row
+    .col-sm-12
+      Search for Destinations
+      = "connecting trips for #{ReportKey.find_by_report_key(ABBConfig.data_key).name}"
+  .row
+    %br
 
-%table
-  %tr
-    %th
-    %th
-    %th
+  .row
+    - href = "search"
+    .panel#destinations_panel{data: {url: "#{href}"}}
 
-  - @destinations.each do |destination|
-    %tr
-      %td= link_to 'Show', destination
-      %td= link_to 'Edit', edit_destination_path(destination)
-      %td= link_to 'Destroy', destination, :method => :delete, :data => { :confirm => 'Are you sure?' }
+    - @destinations.each do |dest|
+      .row
+        .col-sm-12
+          = "#{dest.origin} #{dest.origin_code} #{dest.hub_name} #{dest.hub_code} #{dest.dest} #{dest.dest_code}"
 
 %br
 
-= link_to 'New Destination', new_destination_path

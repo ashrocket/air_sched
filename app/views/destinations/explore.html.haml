@@ -7,10 +7,7 @@
       %h5
         Explore
     .col-sm-2
-      - if ABBConfig.all[:mode].eql? 'HUB'
-        - search_link = search_hub_index_url
-      - else
-        - search_link = search_index_url
+      - search_link = search_index_url
       %a.btn.btn-default#search_flights{href: "#{search_link}", role:"button"}
         %i.fa.fa-plane
         Search
@@ -38,10 +35,7 @@
       = form.hidden_field :origin_code
 
   .row
-    - if ABBConfig.all[:mode].eql? "HUB"
-      - href = "search_hub"
-    - else
-      - href = "search"
+    - href = "search"
     .panel#destinations_panel{data: {url: "#{href}"}}
 
   .row

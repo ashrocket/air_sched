@@ -1,5 +1,5 @@
 {
-  "name": "schedman",
+  "name": "air_sched",
   "version": "1.0",
   "authors": [
     "ashrocket <ashley@raiteri.net>"
@@ -21,5 +21,25 @@
     "vendor/assets/components",
     "test",
     "tests"
-  ]
+  ],
+    "dependencies": {
+       "jquery": "latest",
+       "jquery-ui": "latest",
+       "jquery-ujs": "latest",
+       "bootstrap": "latest",
+       "bootstrap-datepicker": "latest",
+       "jasny-bootstrap": "latest",
+       "lodash": "latest",
+       "hogan": "latest",
+       "underscore.string": "latest",
+       "typeahead.js": "0.9.3",
+       "datatables": "latest",
+       "datatables-tabletools": "latest",
+       "datatables-plugins": "725b2a2115b9e307231746e0c4108db7a1778b27",
+       "jquery-file-upload": "latest",
+       "blueimp-tmpl": "latest",
+       "blueimp-load-image": "latest"
+    }
+
 }
+

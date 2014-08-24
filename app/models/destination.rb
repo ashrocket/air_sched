@@ -22,44 +22,30 @@ class Destination < ActiveRecord::Base
     res = where(cxx: cxx, origin_code:  o, dest_code: d)
     res.map!(&:hub_code).to_a
   end
-  def hubs o, d
-    res = where(:origin_code =>  o, :dest_code => d)
+  def hubs data_key, o, d
+    res = keyed(data_key).where(:origin_code =>  o, :dest_code => d)
     res.map!(&:hub_code).to_a
   end
   # -----
   # Cached Data
   # ----
-  def cached_origins mode, mode_key
-     Rails.cache.fetch("destination_origin_#{mode}_#{mode_key}", :expires_in => 1.hour) do
-       codes = send(mode.downcase, mode_key).select("DISTINCT(origin_code)").map{|f| f.origin_code}
+  def cached_origins data_key
+     Rails.cache.fetch("destination_origin_#{data_key}", :expires_in => 1.hour) do
+       codes = keyed(data_key).select("DISTINCT(origin_code)").map{|f| f.origin_code}
        Airport.where(code:codes)
      end
    end
   def origins
-    mode = ABBConfig.all[:mode].downcase
-    case mode
-    when /hub/
-      mode_key = ABBConfig.hub
-    else
-      mode_key = ABBConfig.cxx
-    end
-    cached_origins mode,mode_key
+    (cached_origins ABBConfig.data_key)
   end
-  def cached_dest_airports  mode, mode_key, origin_code
+  def cached_dest_airports  data_key, origin_code
      Rails.cache.fetch("destination_dest_#{mode}_#{mode_key}_#{origin_code}", :expires_in => 1.hour) do
-       codes = send(mode.downcase, mode_key).where(origin_code: origin_code).select("DISTINCT(dest_code)").map{|f| f.dest_code}
+       codes = keyed(data_key).where(origin_code: origin_code).select("DISTINCT(dest_code)").map{|f| f.dest_code}
        Airport.where(code:codes)
      end
    end
   def dest_airports origin_code
-    mode = ABBConfig.all[:mode].downcase
-    case mode
-    when /hub/
-      mode_key = ABBConfig.hub
-    else
-      mode_key = ABBConfig.cxx
-    end
-    cached_dest_airports mode,mode_key, origin_code
+    (cached_dest_airports ABBConfig.data_key, origin_code)
   end
 
   # -----

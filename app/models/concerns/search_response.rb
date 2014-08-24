@@ -3,16 +3,16 @@ class SearchResponse
     include ActiveModel::Conversion
     extend ActiveModel::Naming
 
-    attr_accessor :ob,:rt, :joined
+    attr_accessor :ob,:rt, :joined, :directs
 
 
     def initialize(attributes = {})
       @ob = []
       @rt = []
       @joined = []
-      outbound_results = attributes[:ob].is_a?(Array)  ? attributes[:ob] : []
-
-      return_results   = attributes[:rt].is_a?(Array)  ? attributes[:rt] : []
+      one_hub_results = attributes[:one_hub_trips]
+      outbound_results = one_hub_results[:ob].is_a?(Array)  ? one_hub_results[:ob] : []
+      return_results   = one_hub_results[:rt].is_a?(Array)  ? one_hub_results[:rt] : []
 
       outbound_results.each{|res| @ob << ResultSet.new(res)  }
       return_results.each{|res| @rt << ResultSet.new(res)  }
@@ -22,6 +22,7 @@ class SearchResponse
       @rt.each do |rt_result|
         rt_result.errors.each{|err| self.errors << err}
       end
+
 
     end
 

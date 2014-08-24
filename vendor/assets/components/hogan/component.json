@@ -1,7 +1,7 @@
 {
   "name": "hogan.js"
   , "description": "A mustache compiler."
-  , "version": "3.0.0"
+  , "version": "3.0.2"
   , "keywords": ["mustache", "template"]
   , "main": "lib/hogan.js"
   , "scripts": [
@@ -19,5 +19,10 @@
     { "type": "Apache-2.0"
       , "url": "http://www.apache.org/licenses/LICENSE-2.0"
     }
+  ]
+  , "ignore" : [
+    "tools"
+    ,"wrappers"
+    ,".*"
   ]
 }

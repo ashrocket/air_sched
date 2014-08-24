@@ -10,10 +10,9 @@
  *
 */
 @import 'prevars';
-@import 'bootstrap';
-@import 'jasny-bootstrap/dist/extend/css/jasny-bootstrap';
+@import 'bootstrap/dist/css/bootstrap';
+@import 'jasny-bootstrap/dist/css/jasny-bootstrap';
 
-@import 'datatables-plugins/integration/bootstrap/3/dataTables.bootstrap';
 @import 'typeahead.js-bootstrap.css/typeahead.js-bootstrap.css';
 @import 'bootstrap-datepicker/css/datepicker3';
 @import 'common';

@@ -1,7 +1,7 @@
 {
   "name": "hogan.js",
   "description": "A mustache compiler.",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "keywords": [
     "mustache",
     "template"
@@ -24,14 +24,18 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0"
     }
   ],
-  "_release": "3.0.0",
+  "ignore": [
+    "tools",
+    "wrappers",
+    ".*"
+  ],
+  "_release": "3.0.2",
   "_resolution": {
     "type": "version",
-    "tag": "v3.0.0",
-    "commit": "d31882834c8819b8e42076badba43b37fdf90651"
+    "tag": "v3.0.2",
+    "commit": "368b997dad7c4f68569ffa29aee7833541453945"
   },
   "_source": "git://github.com/twitter/hogan.js.git",
-  "_target": "~3.0.0",
-  "_originalSource": "hogan",
-  "_direct": true
+  "_target": "*",
+  "_originalSource": "hogan"
 }

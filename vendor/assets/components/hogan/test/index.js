@@ -354,6 +354,22 @@ test("Escaping", function() {
   }
 });
 
+test("Escaping \\u2028", function() {
+  var text = "{{foo}}\u2028{{bar}}";
+  var t = Hogan.compile(text);
+  var s = t.render({foo: 'foo', bar: 'bar'});
+
+  is(s, "foo\u2028bar", "\\u2028 improperly escaped");
+});
+
+test("Escaping \\u2029", function() {
+  var text = "{{foo}}\u2029{{bar}}";
+  var t = Hogan.compile(text);
+  var s = t.render({foo: 'foo', bar: 'bar'});
+
+  is(s, "foo\u2029bar", "\\u2029 improperly escaped");
+});
+
 test("Mustache Injection", function() {
   var text = "{{foo}}";
   var t = Hogan.compile(text);
@@ -481,6 +497,36 @@ test("Undefined Return Value From Lambda", function() {
   }
   var s = t.render(context);
   is(s, "abcdef", "deal with undefined return values from lambdas.")
+});
+
+test("Sections with null values are treated as key hits", function() {
+  var text = "{{#obj}}{{#sub}}{{^test}}ok{{/test}}{{/sub}}{{/obj}}";
+  var t = Hogan.compile(text);
+  var context = {
+    obj: {
+      test: true,
+      sub: {
+        test: null
+      }
+    }
+  }
+  var s = t.render(context);
+  is(s, "ok");
+});
+
+test("Sections with undefined values are treated as key misses", function() {
+  var text = "{{#obj}}{{#sub}}{{#test}}ok{{/test}}{{/sub}}{{/obj}}";
+  var t = Hogan.compile(text);
+  var context = {
+    obj: {
+      test: true,
+      sub: {
+        test: undefined
+      }
+    }
+  }
+  var s = t.render(context);
+  is(s, "ok");
 });
 
 test("Section Extensions", function() {
@@ -859,7 +905,33 @@ test("Recursion in inherited templates", function() {
   var include2 = Hogan.compile("{{$foo}}include2 default content{{/foo}} {{<include}}{{$bar}}don't recurse{{/bar}}{{/include}}");
   var t = Hogan.compile("{{<include}}{{$foo}}override{{/foo}}{{/include}}");
   var s = t.render({}, {include: include, include2: include2});
-  is(s, "override include2 default content default content don't recurse", "matches expected recursive output");
+  is(s, "override override override don't recurse", "matches expected recursive output");
+});
+
+test("Cache contains old partials instances", function() {
+  var tests = [{
+    template: "{{<parent}}{{$a}}c{{/a}}{{/parent}}",
+    partials: {
+      parent: "{{<grandParent}}{{$a}}p{{/a}}{{/grandParent}}",
+      grandParent: "{{$a}}g{{/a}}"
+    },
+    expected: "c"
+  }, {
+    template: "{{<parent}}{{/parent}}",
+    partials:{
+      parent: "{{<grandParent}}{{$a}}p{{/a}}{{/grandParent}}",
+      grandParent: "{{$a}}g{{/a}}"
+    },
+    expected: "p"
+  }];
+  tests.forEach(function(test) {
+    var partials = {};
+    for (var i in test.partials) {
+      partials[i] = Hogan.compile(test.partials[i]);
+    }
+    var output = Hogan.compile(test.template).render({}, partials);
+    is(output, test.expected);
+  });
 });
 
 test("Doesn't parse templates that have non-$ tags inside super template tags", function() {
@@ -912,6 +984,36 @@ test("Issue #62: partial references inside substitutions should work", function 
   };
 
   is(templates.main.render({}, templates), templatesAsString.main.render({}, templatesAsString))
+});
+
+test("Top-level substitutions take precedence in multi-level inheritance", function() {
+  var child = Hogan.compile('{{<parent}}{{$a}}c{{/a}}{{/parent}}').render({}, {
+    parent: '{{<older}}{{$a}}p{{/a}}{{/older}}',
+    older: '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
+    grandParent: '{{$a}}g{{/a}}'
+  });
+  is(child, 'c', 'should use the child sub value');
+
+  var noSubChild = Hogan.compile('{{<parent}}{{/parent}}').render({}, {
+    parent: '{{<older}}{{$a}}p{{/a}}{{/older}}',
+    older: '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
+    grandParent: '{{$a}}g{{/a}}'
+  });
+  is(noSubChild, 'p', 'should use the parent\'s value');
+});
+
+test("Lambdas work in multi-level inheritance", function() {
+  var lambda = function() {
+    return function(text) {
+      return "changed " + text;
+    };
+  }
+  var child = Hogan.compile('{{<parent}}{{$a}}{{#lambda}}c{{/lambda}}{{/a}}{{/parent}}').render({lambda:lambda}, {
+    parent: '{{<older}}{{$a}}p{{/a}}{{$b}}{{#lambda}}p{{/lambda}}{{/b}}{{/older}}',
+    older: '{{<grandParent}}{{$a}}o{{/a}}{{$c}}{{#lambda}}o{{/lambda}}{{/c}}{{/grandParent}}',
+    grandParent: '{{$a}}g{{/a}} - {{$b}}g{{/b}} - {{$c}}g{{/c}} - {{#lambda}}g{{/lambda}}'
+  });
+  is(child, 'changed c - changed p - changed o - changed g', 'should be changed child value');
 });
 
 /* Safety tests */

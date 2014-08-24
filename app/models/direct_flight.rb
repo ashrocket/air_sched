@@ -9,12 +9,12 @@ class DirectFlight < ActiveRecord::Base
     #
     # Scopes
     #
-    def cxx cxr
-       where("cxx = ?",  cxr)
-    end
-    def hub apt
-      where("hub = ?",  apt)
-    end
+    #def cxx cxr
+    #   where("cxx = ?",  cxr)
+    #end
+    #def hub apt
+    #  where("hub = ?",  apt)
+    #end
     def keyed report_key
       where("report_key = ?",  report_key)
     end

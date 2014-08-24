@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
+
+  root 'home#index'
+
+
   resource :mail, :controller => 'emails', only: [:index] do
            get '/', action: :index
            get 'msg_ids',  format: 'json'
@@ -16,7 +20,50 @@ Rails.application.routes.draw do
            post 'remove', format: 'json'
            post 'archive', format: 'json'
            post 'handle_mail', format: 'json'
-      end
+  end
+
+  resources :oag_schedules,  only: [:mkt],  format: 'json' do
+   get 'mkt/:origin/:dest', action: :mkt,  on: :collection, format: 'json', origin: /[a-zA-Z]{3}/, dest: /[a-zA-Z]{3}/
+   get 'to_hub/:origin',   action: :to_hub,   on: :collection, format: 'json',  origin: /[a-zA-Z]{3}/
+   get 'from_hub/:dest', action: :from_hub, on: :collection, format: 'json', dest: /[a-zA-Z]{3}/
+  end
+
+  resources :destinations,  only: [:index, :show] do
+   get :explore, on: :collection
+   get 'hubs/:origin/:dest', action: :hubs, on: :collection, format: 'json'
+  end
+  resources :cnx_pairs, only: [:show], format: 'json'
+  resources :cnx_pairs, only: [:destinations], path: 'connections', as: 'connections' ,format: 'json' do
+    get 'from/:origin', to: 'cnx_pairs#from',  as: :from, on:  :collection, origin: /[a-zA-Z]{3}/
+  end
+
+  resources :search, only: [:index] do
+   get '(/:origin_code)(/:dest_code)(/:depart)/(:owrt)(/:ret_date)',  action: :index,
+       on:  :collection, format: 'html',
+       origin: /[a-zA-Z]{3}/, dest: /[a-zA-Z]{3}/, depart: /\d{2}\-\d{2}\-\d{4}/, ret_date: /\d{2}\-\d{2}\-\d{4}/, owrt: /OW|RT/
+  end
+  #post 'search', to: 'search#search', as: :search, format: 'json'
+  post 'search', to: 'search#search', as: :search
+
+  resources :direct_flight, only: [:none] do
+  end
+
+
+
+  resources :airports,  only: [:show],  format: 'json', id: /[a-zA-Z]{3}/ do
+    member do
+      get 'dest(/:query)',  action: :dest, as: :dest
+    end
+    collection do
+      get 'origins(/:query)', action: :origins, as: :origins
+      get 'origins/dest'    , action: :dest
+    end
+  end
+
+  resources :airlines, only: [:index, :show],  format: 'json'
+  resources :carriers,   only: [:index],  format: 'json'
+  resources :hubs,   only: [:index],  format: 'json'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

@@ -1,0 +1,82 @@
+.container
+  .row
+    %br
+  .row
+    .col-sm-4
+      .h3
+        %a{href:"#{root_url}"}<
+          %i.fa.fa-home
+        %a{href:"#{admin_dashboard_url}"}<
+          %i.fa.fa-gear
+        Search For Flights
+    .col-sm-2
+      %a.btn.btn-default#analyze_pair{href: "#", role:"button"} Analyze Pair
+    .col-sm-2
+      %a{href: "#{explore_destinations_url}"} Explore City Pairs
+
+  .row
+    %br
+  .row
+    = render partial: 'search/search_form', locals: {search_form_url: search_url}
+
+
+  .row
+
+    %br
+    %br
+    .table-responsive.hide
+      %table.table.table-hover.table-condensed#to_hub_table
+        %thead
+          %tr
+            %th Eff
+            %th Disc
+            %th From
+            %th To
+            %th Flight Number
+            %th Dep Time
+            %th Arr Time
+            %th Freq
+            %th Stops
+
+        %tbody
+          -#%tr
+      -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
+
+  .row
+
+    %br
+    %br
+    .table-responsive.hide
+      %table.table.table-hover.table-condensed#from_hub_table
+        %thead
+          %tr
+            %th Eff
+            %th Disc
+            %th From
+            %th To
+            %th Flight Number
+            %th Dep Time
+            %th Arr Time
+            %th Freq
+            %th Stops
+
+        %tbody
+          -#%tr
+      -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
+
+%br
+
+
+
+.modal.fade#hub_modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+        %h4.modal-title Viable Hubs for City Pair
+      .modal-body#hub_content
+
+
+
+  -#= f.input :stops,  :type => "integer", input_html: { :size => 1,:maxlength => 1, :placeholder => "STOPS PER LEG", :class => ""}
+

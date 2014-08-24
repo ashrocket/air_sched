@@ -15,7 +15,7 @@
 
 var Hogan = {};
 
-(function (Hogan, useArrayBuffer) {
+(function (Hogan) {
   Hogan.Template = function (codeObj, text, compiler, options) {
     codeObj = codeObj || {};
     this.r = codeObj.code || this.r;
@@ -24,7 +24,7 @@ var Hogan = {};
     this.text = text || '';
     this.partials = codeObj.partials || {};
     this.subs = codeObj.subs || {};
-    this.ib();
+    this.buf = '';
   }
 
   Hogan.Template.prototype = {
@@ -72,13 +72,17 @@ var Hogan = {};
 
       if (partial.subs) {
         // Make sure we consider parent template now
-        if (this.activeSub === undefined) {
-          // Store parent template text in partials.stackText to perform substitutions in child templates correctly
-          partials.stackText  = this.text;
+        if (!partials.stackText) partials.stackText = {};
+        for (key in partial.subs) {
+          if (!partials.stackText[key]) {
+            partials.stackText[key] = (this.activeSub !== undefined && partials.stackText[this.activeSub]) ? partials.stackText[this.activeSub] : this.text;
+          }
         }
-         template = createSpecializedPartial(template, partial.subs, partial.partials, partials.stackText || this.text);
-       }
+        template = createSpecializedPartial(template, partial.subs, partial.partials,
+          this.stackSubs, this.stackPartials, partials.stackText);
+      }
       this.partials[symbol].instance = template;
+
       return template;
     },
 
@@ -142,7 +146,7 @@ var Hogan = {};
       } else {
         for (var i = 1; i < names.length; i++) {
           found = findInScope(names[i], val, doModelGet);
-          if (found != null) {
+          if (found !== undefined) {
             cx = val;
             val = found;
           } else {
@@ -174,7 +178,7 @@ var Hogan = {};
       for (var i = ctx.length - 1; i >= 0; i--) {
         v = ctx[i];
         val = findInScope(key, v, doModelGet);
-        if (val != null) {
+        if (val !== undefined) {
           found = true;
           break;
         }
@@ -211,15 +215,9 @@ var Hogan = {};
     },
 
     // template result buffering
-    b: (useArrayBuffer) ? function(s) { this.buf.push(s); } :
-                          function(s) { this.buf += s; },
+    b: function(s) { this.buf += s; },
 
-    fl: (useArrayBuffer) ? function() { var r = this.buf.join(''); this.buf = []; return r; } :
-                           function() { var r = this.buf; this.buf = ''; return r; },
-    // init the buffer
-    ib: function () {
-      this.buf = (useArrayBuffer) ? [] : '';
-    },
+    fl: function() { var r = this.buf; this.buf = ''; return r; },
 
     // method replace section
     ms: function(func, ctx, partials, inverted, start, end, tags) {
@@ -231,7 +229,7 @@ var Hogan = {};
         if (inverted) {
           return true;
         } else {
-          textSource = (this.activeSub && this.subsText[this.activeSub]) ? this.subsText[this.activeSub] : this.text;
+          textSource = (this.activeSub && this.subsText && this.subsText[this.activeSub]) ? this.subsText[this.activeSub] : this.text;
           return this.ls(result, cx, partials, textSource.substring(start, end), tags);
         }
       }
@@ -264,11 +262,11 @@ var Hogan = {};
 
   //Find a key in an object
   function findInScope(key, scope, doModelGet) {
-    var val, checkVal;
+    var val;
 
     if (scope && typeof scope == 'object') {
 
-      if (scope[key] != null) {
+      if (scope[key] !== undefined) {
         val = scope[key];
 
       // try lookup with get for backbone or similar model data
@@ -280,7 +278,7 @@ var Hogan = {};
     return val;
   }
 
-  function createSpecializedPartial(instance, subs, partials, childText) {
+  function createSpecializedPartial(instance, subs, partials, stackSubs, stackPartials, stackText) {
     function PartialTemplate() {};
     PartialTemplate.prototype = instance;
     function Substitutions() {};
@@ -289,15 +287,25 @@ var Hogan = {};
     var partial = new PartialTemplate();
     partial.subs = new Substitutions();
     partial.subsText = {};  //hehe. substext.
-    partial.ib();
+    partial.buf = '';
 
+    stackSubs = stackSubs || {};
+    partial.stackSubs = stackSubs;
+    partial.subsText = stackText;
     for (key in subs) {
-      partial.subs[key] = subs[key];
-      partial.subsText[key] = childText;
+      if (!stackSubs[key]) stackSubs[key] = subs[key];
+    }
+    for (key in stackSubs) {
+      partial.subs[key] = stackSubs[key];
     }
 
+    stackPartials = stackPartials || {};
+    partial.stackPartials = stackPartials;
     for (key in partials) {
-      partial.partials[key] = partials[key];
+      if (!stackPartials[key]) stackPartials[key] = partials[key];
+    }
+    for (key in stackPartials) {
+      partial.partials[key] = stackPartials[key];
     }
 
     return partial;

@@ -4,7 +4,7 @@ ActiveAdmin.register ReportKey do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  # permit_params :list, :of, :attributes, :on, :model
+  permit_params :report_key, :name, :city
   #
   # or
   #
@@ -13,6 +13,10 @@ ActiveAdmin.register ReportKey do
   #  permitted << :other if resource.something?
   #  permitted
   # end
-
+  controller do
+    def find_resource
+      scoped_collection.friendly.find(params[:id])
+    end
+  end
 
 end

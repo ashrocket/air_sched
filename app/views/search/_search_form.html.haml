@@ -1,0 +1,76 @@
+= simple_form_for @search_request,  as: :search_request, :url => search_form_url,
+                      :html => { id: 'flight_search_form', class: 'form-inline' } do |form|
+  - if @search_request.errors.any?
+    #error_explanation
+      %h5= "#{pluralize(@search_request.errors.count, "error")} prohibited this search from executing:"
+      %ul
+        - @search_request.errors.full_messages.each do |msg|
+          %li= msg
+
+
+
+  -#.form-group
+  -#  %label.sr-only{for: "exampleInputEmail2"}Email address
+  -#  %input.form-control#exampleInputEmail2{type:"email", placeholder:"Enter email"}
+  .search_inputs
+    = form.hidden_field :data_key
+
+    .search_fields
+
+      = form.input :owrt, as: :radio_buttons,
+                    wrapper: :bootstrap_button_radios,
+                    wrapper_html: {data:{toggle:'buttons'}},
+                    item_wrapper_class: 'btn btn-default btn-small',
+                    input_html: {data:{toggle:'button'}},
+                    collection: owrt_collection,
+                    label_method: lambda{ |owrt| owrt[:name]},
+                    value_method: lambda{ |owrt| owrt[:val]}
+
+
+      = form.input :origin, label: false,
+            input_html: { :placeholder => "FROM", :class => "search-origin input-md typeahead",
+            "data-origin-code" => @search_request.origin_code, "data-origin-name" => @search_request.origin}
+
+
+
+      = form.hidden_field :origin_id
+      = form.hidden_field :origin_code
+
+      = form.input :dest, label: false,
+            input_html: { :placeholder => "TO", :class => "search-dest typeahead input-md",
+            "data-dest-code" => @search_request.dest_code, "data-dest-name" => @search_request.dest}
+
+
+      = form.hidden_field :dest_id
+      = form.hidden_field :dest_code
+
+      -#<input type="text" data-behaviour='datepicker' >
+      = form.input :depart,   placeholder: "Departure Date",
+           input_html: {class: "datepicker-input depart-datepicker input-md",
+           data:{behaviour:"datepicker"}}, label: false
+      = form.input :ret_date,  placeholder: "Return Date", required: false,
+           input_html: {class: "datepicker-input return-datepicker input-md",
+           data:{behaviour:"datepicker"}},  label: false
+
+      = form.submit "Search", class:"btn btn-primary"
+
+      -#= form.input :owrt, as: :boolean, label: "RoundTrip"
+
+      / Split button
+      .btn-group
+        %button.btn.btn-default{type: "button"} Config
+        %button.btn.btn-default.dropdown-toggle{"data-toggle" => "dropdown", type: "button"}
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu.search-settings-form.pull-right{role: "menu"}
+          %li
+            = form.input :mct, :type => "number", label: false, placeholder: 'MCT in minutes',
+             input_html: {:maxlength => 3, size: 'auto', val: 0}
+          %li.divider
+          %li
+            = form.input :maxct,  :type => "number", label: false, placeholder: 'MAXCT in minutes',
+             input_html: {:maxlength => 4, size: 'auto', val: 1440}
+          %li
+            = form.input :stops,  :type => "number", label: false, placeholder: 'Max Stops Per Leg',
+             input_html: {min: "1", max: "5", val: 0}
+          %li.divider

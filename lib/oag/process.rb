@@ -134,7 +134,7 @@ module Oag
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
                d_name = Airport.cached_name(pair[1])
-               connections << CnxPair.new(origin: pair[0], origin_name: o_name, dest: pair[1], dest_name: d_name)
+               connections << CnxPair.new(report_key: report.report_key, origin: pair[0], origin_name: o_name, dest: pair[1], dest_name: d_name)
             end
             CnxPair.import connections
             connections = []
@@ -160,7 +160,6 @@ module Oag
           report.report_status = 'schedules_loaded'
           report.save
         rescue Exception => ex
-               byebug
                Rails.logger.info ex.message
                Rails.logger.info report.inspect
         end

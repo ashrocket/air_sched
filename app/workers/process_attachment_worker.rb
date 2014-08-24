@@ -17,7 +17,7 @@ class ProcessAttachmentWorker
         end
         ScheduleImportWorker.perform_async(report.id)
       end
-    end  
+    end
 
     #Do Something here with the message
     #

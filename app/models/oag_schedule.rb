@@ -179,7 +179,6 @@ class OagSchedule < ActiveRecord::Base
 
 
     def search_interlines req
-        req.cxrs
         trips   = {}
         o_voyages = []
         return_voyages = []

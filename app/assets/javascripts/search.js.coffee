@@ -34,6 +34,7 @@ $ ->
                schedule.disc_date,
                schedule.origin_apt,
                schedule.dest_apt,
+               schedule.airline_code,
                schedule.flight_num,
                schedule.dep_time_local,
                schedule.arr_time_local,
@@ -51,6 +52,7 @@ $ ->
                schedule.disc_date,
                schedule.origin_apt,
                schedule.dest_apt,
+               schedule.airline_code,
                schedule.flight_num,
                schedule.dep_time_local,
                schedule.arr_time_local,
@@ -121,14 +123,14 @@ $ ->
        iDisplayLength: 50
        aaSorting: [[ 2, "desc" ]]
        aoColumns: [{ "sType": "date" },{"sType": "date" },
-                    null,null,null,{"sType": "integer" },{"sType": "integer" },null, null]
+                    null,null,null,null,{"sType": "integer" },{"sType": "integer" },null, null]
 
     fromHubTable = $("#from_hub_table").dataTable
        bFilter: false
        iDisplayLength: 50
        aaSorting: [[ 2, "desc" ]]
        aoColumns: [{ "sType": "date" },{"sType": "date" },
-                    null,null,null,{"sType": "datetime-us" },{"sType": "datetime-us" },null, null]
+                    null,null,null,null,{"sType": "datetime-us" },{"sType": "datetime-us" },null, null]
 
 
     # -------------------------------

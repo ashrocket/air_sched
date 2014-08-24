@@ -11,11 +11,13 @@ class SearchRequest
     attr_accessor :depart,:ret_date
     attr_accessor :mct, :maxct
     attr_accessor :stops
+    attr_accessor :include_direct
+
 
 
 
     validates :data_key, :owrt, :origin_code, :dest_code, :depart, presence: true
-    validates_format_of :mode,  :with => /\AHUB|CXX\z/
+    #validates_format_of :mode,  :with => /\AHUB|CXX\z/
     validates_format_of :origin_code, :dest_code,   :with => /\A[A-Z]{3}\z/
     validates_length_of :origin_code, :dest_code, :maximum => 3
 
@@ -24,6 +26,7 @@ class SearchRequest
 
     def initialize(attributes = {})
       @join = false
+      @include_direct = false
       @owrt     = "OW"
       @mct   = ABBConfig.mct.to_i
       @stops = 0
@@ -42,7 +45,7 @@ class SearchRequest
       @depart    = Chronic.parse(@depart).to_date unless @depart.blank?
       @depart    = (Date.today + 1.week) if @depart.blank?
       @ret_date  = Chronic.parse(@ret_date).to_date unless @ret_date.blank?
-      #@cxrs = OagSchedule.carriers_for_key(attributes[:data_key]) if @cxrs.blank?
+      @cxrs = OagSchedule.carriers_for_key(attributes[:data_key]) if @cxrs.blank?
 
 
     end

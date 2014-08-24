@@ -21,6 +21,10 @@
 //= require datatables/media/js/jquery.dataTables
 //= require datatables-tabletools/js/dataTables.tableTools
 //= require datatables-plugins/pagination/jPaginator/dataTables.jPaginator
+//= require datatables-plugins/integration/bootstrap/3/dataTables.bootstrap
+
+//= require jquery/jquery.dataTables.fileSize
+
 //= require hogan/web/1.0.0/hogan
 //= require lodash/dist/lodash.min
 //= require underscore.string/dist/underscore.string.min

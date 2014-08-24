@@ -26,7 +26,7 @@ class DestinationsController < ApplicationController
 
       origin = params[:origin].upcase
       dest  =   params[:dest].upcase
-      hubs = Destination.hubs data_key, origin_apt.code,dest_apt.code
+      hubs = Destination.hubs data_key, origin, dest
     end
     @hubs = Airport.where(:code => hubs)
   end

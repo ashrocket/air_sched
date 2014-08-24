@@ -12,7 +12,13 @@
     .col-sm-2
       %a.btn.btn-default#analyze_pair{href: "#", role:"button"} Analyze Pair
     .col-sm-2
-      %a{href: "#{explore_destinations_url}"} Explore City Pairs
+      %a.btn.btn-default#reverse_pair{href: "#", role:"button"}
+        %i.fa.fa-exchange
+        Reverse
+    .col-sm-2
+      %a.btn.btn-default{href: "#{explore_destinations_url}"}
+        %i.fa.fa-globe
+        Explore
 
   .row
     %br

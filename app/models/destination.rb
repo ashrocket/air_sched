@@ -19,12 +19,10 @@ class Destination < ActiveRecord::Base
     #
 
   def cxx_hubs cxx, o, d
-    res = where(cxx: cxx, origin_code:  o, dest_code: d)
-    res.map!(&:hub_code).to_a
+    keyed(data_key).where(cxx: cxx, origin_code:  o, dest_code: d).pluck(:hub_code)
   end
   def hubs data_key, o, d
-    res = keyed(data_key).where(:origin_code =>  o, :dest_code => d)
-    res.map!(&:hub_code).to_a
+    keyed(data_key).where(:origin_code =>  o, :dest_code => d).pluck(:hub_code)
   end
   # -----
   # Cached Data

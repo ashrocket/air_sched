@@ -7,12 +7,21 @@ $ ->
     renderHubs = (airports) ->
       $('#hub_content').empty()
       $('#hub_content').append "<ul class='nav'></ul>"
+      if airports.length > 1
+        _.each airports, (airport)->
+             html_data = "<li><a class='hub-link' href='#' data-hub-code-id='" + airport.id  + "'" +
+             " data-hub-code='" + airport.code + "'> #{airport.name} (#{airport.code})</a></li>"
+             $('#hub_content').append html_data
+        $('#hub_modal').modal('show')
+      else
+        hub_code = airports[0].code
+        origin_code = $('#search_request_origin').data('origin-code')
+        dest_code = $('#search_request_dest').data('dest-code')
 
-      _.each airports, (airport)->
-           html_data = "<li><a class='hub-link' href='#' data-hub-code-id='" + airport.id  + "'" +
-           " data-hub-code='" + airport.code + "'> #{airport.name} (#{airport.code})</a></li>"
-           $('#hub_content').append html_data
-      $('#hub_modal').modal('show')
+        $('#hub_modal').modal('hide')
+        loadToHubSchedule(origin_code, hub_code )
+        loadFromHubSchedule(hub_code,dest_code  )
+
 
 
     renderToHubSchedules = (schedules) ->
@@ -107,14 +116,14 @@ $ ->
     $("#flight_search_form").on "ajax:complete", (data, textStatus, jqXHR) ->
 
 
-    toHubTable = $("#to_hub_table").DataTable
+    toHubTable = $("#to_hub_table").dataTable
        bFilter: false
        iDisplayLength: 50
        aaSorting: [[ 2, "desc" ]]
        aoColumns: [{ "sType": "date" },{"sType": "date" },
-                    null,null,null,{"sType": "datetime-us" },{"sType": "datetime-us" },null, null]
+                    null,null,null,{"sType": "integer" },{"sType": "integer" },null, null]
 
-    fromHubTable = $("#from_hub_table").DataTable
+    fromHubTable = $("#from_hub_table").dataTable
        bFilter: false
        iDisplayLength: 50
        aaSorting: [[ 2, "desc" ]]

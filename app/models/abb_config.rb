@@ -1,2 +1,3 @@
-class ABBConfig < RailsSettings::CachedSettings
-end
+# class AbbConfig
+#   # < RailsSettings::CachedSettings
+# end

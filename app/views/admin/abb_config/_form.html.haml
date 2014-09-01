@@ -1,0 +1,16 @@
+= simple_form_for [:tuning, @abb_config], html:{class: 'form-inline'} do |form|
+  = form.error_notification
+
+  - case @abb_config.value.class.to_s.downcase
+  - when /string/
+    - render 'string', form: form
+  - when /float/
+    - render 'float', form: form
+  - when /fixnum/
+    - render 'fixnum', form: form
+  - else
+    .form-inputs
+      = form.input :var
+      = form.input :value
+    .form-actions
+      = form.button :submit, "Save"

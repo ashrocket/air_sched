@@ -1,0 +1,7 @@
+= simple_form_for(@abb_config) do |f|
+  = f.error_notification
+  .form-inputs
+    = f.input :var
+    = f.input :value
+  .form-actions
+    = f.button :submit, "Save"

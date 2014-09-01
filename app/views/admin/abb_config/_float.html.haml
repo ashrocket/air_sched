@@ -1,0 +1,7 @@
+.form-inputs
+  = form.input :var
+  = form.input :value, as: :float, input_html: {value: @abb_config.value.to_f }
+  = form.input :tip, as: :text, input_html: {value: @abb_config.tip }
+  .form-group{style: 'vertical-align: bottom;'}
+    = form.submit "Save", class:"btn btn-primary"
+

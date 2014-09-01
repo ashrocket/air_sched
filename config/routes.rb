@@ -64,6 +64,15 @@ Rails.application.routes.draw do
   resources :carriers,   only: [:index],  format: 'json'
   resources :hubs,   only: [:index],  format: 'json'
 
+
+
+  namespace :admin do
+      # # mount Sidekiq::Web => '/sidekiq'
+      # resources :abb_config, as: 'config', only: [:index] do
+      #   get 'index'
+      # end
+
+  end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

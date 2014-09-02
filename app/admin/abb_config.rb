@@ -1,21 +1,43 @@
-# ActiveAdmin.register AbbConfig :as => "Data Key" do
+ActiveAdmin.register ABBConfig do
+  menu :parent => "Config"
+
+  permit_params :var, :value, :thing_id, :thing_type, :tip
+
+  form :partial => "form"
+  # content do
+  index do
+      column :var
+      column :value
+      column :tip
+      actions
+  end
+
+    # simple_form_for [:admin, @abb_config], html:{class: 'form-inline'} do |form|
+    #
+    #   case @abb_config.value.class.to_s.downcase
+    #     when /string/
+    #       render 'string', form: form
+    #     when /float/
+    #       render 'float', form: form
+    #     when /fixnum/
+    #       render 'fixnum', form: form
+    #     else
+    #       div :class => 'form-inputs' do
+    #         form.input :var
+    #         form.input :value
+    #       end
+    #       div :class => 'form-actions' do
+    #         form.button :submit, 'Save'
+    #       end
+    #   end
+    #
+    #
+    #
+    # end
+
+end
 #
-#   content do
-#       columns do
-#         column do
-#           panel "Data Key" do
-#             render "index"
-#
-#           end
-#
-#         end
-#       end
-#       # renders app/views/admin/posts/_some_partial.html.erb
-#     end
-#
-#
-#
-# end
+
 
 # ActiveAdmin.register_page "Config" do
 #    content do

@@ -61,6 +61,11 @@ class OagSchedule < ActiveRecord::Base
       #         :via_apts => row[:intairports]
   end
 
+
+  def plated_flt_number
+     "#{airline_code} #{flight_num}"
+  end
+
   class << self
 
 

@@ -67,6 +67,7 @@ Rails.application.routes.draw do
 
 
   namespace :admin do
+    get '/config', to: 'config#index'
       # # mount Sidekiq::Web => '/sidekiq'
       # resources :abb_config, as: 'config', only: [:index] do
       #   get 'index'

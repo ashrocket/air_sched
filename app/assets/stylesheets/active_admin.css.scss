@@ -29,3 +29,7 @@
 // For example, to change the default status-tag color:
 //
 //   .status_tag { background: #6090DB; }
+.title_bar h2#page_title {
+  @extend h5;
+
+}

@@ -1,4 +1,5 @@
 ActiveAdmin.register AppSwitch do
+  menu :parent => "Config"
 
 
   # See permitted parameters documentation:

@@ -5,6 +5,14 @@ class ReportKey < ActiveRecord::Base
   #t.string :name
   #t.boolean :active
 
-  scope :active,  -> { where(active: true) }
+  class << self
+    def active
+     where(active: true).uniq
+    end
 
+    def active_keycodes
+     where(active: true).uniq.pluck(:report_key)
+    end
+
+  end
 end

@@ -26,7 +26,7 @@ class CreateOagSchedules < ActiveRecord::Migration
        t.string :arr_op_days
        t.string :dep_time_local
        t.string :arr_time_local
-       t.string :next_day_arrival
+       t.boolean :next_day_arrival, default: false
        t.string :duration
        t.integer :stops
        t.string :restrictions

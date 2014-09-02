@@ -1,4 +1,5 @@
 ActiveAdmin.register ReportKey do
+  menu :parent => "Config"
 
 
   # See permitted parameters documentation:

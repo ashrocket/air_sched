@@ -8,16 +8,16 @@
       %li
         %a{href:"#{root_url}"}<
           = image_tag('icons/schedman_favicon.ico', size: "25x25")
-      %li
-        %a{href:"#{tuning_index_url}"}<
-          %i.fa.fa-gear
+      -#%li
+      -#  %a{href:"#{tuning_index_url}"}<
+      -#    %i.fa.fa-gear
       %li.nav-label
         %a{href:"#"}<
           System Config
-      %li
-        %a{href: "#{tuning_abb_config_index_url}", role:"button"} OAG Files
-      %li
-        %a{href: "#{tuning_oag_emails_url}", role:"button"} OAG Emails
+      -#%li
+      -#  %a{href: "#{tuning_abb_config_index_url}", role:"button"} OAG Files
+      -#%li
+      -#  %a{href: "#{tuning_oag_emails_url}", role:"button"} OAG Emails
   %br
   .row
     .alert.alert-danger.alert-dismissable.hide
@@ -40,7 +40,7 @@
       -#.col-sm-2
       -#  = item.thing_type
       .col-sm-2
-        = link_to 'Edit', edit_tuning_abb_config_path(item)
+        = link_to 'Edit', edit_admin_abb_config_path(item)
 
   .row
     %br

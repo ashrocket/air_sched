@@ -1,7 +1,6 @@
-ActiveAdmin.register DirectFlight, :as => "Directs" do
+ActiveAdmin.register CnxPair, :as => "Pairs" do
   menu :parent => "Connections"
 
-  
   # See permitted parameters documentation:
   # https://github.com/gregbell/active_admin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
@@ -17,8 +16,8 @@ ActiveAdmin.register DirectFlight, :as => "Directs" do
   index do
     column :report_key
     column :origin
+    column :origin_name
     column :dest
-    column :carriers
+    column :dest_name
   end
-
 end

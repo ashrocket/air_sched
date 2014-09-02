@@ -1,4 +1,4 @@
-= simple_form_for [:tuning, @abb_config], html:{class: 'form-inline'} do |form|
+= simple_form_for [:admin, @abb_config], html:{class: 'form-inline'} do |form|
   = form.error_notification
 
   - case @abb_config.value.class.to_s.downcase

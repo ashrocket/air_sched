@@ -1,0 +1,19 @@
+.container
+  .row
+    .col-sm-3.col-sm-offset-1
+      .h3{:style => 'margin: 0px;'}
+        %a{href:"#{root_url}"}<
+          = image_tag('icons/schedman_favicon.ico', size: "25x25")
+
+        Data Key
+    .col-sm-3
+      - ABBConfig.data_key = '' if ABBConfig.find_by(var: 'data_key').blank?
+      - @abb_config = ABBConfig.find_by(var: 'data_key')
+      = simple_form_for [:admin, @abb_config], remote:true, html:{class: "admin-datakey-form form-inline"} do |form|
+        - if ReportKey.active.blank?
+          %h5 No valid data keys are loaded in system
+        - else
+          = form.input :value, label:false, collection: ReportKey.active,
+                        selected: ABBConfig.data_key, label_method: :name, value_method: :report_key
+
+

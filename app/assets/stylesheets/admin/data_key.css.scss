@@ -1,4 +1,4 @@
-body.tuning.index{
+body.admin_dashboard.index{
   //font-size: 24px;
   //// Headings
   //// -------------------------
@@ -23,13 +23,29 @@ body.tuning.index{
     margin: 5px auto;
 
   }
-}
 
-.admin-datakey-form {
- display: inline-block;
-  //margin-left: 20px;
-  select {
-    margin: 10px auto;
+  @keyframes glow {
+      to {
+          text-shadow: 0 0 20px green;
+      }
+  }
+  .admin-datakey-form {
+   display: inline-block;
+    //margin-left: 20px;
+    select {
+      margin: 10px auto;
+    }
+    .success-change {
+      transition: color 1.5s ease;
+      color: green;
+    }
+    .fail-change {
+      transition: color 1.5s ease;
+      color: red;
+    }
+
   }
 
 }
+
+

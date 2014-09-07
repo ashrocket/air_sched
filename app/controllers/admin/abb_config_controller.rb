@@ -1,4 +1,4 @@
-class Tuning::ABBConfigController < ApplicationController
+class Admin::ABBConfigController < ApplicationController
   def index
     # to get all items for render list
     @abb_configs = ABBConfig.unscoped

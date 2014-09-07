@@ -2,9 +2,9 @@ $ ->
   $("body.admin_dashboard").ready ->
 
     $("form.admin-datakey-form").on("ajax:success", (e, data, status, xhr) ->
-      $("form.admin-datakey-form .abb_config_value").addClass('success-change')
+      $("form.admin-datakey-form select").addClass('success-change')
     ).on "ajax:error", (e, xhr, status, error) ->
-      $("form.admin-datakey-form .abb_config_value").addClass('fail-change').append("<p>ERROR</p>")
+      $("form.admin-datakey-form select").addClass('fail-change').append("<p>ERROR</p>")
 
     $("select").change (evt) ->
       $(evt.target).removeClass('success-change')

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.1'
+gem 'rails', '~> 4.1'
 # ORM related gems
 gem 'mysql2'
 gem 'friendly_id', '~> 5.0.0'

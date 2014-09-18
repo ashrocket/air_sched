@@ -13,6 +13,26 @@ ActiveAdmin.register OagReport do
   #  permitted << :other if resource.something?
   #  permitted
   # end
+  index do
+          column 'Mail Id' do |report|
+            report.msg_id
+          end
+          column 'Report Key' do |report|
+            report.report_key
+          end
+          column 'Finished'  do |report|
+            report.complete
+          end
+          column 'Status' do |report|
+            report.report_status
+          end
+          column 'Modified' do |report|
+            report.updated_at
+          end
+          column 'Message Data' do |report|
+            report.received
+          end
 
+     end
 
 end

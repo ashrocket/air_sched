@@ -17,19 +17,19 @@ ActiveAdmin.register OagReport do
           column 'Mail Id' do |report|
             report.msg_id
           end
-          column 'Report Key' do |report|
+          column 'Report Key', :sortable => :report_key do |report|
             report.report_key
           end
-          column 'Finished'  do |report|
+          column 'Finished', :sortable => :complete  do |report|
             report.complete
           end
-          column 'Status' do |report|
+          column 'Status', :sortable => :report_status do |report|
             report.report_status
           end
-          column 'Modified' do |report|
+          column 'Modified', :sortable => :updated_at do |report|
             report.updated_at
           end
-          column 'Message Data' do |report|
+          column 'Message Date', :sortable => :received do |report|
             report.received
           end
 

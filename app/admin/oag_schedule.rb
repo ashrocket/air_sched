@@ -18,7 +18,7 @@ ActiveAdmin.register OagSchedule, :as => "Summaries" do
   #  permitted
   # end
     index do
-         column 'Key' do |sched|
+         column 'Key', :sortable => :report_key do |sched|
            sched.report_key
          end
          column 'EffectiveDT' do |sched|
@@ -50,7 +50,7 @@ ActiveAdmin.register OagSchedule, :as => "Summaries" do
          end
          column :airline_name
 
-         column 'Origin Apt' do |sched|
+         column 'Origin Apt', :sortable => :origin_apt_name do |sched|
            "#{sched.origin_apt_name}, #{sched.origin_apt_city}"
          end
          column 'Dest Apt' do |sched|

@@ -145,6 +145,8 @@ module Oag
     end
     #TODO provide the option to store the processed files in the processed folder
     def finalize report
+        puts "Finalizing #{report.attachment_path} import"
+
         File.delete report.attachment_path
         File.delete report.report_path
         Mastiff::Email.finalize([report.msg_id])

@@ -144,7 +144,7 @@ ActiveAdmin.setup do |config|
 
   # == Setting a Favicon
   #
-  config.favicon = '/icons/schedman_favicon.ico'
+  config.favicon = 'icons/schedman_favicon.ico'
 
 
   # == Removing Breadcrumbs

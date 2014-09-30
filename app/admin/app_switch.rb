@@ -1,5 +1,5 @@
 ActiveAdmin.register AppSwitch do
-  menu :parent => "Config"
+  menu priority: 3,  :parent => 'Config'
 
 
   # See permitted parameters documentation:

@@ -1,5 +1,5 @@
-ActiveAdmin.register_page "Data Key" do
-  menu :parent => "Config"
+ActiveAdmin.register_page 'Active Data Key' do
+  menu priority: 0,  :parent => 'Config'
 
 
   content :title => 'System Settings' do

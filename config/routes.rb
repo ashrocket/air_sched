@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   root 'home#index'
 
 
-  resource :mail, :controller => 'emails', only: [:index] do
+  resource :emails, :controller => 'emails', as: 'mail', only: [:index] do
            get '/', action: :index
            get 'msg_ids',  format: 'json'
            get 'validity',  format: 'json'
@@ -67,7 +67,14 @@ Rails.application.routes.draw do
 
 
   namespace :admin do
-    get '/config', to: 'config#index'
+    resources :abb_configs
+
+    resources :exports, only: [:index] do
+        collection do
+            get  :tasks, action: :tasks
+            post :generate, to: 'exports#generate', as: :generate
+        end
+    end
       # # mount Sidekiq::Web => '/sidekiq'
       # resources :abb_config, as: 'config', only: [:index] do
       #   get 'index'

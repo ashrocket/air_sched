@@ -1,5 +1,6 @@
 ActiveAdmin.register OagSchedule, :as => "Summaries" do
   menu :parent => "Schedules"
+  actions :all, :except => [:new]
 
 
   # filter :op, :as => :select

@@ -1,7 +1,5 @@
 class Destination < ActiveRecord::Base
-  # :hub
-  # :cxx
-
+  # :report_key
   # :origin
   # :origin_code
   # :cxr1

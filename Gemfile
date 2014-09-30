@@ -8,6 +8,7 @@ gem 'activerecord-import'
 gem 'date_validator'
 gem 'chronic'
 
+
 # Template language gems
 # Use SCSS for stylesheets
 gem 'coffee-rails', '~> 4.0'
@@ -24,6 +25,7 @@ gem 'haml-rails'
 
 #View based gems
 gem 'simple_form'
+gem 'css3-progress-bar-rails'
 
 
 
@@ -34,6 +36,8 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
 #gem 'spring',        group: :development
 
+gem 'figaro'
+gem 'aws-sdk'
 gem 'redis-objects', '~> 0.9'
 gem 'sidekiq', '2.17.7'
 gem 'sinatra', '>= 1.3.0', :require => nil

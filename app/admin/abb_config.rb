@@ -1,16 +1,25 @@
-ActiveAdmin.register ABBConfig do
-  menu :parent => "Config"
+ActiveAdmin.register ABBConfig, as: 'App Setting' do
+  menu priority: 2,  :parent => 'Config'
 
   permit_params :var, :value, :thing_id, :thing_type, :tip
 
-  form :partial => "form"
   # content do
+  controller do
+    def new
+      super do |format|
+        @app_setting.var = ''
+        @app_setting.value = ''
+      end
+    end
+  end
+
   index do
       column :var
       column :value
       column :tip
       actions
   end
+  form :partial => 'admin/abb_configs/form'
 
     # simple_form_for [:admin, @abb_config], html:{class: 'form-inline'} do |form|
     #

@@ -1,13 +1,15 @@
+- if @abb_config.nil? and not @app_setting.nil?
+  - @abb_config = @app_setting
 = simple_form_for [:admin, @abb_config], html:{class: 'form-inline'} do |form|
   = form.error_notification
 
   - case @abb_config.value.class.to_s.downcase
   - when /string/
-    - render 'string', form: form
+    - render 'admin/abb_configs/string', form: form
   - when /float/
-    - render 'float', form: form
+    - render 'admin/abb_configs/float', form: form
   - when /fixnum/
-    - render 'fixnum', form: form
+    - render 'admin/abb_configs/fixnum', form: form
   - else
     .form-inputs
       = form.input :var

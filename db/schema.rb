@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140821204002) do
+ActiveRecord::Schema.define(version: 20140929190724) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -27,6 +27,16 @@ ActiveRecord::Schema.define(version: 20140821204002) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "activeadmin_settings_pictures", force: true do |t|
+    t.string   "data"
+    t.string   "data_file_size"
+    t.string   "data_content_type"
+    t.integer  "width"
+    t.integer  "height"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "admin_users", force: true do |t|
     t.string   "email",                  default: "", null: false
@@ -143,6 +153,13 @@ ActiveRecord::Schema.define(version: 20140821204002) do
   add_index "hubs", ["code"], name: "index_hubs_on_code", unique: true, using: :btree
   add_index "hubs", ["slug"], name: "index_hubs_on_slug", unique: true, using: :btree
 
+  create_table "market_data_exports", force: true do |t|
+    t.string   "status"
+    t.string   "location"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "oag_reports", force: true do |t|
     t.string   "msg_id"
     t.string   "report_key"
@@ -164,7 +181,7 @@ ActiveRecord::Schema.define(version: 20140821204002) do
     t.string   "airline_code"
     t.string   "airline_name"
     t.string   "flight_num"
-    t.boolean  "op",                  default: false
+    t.boolean  "op",                  default: false, null: false
     t.string   "op_cxr_code"
     t.string   "op_cxr_name"
     t.string   "op_flight_num"
@@ -181,7 +198,7 @@ ActiveRecord::Schema.define(version: 20140821204002) do
     t.string   "arr_op_days"
     t.string   "dep_time_local"
     t.string   "arr_time_local"
-    t.string   "next_day_arrival"
+    t.boolean  "next_day_arrival",    default: false, null: false
     t.string   "duration"
     t.integer  "stops"
     t.string   "restrictions"

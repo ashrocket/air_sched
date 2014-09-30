@@ -17,7 +17,7 @@ def perform()
        exporter = MarketDataExporter.new({})
        url = exporter.export_to_s3
        @export_report.status = 'exported'
-       @export_report.location = url
+       @export_report.location = url.to_s
 
        @export_report.save
      ensure

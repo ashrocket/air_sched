@@ -10,7 +10,7 @@ class MarketDataExporter
 
   def export_to_s3
     csv_files = {}
-
+    s3_location = ''
     @export_report_keys.each do |report_key|
 
       zipfile_name = 'abb_markets.zip'
@@ -45,9 +45,10 @@ class MarketDataExporter
       bucket = s3.buckets[bucket_name()]
       bucket_obj = bucket.objects["abb_via_#{report_key.parameterize.underscore.downcase}_markets.csv"]
       bucket_obj.write(data: csv_string)
-      bucket_obj.public_url
-    end
+      s3_location =  bucket_obj.public_url
 
+    end
+    s3_location
   end
 
   private

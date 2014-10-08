@@ -1,5 +1,5 @@
 module Admin
-class ExportsController < ApplicationController
+class MarketDataExportsController < ApplicationController
 
   def tasks
    render :default
@@ -15,5 +15,7 @@ class ExportsController < ApplicationController
         }
       end
   end
+
+
 end
 end

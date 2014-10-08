@@ -34,15 +34,15 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE active_admin_comments (
-    id bigint NOT NULL,
-    namespace text,
+    id integer NOT NULL,
+    namespace character varying(255),
     body text,
-    resource_id text NOT NULL,
-    resource_type text NOT NULL,
-    author_id bigint,
-    author_type text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    resource_id character varying(255) NOT NULL,
+    resource_type character varying(255) NOT NULL,
+    author_id integer,
+    author_type character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -977,27 +977,6 @@ CREATE INDEX direct_flights_o_and_d ON direct_flights USING btree (origin, dest)
 
 
 --
--- Name: idx_23396_index_active_admin_comments_on_author_type_and_author; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23396_index_active_admin_comments_on_author_type_and_author ON active_admin_comments USING btree (author_type, author_id);
-
-
---
--- Name: idx_23396_index_active_admin_comments_on_namespace; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23396_index_active_admin_comments_on_namespace ON active_admin_comments USING btree (namespace);
-
-
---
--- Name: idx_23396_index_active_admin_comments_on_resource_type_and_reso; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23396_index_active_admin_comments_on_resource_type_and_reso ON active_admin_comments USING btree (resource_type, resource_id);
-
-
---
 -- Name: idx_23405_index_admin_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1173,6 +1152,27 @@ CREATE UNIQUE INDEX idx_23545_index_settings_on_thing_type_and_thing_id_and_var 
 
 
 --
+-- Name: index_active_admin_comments_on_author_type_and_author_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_active_admin_comments_on_author_type_and_author_id ON active_admin_comments USING btree (author_type, author_id);
+
+
+--
+-- Name: index_active_admin_comments_on_namespace; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_active_admin_comments_on_namespace ON active_admin_comments USING btree (namespace);
+
+
+--
+-- Name: index_active_admin_comments_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_active_admin_comments_on_resource_type_and_resource_id ON active_admin_comments USING btree (resource_type, resource_id);
+
+
+--
 -- Name: index_interline_cxr_rules_on_combinations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1228,8 +1228,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140821200616');
 INSERT INTO schema_migrations (version) VALUES ('20140821200706');
 
 INSERT INTO schema_migrations (version) VALUES ('20140821204002');
-
-INSERT INTO schema_migrations (version) VALUES ('20140825091056');
 
 INSERT INTO schema_migrations (version) VALUES ('20140929190724');
 

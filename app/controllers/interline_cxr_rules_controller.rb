@@ -22,7 +22,6 @@ class InterlineCxrRulesController < ApplicationController
 
   # POST /interline_cxr_rules
   def create
-    byebug
     @report_key = ReportKey.keyed(params[:report_key_id])
     @interline_cxr_rule = @report_key.interline_cxr_rules.build(interline_cxr_rule_params)
 
@@ -35,7 +34,6 @@ class InterlineCxrRulesController < ApplicationController
 
   # PATCH/PUT /interline_cxr_rules/1
   def update
-    byebug
     if @interline_cxr_rule.update(interline_cxr_rule_params)
       redirect_to @interline_cxr_rule, notice: 'Interline cxr rule was successfully updated.'
     else

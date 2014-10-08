@@ -37,7 +37,7 @@ class ScheduleImportWorker
       end
     else
       Rails.logger.info "Import Worker, busy, delaying #{report_id} for 1 minute"
-      ScheduleImportWorker.delay_for(1.minute).perform(report_id)
+      ScheduleImportWorker.delay_for(3.minute).perform_async(report_id)
     end
     #Do Something here with the message
     #

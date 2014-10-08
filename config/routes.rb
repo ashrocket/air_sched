@@ -69,10 +69,10 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :abb_configs
 
-    resources :exports, only: [:index] do
+    resources :market_data_exports, only: [:index] do
         collection do
             get  :tasks, action: :tasks
-            post :generate, to: 'exports#generate', as: :generate
+            post :generate, to: 'market_data_exports#generate', as: :generate
         end
     end
       # # mount Sidekiq::Web => '/sidekiq'
@@ -81,6 +81,12 @@ Rails.application.routes.draw do
       # end
 
   end
+
+  resources :report_keys do
+    resources :interline_cxr_rules
+
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

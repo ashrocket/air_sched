@@ -25,44 +25,30 @@ class DirectFlight < ActiveRecord::Base
     # -----
     # Cached Data
     # ----
-    def cached_origins mode, mode_key
-       Rails.cache.fetch("direct_flight_origin_#{mode}_#{mode_key}", :expires_in => 1.hour) do
-         codes = send(mode.downcase, mode_key).select("DISTINCT(origin)").map{|f| f.origin}
+    def cached_origins data_key
+       Rails.cache.fetch("direct_flight_origin_#{data_key.parameterize.downcase}", :expires_in => 1.hour) do
+         codes = keyed(data_key).select("DISTINCT(origin)").map{|f| f.origin}
          Airport.where(code:codes)
        end
     end
     def origins
-      mode = ABBConfig.all[:mode].downcase
-      case mode
-      when /hub/
-        mode_key = ABBConfig.hub
-      else
-        mode_key = ABBConfig.cxx
-      end
-      cached_origins mode,mode_key
+      cached_origins ABBConfig.data_key
     end
 
 
-    def cached_dest_airports  mode, mode_key, origin_code
-       Rails.cache.fetch("direct_flights_dest_#{mode}_#{mode_key}_#{origin_code}", :expires_in => 1.hour) do
-         codes = send(mode.downcase, mode_key).where(origin: o).select("DISTINCT(dest)").map{|f| f.dest}
+    def cached_dest_airports  data_key, origin_code
+       Rails.cache.fetch("direct_flights_dest_#{data_key.parameterize.downcase}_#{origin_code}", :expires_in => 1.hour) do
+         codes = keyed(data_key).where(origin: origin_code).select("DISTINCT(dest)").map{|f| f.dest}
          Airport.where(code:codes)
        end
      end
     def dest_airports origin_code
-      mode = ABBConfig.all[:mode].downcase
-      case mode
-      when /hub/
-        mode_key = ABBConfig.hub
-      else
-        mode_key = ABBConfig.cxx
-      end
-      cached_dest_airports mode,mode_key, origin_code
+      cached_dest_airports ABBConfig.data_key, origin_code
     end
 
-    def cached_pair o,d
-        Rails.cache.fetch("direct_flight_#{o}_#{d}", :expires_in => 1.hour) do
-          pair(o,d)
+    def cached_pair data_key, o,d
+        Rails.cache.fetch("direct_flight_#{data_key.parameterize.downcase}_#{o}_#{d}", :expires_in => 1.hour) do
+          keyed(data_key).pair(o,d)
         end
     end
 

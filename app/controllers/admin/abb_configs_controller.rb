@@ -52,7 +52,6 @@ class ABBConfigsController < ApplicationController
   end
 
   def update
-
     @abb_config = ABBConfig.unscoped.find(params[:id])
     @abb_config.var = params[:abb_config][:var]
     @abb_config.value = params[:abb_config][:value]

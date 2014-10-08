@@ -64,14 +64,14 @@ module Oag
 
     def refresh_destinations report
         Destination.keyed(report.report_key).delete_all
+
         direct_flights = DirectFlight.keyed(report.report_key).to_a
         cnx = []
         connections = []
         # Let's cache the results to limit DB Hits.
         cache = {}
-
         origins      = DirectFlight.keyed(report.report_key).pluck(:origin).uniq
-        direct_pairs = DirectFlight.keyed(report.report_key).pluck(:origin, :dest)
+        direct_pairs = DirectFlight.keyed(report.report_key).pluck(:origin, :dest, :carriers)
         direct_pairs.sort!
         direct_pairs_hash = direct_pairs.group_by{|pair| pair[0]}
 
@@ -94,7 +94,13 @@ module Oag
 
             dest_apts.delete_if{|apt| apt.eql? o_apt}
             dest_apts.each do |dest|
-              cnx << [o_apt,hub,dest] unless o_apt.eql? dest
+              df1 =  DirectFlight.keyed(report.report_key).where(origin: o_apt, dest: hub).first
+              cxrs1 =  df1.blank? ? [""] : df1.carriers.uniq
+              df2 =  DirectFlight.keyed(report.report_key).where(origin: hub, dest: dest).first
+              cxrs2 =  df2.blank? ? [""] : df2.carriers.uniq
+
+
+              cnx << [o_apt,hub,dest, cxrs1, cxrs2] unless o_apt.eql? dest
             end
           end
         end
@@ -110,8 +116,8 @@ module Oag
            h_name = Airport.cached_name(row[1])
            d_name = Airport.cached_name(row[2])
            connections << Destination.new(report_key: report.report_key, origin: o_name, origin_code: row[0],
-                                          hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2]
-
+                                          hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2],
+                                          cxrs1: row[3], cxrs2: row[4]
            )
           end
           Destination.import connections

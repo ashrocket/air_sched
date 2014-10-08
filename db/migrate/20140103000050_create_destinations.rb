@@ -4,10 +4,10 @@ class CreateDestinations < ActiveRecord::Migration
       t.string :report_key
       t.string :origin
       t.string :origin_code
-      t.string :cxrs1
+      t.string :cxrs1, array: true, default: []
       t.string :hub_name
       t.string :hub_code
-      t.string :cxrs2
+      t.string :cxrs2, array: true, default: []
       t.string :dest
       t.string :dest_code
     end

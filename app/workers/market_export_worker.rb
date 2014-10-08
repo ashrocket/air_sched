@@ -13,7 +13,7 @@ recurrence { daily(1) }
 def perform()
    if lock.acquire!
      begin
-       @export_report = ExportReport.create(status: 'started')
+       @export_report = MarketDataExport.create(status: 'started')
        exporter = MarketDataExporter.new({})
        url = exporter.export_to_s3
        @export_report.status = 'exported'

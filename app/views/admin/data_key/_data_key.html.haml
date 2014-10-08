@@ -15,5 +15,6 @@
         - else
           = form.input :value, label:false, collection: ReportKey.active,
                         selected: ABBConfig.data_key, label_method: :name, value_method: :report_key
+          = form.hidden_field :var, value: 'data_key'
 
 

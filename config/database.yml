@@ -3,35 +3,55 @@
 #
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem 'sqlite3'
+#development:
+#  adapter: mysql2
+#  encoding: utf8
+#  database: air_sched
+#  username: air_sched_admin
+#  password: airline1
+#  host: localhost
+#  port: 3306
 development:
-  adapter: mysql2
-  encoding: utf8
+  adapter: postgresql
+  encoding: unicode
   database: air_sched
+  pool: 5
   username: air_sched_admin
   password: airline1
-  host: localhost
-  port: 3306
-
+  encoding: utf8
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test: &test
-  adapter: mysql2
-  encoding: utf8
+#  adapter: mysql2
+#  encoding: utf8
+#  database: air_sched_test
+#  username: air_sched_admin
+#  password: airline1
+#  host: localhost
+#  port: 3306
+  adapter: postgresql
+  encoding: unicode
   database: air_sched_test
+  pool: 5
   username: air_sched_admin
   password: airline1
-  host: localhost
-  port: 3306
+  encoding: utf8
 
 production:
-  adapter: mysql2
-  encoding: utf8
+#  adapter: mysql2
+#  encoding: utf8
+#  database: air_sched
+#  username: air_sched_admin
+#  password: airline1
+#  host: localhost
+#  port: 3306
+  adapter: postgresql
+  encoding: unicode
   database: air_sched
+  pool: 5
   username: air_sched_admin
   password: airline1
-  host: localhost
-  port: 3306
-
+  encoding: utf8
 cucumber:
   <<: *test

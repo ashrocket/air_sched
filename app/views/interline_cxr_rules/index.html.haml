@@ -1,0 +1,27 @@
+%h1 Listing interline_cxr_rules
+
+%table
+  %tr
+    %th Data key
+    %th Markets
+    %th Combinations
+    %th Rule kind
+    %th Active
+    %th
+    %th
+    %th
+
+  - @interline_cxr_rules.each do |interline_cxr_rule|
+    %tr
+      %td= interline_cxr_rule.data_key
+      %td= interline_cxr_rule.markets
+      %td= interline_cxr_rule.combinations
+      %td= interline_cxr_rule.rule_kind
+      %td= interline_cxr_rule.active
+      %td= link_to 'Show', interline_cxr_rule
+      %td= link_to 'Edit', edit_report_key_interline_cxr_rule_path(interline_cxr_rule)
+      %td= link_to 'Destroy', report_key_interline_cxr_rule_path(interline_cxr_rule), :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Interline cxr rule', new_report_key_interline_cxr_rule_path(ReportKey.current_report)

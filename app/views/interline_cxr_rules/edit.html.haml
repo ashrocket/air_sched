@@ -1,0 +1,11 @@
+%h1 Editing interline_cxr_rule
+- @rule_key = @interline_cxr_rule.data_key
+
+= render 'form'
+
+= link_to 'Show', @interline_cxr_rule
+\|
+- unless @rule_key.blank?
+  = link_to 'Back', report_key_interline_cxr_rules_path(@rule_key)
+- else
+  = link_to 'Back', report_key_interline_cxr_rules_path(ReportKey.current)

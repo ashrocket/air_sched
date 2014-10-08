@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Data key:
+  = @interline_cxr_rule.data_key
+%p
+  %b Markets:
+  = @interline_cxr_rule.markets
+%p
+  %b Combinations:
+  = @interline_cxr_rule.combinations
+%p
+  %b Rule kind:
+  = @interline_cxr_rule.rule_kind
+%p
+  %b Active:
+  = @interline_cxr_rule.active
+
+= link_to 'Edit', edit_interline_cxr_rule_path(@interline_cxr_rule)
+\|
+= link_to 'Back', interline_cxr_rules_path

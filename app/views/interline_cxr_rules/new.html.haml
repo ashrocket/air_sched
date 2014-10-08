@@ -1,0 +1,8 @@
+.container
+  %h3 New Interline Carrier Rule
+  - @rule_key = ReportKey.current_report
+  .row
+    .col-xs-12.col-md-6
+      = render 'form'
+  .row
+    = link_to 'Back', new_report_key_interline_cxr_rule_path

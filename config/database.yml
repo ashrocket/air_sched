@@ -14,6 +14,7 @@
 development:
   adapter: postgresql
   encoding: unicode
+  host: localhost
   database: air_sched
   pool: 5
   username: air_sched_admin
@@ -32,6 +33,7 @@ test: &test
 #  port: 3306
   adapter: postgresql
   encoding: unicode
+  host: localhost
   database: air_sched_test
   pool: 5
   username: air_sched_admin
@@ -48,6 +50,7 @@ production:
 #  port: 3306
   adapter: postgresql
   encoding: unicode
+  host: localhost
   database: air_sched
   pool: 5
   username: air_sched_admin

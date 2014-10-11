@@ -3,34 +3,7 @@ require 'mastiff'
 
 module Oag
   class Process
-    #def job_from_filename(job_type, filename)
-    #   test_string = filename.upcase
-    #   matches = test_string.match(/#{job_type}[^a-zA-Z0-9]?([a-zA-Z0-9]+)/)
-    #   key = matches.blank? ? nil : matches.captures.first
-    #   ext = File.extname(filename)
-    #   case ext
-    #   when /\.zip/
-    #     {job: job_type, key: key, archive: filename}
-    #   else
-    #     {job: job_type, key: key, tmpfile: filename }
-    #   end
-    #end
-    #def process_attachment msg_id
-    #case job[:job]
-    #  when /HUB/
-    #    process_hub job
-    #  when /CXX/
-    #    process_cxx job
-    #end
-    #end
-    #def process_job job
-    #  case job[:job]
-    #    when /HUB/
-    #      process_hub job
-    #    when /CXX/
-    #      process_cxx job
-    #  end
-    #end
+
     def refresh_airports report
         origins      = OagSchedule.keyed(report.report_key).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
         destinations = OagSchedule.keyed(report.report_key).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
@@ -104,12 +77,12 @@ module Oag
             end
           end
         end
-        Rails.logger.info "Unique Connection Pairs not filtered for Direct Flight Exclusion rule #{cnx.count}"
+        Rails.logger.info "Unique Connection Pairs not filtered for Direct Flight Exclusion rule #{cnx.count} #{report.report_key}"
         cnx.delete_if{|row| direct_pairs_hash[row[0]].include? [row[0],row[2]] }
-        Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count}"
+        Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count} #{report.report_key}"
         tot = cnx.count
         cnx.in_groups_of(1000) do |cnx_group|
-          puts "Building #{cnx_group.count} connections out of #{tot} remaining"
+          Sidekiq::Logging.logger.info "Building #{cnx_group.count} connections out of #{tot} remaining for #{report.report_key}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
@@ -119,6 +92,10 @@ module Oag
                                           hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2],
                                           cxrs1: row[3], cxrs2: row[4]
            )
+          end
+          rules = InterlineCxrRule.keyed(report.report_key)
+          rules.sort_by(&:sequence).each do |rule|
+            connections = rule.apply(connections)
           end
           Destination.import connections
           connections = []
@@ -135,7 +112,7 @@ module Oag
           pairs =  Destination.keyed(report.report_key).pluck(:origin_code, :dest_code).uniq
           tot = pairs.count
           pairs.in_groups_of(1000) do |pair_group|
-            puts "Building #{pair_group.count} connection pairs out of #{tot} remaining"
+            Sidekiq::Logging.logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
             tot -= 1000
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
@@ -151,7 +128,7 @@ module Oag
     end
     #TODO provide the option to store the processed files in the processed folder
     def finalize report
-        puts "Finalizing #{report.attachment_path} import"
+        Sidekiq::Logging.logger.info "Finalizing #{report.attachment_path} import"
 
         File.delete report.attachment_path
         File.delete report.report_path

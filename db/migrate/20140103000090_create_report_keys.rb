@@ -1,8 +1,9 @@
 class CreateReportKeys < ActiveRecord::Migration
   def change
     create_table :report_keys do |t|
-      t.string :report_key
-      t.string :name
+      t.string :report_key,  null: false
+      t.string :name,  null: false
+      t.string :file_pattern,  null: false, default: '(?!)'
       t.string :city
       t.boolean :active
       t.string :slug

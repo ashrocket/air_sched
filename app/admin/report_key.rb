@@ -5,7 +5,7 @@ ActiveAdmin.register ReportKey, as: 'Data Keys' do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :report_key, :name, :city
+  permit_params :report_key, :name, :city, :file_pattern, :active
   #
   # or
   #

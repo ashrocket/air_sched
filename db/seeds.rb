@@ -5,7 +5,7 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-ABBConfig.data_key = 'SNN'
+ABBConfig.data_key = 'SIN'
 config = ABBConfig.where(:var => 'data_key').first
 config.tip = "Key that determins which data set will be used"
 config.save
@@ -24,3 +24,5 @@ ABBConfig.maxmaxct = 2880
  config = ABBConfig.where(:var => 'maxmaxct').first
  config.tip = "in minutes"
  config.save
+
+AppSwitch.where(name: 'autoload').first_or_create!

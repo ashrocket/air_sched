@@ -448,10 +448,12 @@ ALTER SEQUENCE hubs_id_seq OWNED BY hubs.id;
 CREATE TABLE interline_cxr_rules (
     id integer NOT NULL,
     report_key_id integer,
-    markets text[] DEFAULT '{}'::text[],
-    combinations text[] DEFAULT '{}'::text[],
+    patterns text[] DEFAULT '{(?!)}'::text[],
+    match_on character varying(255) DEFAULT 'id'::character varying,
     rule_kind character varying(255) DEFAULT 'allow'::character varying NOT NULL,
     active boolean DEFAULT true,
+    sequence integer DEFAULT 0,
+    description text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -611,14 +613,15 @@ ALTER SEQUENCE oag_schedules_id_seq OWNED BY oag_schedules.id;
 --
 
 CREATE TABLE report_keys (
-    id bigint NOT NULL,
-    report_key text,
-    name text,
-    city text,
+    id integer NOT NULL,
+    report_key character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    file_pattern character varying(255) DEFAULT '(?!)'::character varying NOT NULL,
+    city character varying(255),
     active boolean,
-    slug text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    slug character varying(255),
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1124,20 +1127,6 @@ CREATE INDEX idx_23519_oag_flight_id ON oag_schedules USING btree (airline_code,
 
 
 --
--- Name: idx_23530_index_report_keys_on_report_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23530_index_report_keys_on_report_key ON report_keys USING btree (report_key);
-
-
---
--- Name: idx_23530_index_report_keys_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23530_index_report_keys_on_slug ON report_keys USING btree (slug);
-
-
---
 -- Name: idx_23537_unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1173,24 +1162,24 @@ CREATE INDEX index_active_admin_comments_on_resource_type_and_resource_id ON act
 
 
 --
--- Name: index_interline_cxr_rules_on_combinations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_interline_cxr_rules_on_combinations ON interline_cxr_rules USING gin (combinations);
-
-
---
--- Name: index_interline_cxr_rules_on_markets; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_interline_cxr_rules_on_markets ON interline_cxr_rules USING gin (markets);
-
-
---
 -- Name: index_interline_cxr_rules_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_interline_cxr_rules_on_report_key_id ON interline_cxr_rules USING btree (report_key_id);
+
+
+--
+-- Name: index_report_keys_on_report_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_report_keys_on_report_key ON report_keys USING btree (report_key);
+
+
+--
+-- Name: index_report_keys_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_report_keys_on_slug ON report_keys USING btree (slug);
 
 
 --

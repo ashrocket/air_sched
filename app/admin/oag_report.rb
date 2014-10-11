@@ -33,6 +33,9 @@ ActiveAdmin.register OagReport, :as => 'OAG Imports' do
           column 'Message Date', :sortable => :received do |report|
             report.received
           end
+          column 'Detail Status', :sortable => :load_status do |report|
+            report.load_status
+          end
 
      end
 

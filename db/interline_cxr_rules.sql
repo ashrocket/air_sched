@@ -1,0 +1,2 @@
+
+UPDATE public.interline_cxr_rules SET report_key_id = 2, patterns = array['^(\\w{3})?(?<!BOM|DEL|MAA)(BOM|DEL|MAA)$','^(BOM|DEL|MAA)(?!BOM|DEL|MAA)(\\w{3})$'], match_on = 'market',   rule_kind = 'whitelisted', active = true, description = null, created_at = '2014-10-10 18:30:27.739', updated_at = '2014-10-10 19:30:57.458' WHERE id = 1;

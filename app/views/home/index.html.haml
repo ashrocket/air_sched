@@ -19,9 +19,6 @@
 
   .row
     .col-sm-3.col-sm-offset-1
-      - if ABBConfig.all[:mode].eql? 'HUB'
-        %a.btn.btn-primary.btn-lg.active{href: "#{search_hub_index_url}", role:"button"} Search
-      - else
-        %a.btn.btn-primary.btn-lg.active{href: "#{search_index_url}", role:"button"} Search
+      %a.btn.btn-primary.btn-lg.active{href: "#{search_index_url}", role:"button"} Search
     .col-sm-3.col-sm-offset-1
       %a.btn.btn-default.btn-lg.active{href: "#{explore_destinations_url}", role:"button"} Explore

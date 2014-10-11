@@ -41,6 +41,8 @@ gem 'figaro'
 gem 'aws-sdk'
 gem 'redis-objects', '~> 0.9'
 gem 'sidekiq', '2.17.7'
+gem 'sidekiq-lock'
+gem 'sidekiq-failures'
 gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'sidetiq', '0.5.0'
 gem 'rabl'

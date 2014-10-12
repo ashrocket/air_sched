@@ -4,9 +4,10 @@ class CreateOagReports < ActiveRecord::Migration
       t.string :msg_id
       t.string :report_key
       t.text     :load_status
-      t.string   :report_status, :default => 'uninitialized'
-      t.string   :attachment_status, :default => 'unstored'
+      t.string   :report_status, default: 'uninitialized'
+      t.string   :attachment_status, default: 'unstored'
       t.datetime :received
+      t.integer  :attachment_lines, default: 0
       t.string   :attachment_path
       t.integer  :attachment_size
       t.boolean  :complete, :default => false

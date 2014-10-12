@@ -4,9 +4,12 @@ require 'mastiff'
 module Oag
   class Process
 
-    def refresh_airports report
-        origins      = OagSchedule.keyed(report.report_key).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
-        destinations = OagSchedule.keyed(report.report_key).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
+    def refresh_airports(report)
+        origins = []
+        destination = []
+        origins      += OagSchedule.keyed(report.report_key).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
+        destinations += OagSchedule.keyed(report.report_key).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
+
         airports = (origins + destinations).uniq!
         airports.each do |airport|
            apt = Airport.where(code: airport[0]).first_or_create!
@@ -82,7 +85,7 @@ module Oag
         Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count} #{report.report_key}"
         tot = cnx.count
         cnx.in_groups_of(1000) do |cnx_group|
-          Sidekiq::Logging.logger.info "Building #{cnx_group.count} connections out of #{tot} remaining for #{report.report_key}"
+          Rails.logger.info "Building #{cnx_group.count} connections out of #{tot} remaining for #{report.report_key}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
@@ -112,7 +115,7 @@ module Oag
           pairs =  Destination.keyed(report.report_key).pluck(:origin_code, :dest_code).uniq
           tot = pairs.count
           pairs.in_groups_of(1000) do |pair_group|
-            Sidekiq::Logging.logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
+            Rails.logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
             tot -= 1000
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
@@ -128,7 +131,7 @@ module Oag
     end
     #TODO provide the option to store the processed files in the processed folder
     def finalize report
-        Sidekiq::Logging.logger.info "Finalizing #{report.attachment_path} import"
+        Rails.logger.info "Finalizing #{report.attachment_path} import"
 
         File.delete report.attachment_path
         File.delete report.report_path
@@ -137,7 +140,10 @@ module Oag
         report.report_status                    = 'finished'
         report.save
     end
-
+    def large_import(report)
+      line_count = %x{wc -l < "#{report.load_status['report_path']}"}.to_i
+      line_count > 10000
+    end
     def import_oag_file report
         begin
           importer = Oag::Import.new
@@ -150,6 +156,16 @@ module Oag
         end
 
 
+    end
+    def import_large_oag_file report
+        begin
+          importer = Oag::Import.new
+          importer.parse_and_load_large_report report
+
+        rescue Exception => ex
+               Rails.logger.info ex.message
+               Rails.logger.info report.inspect
+        end
     end
 
 

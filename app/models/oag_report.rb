@@ -6,7 +6,9 @@ class OagReport < ActiveRecord::Base
   def report_path
     load_status["report_path"]
   end
-
+  def large_report?
+    attachment_lines > 10000
+  end
   def report_file_string
     unless report_path and File.exist? report_path
       if File.exist?(attachment_path)

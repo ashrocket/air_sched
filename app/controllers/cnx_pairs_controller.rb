@@ -6,7 +6,7 @@ class CnxPairsController < ApplicationController
     @airport_code = params[:id]
     cnx_pairs = CnxPair.keyed(ABBConfig.data_key).from_airport(@airport_code)
 
-    @cnx_pairs = cnx_pairs.map{|pair| pair.slice(:dest, :dest_name).merge(:dest_airport_id =>  Airport.friendly.find(pair.dest).id)}
+    @cnx_pairs = cnx_pairs.map{|pair| pair.slice(:dest, :dest_name).merge(:dest_airport_id =>  Airport.friendly.find(pair.dest.downcase).id)}
 
   end
   # GET /connections/from/airport_code JSON Only
@@ -14,7 +14,7 @@ class CnxPairsController < ApplicationController
     @airport_code = params[:origin]
     cnx_pairs = CnxPair.keyed(ABBConfig.data_key).from_airport(@airport_code)
 
-    @cnx_pairs = cnx_pairs.map{|pair| pair.slice(:dest, :dest_name).merge(:dest_airport_id =>  Airport.friendly.find(pair.dest).id)}
+    @cnx_pairs = cnx_pairs.map{|pair| pair.slice(:dest, :dest_name).merge(:dest_airport_id =>  Airport.friendly.find(pair.dest.downcase).id)}
   end
 
 

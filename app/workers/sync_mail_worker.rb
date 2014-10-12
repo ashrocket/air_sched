@@ -10,6 +10,7 @@ class SyncMailWorker
   recurrence { minutely }
 
   def perform
+    Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
         Mastiff::Email.sync_messages

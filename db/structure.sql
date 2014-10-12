@@ -515,18 +515,19 @@ ALTER SEQUENCE market_data_exports_id_seq OWNED BY market_data_exports.id;
 --
 
 CREATE TABLE oag_reports (
-    id bigint NOT NULL,
-    msg_id text,
-    report_key text,
+    id integer NOT NULL,
+    msg_id character varying(255),
+    report_key character varying(255),
     load_status text,
-    report_status text DEFAULT 'uninitialized'::text,
-    attachment_status text DEFAULT 'unstored'::text,
-    received timestamp with time zone,
-    attachment_path text,
-    attachment_size bigint,
+    report_status character varying(255) DEFAULT 'uninitialized'::character varying,
+    attachment_status character varying(255) DEFAULT 'unstored'::character varying,
+    received timestamp without time zone,
+    attachment_lines integer DEFAULT 0,
+    attachment_path character varying(255),
+    attachment_size integer,
     complete boolean DEFAULT false,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 

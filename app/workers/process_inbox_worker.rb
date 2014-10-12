@@ -10,6 +10,7 @@ class ProcessInboxWorker
   recurrence { minutely(10) }
 
   def perform
+    Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
           Mastiff::Email.process_inbox

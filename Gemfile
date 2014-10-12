@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 4.1'
 # ORM related gems
-gem 'pg'
+gem 'pg', '~> 0.18.0.pre20140820094244'
 # gem 'mysql2'
 gem 'friendly_id', '~> 5.0.0'
 gem 'activerecord-import'

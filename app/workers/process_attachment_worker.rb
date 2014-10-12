@@ -5,6 +5,7 @@ class ProcessAttachmentWorker
   sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
 
   def perform(message_id)
+    Rails.logger = Sidekiq::Logging.logger
     if AppSwitch.on?('autoload')
       msg = Mastiff::Email::Message.get(message_id)
 

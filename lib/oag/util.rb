@@ -24,6 +24,35 @@ module Oag
     end
 
 
+  def release_concurrent_postgres_db_connection
+      begin
+        defined?(ActiveRecord::Base) and
+                ActiveRecord::Base.connection.disconnect!
+      rescue Exception => ex
+        Rails.logger.info ex.message
+      end
+  end
+
+
+    # As per https://github.com/grosser/parallel  Active Record Connection
+    # https://devcenter.heroku.com/articles/forked-pg-connections
+    def refresh_concurrent_postgres_db_connection
+      begin
+        begin
+        ActiveRecord::Base.connection.reconnect!
+        # defined?(ActiveRecord::Base) and
+        #    ActiveRecord::Base.establish_connection(
+        #      Rails.application.config.database_configuration[Rails.env]
+        #  )
+        rescue Exception => ex
+          Rails.logger.info ex.message
+          ActiveRecord::Base.connection.reconnect!
+        end
+      rescue
+        Rails.logger.info ex.message
+      end
+    end
+
 
   end
 end

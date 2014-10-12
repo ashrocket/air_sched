@@ -79,7 +79,7 @@ class OagSchedule < ActiveRecord::Base
     end
 
     def operating(dep_date)
-      where("dep_op_days REGEXP '.*?.*'", dep_date.cwday)
+      where("dep_op_days ~* '.*?.*'", dep_date.cwday)
     end
     def travelling_on(dep_date)
       where('? BETWEEN eff_date and disc_date', dep_date ).operating(dep_date)
@@ -98,7 +98,7 @@ class OagSchedule < ActiveRecord::Base
     def mkt_cxrs row
       mkt_cxrs = [row[:dupcar1], row[:dupcar2], row[:dupcar3], row[:dupcar4],
                   row[:dupcar5], row[:dupcar6], row[:dupcar7], row[:dupcar8]].compact
-      mkt_cxrs.delete_if{|v| v.eql?"0"}
+      mkt_cxrs.delete_if{|v| v.eql? '0'}
       mkt_cxrs.join ';'
     end
 

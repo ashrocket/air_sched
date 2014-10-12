@@ -11,6 +11,7 @@ sidekiq_options lock: { timeout: 600000, name: 'lock-export-worker' }
 recurrence { daily(1) }
 
 def perform()
+   Rails.logger = Sidekiq::Logging.logger
    if lock.acquire!
      begin
        @export_report = MarketDataExport.create(status: 'started')

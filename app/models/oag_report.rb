@@ -1,4 +1,5 @@
 class OagReport < ActiveRecord::Base
+  # http://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Serialization/ClassMethods.html
   serialize :load_status, JSON
 
   scope :incomplete,  -> { where(complete: false) }

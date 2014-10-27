@@ -69,6 +69,13 @@ class OagSchedule < ActiveRecord::Base
   class << self
 
 
+    def origins(report)
+      keyed(report.report_key).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq || []
+    end
+
+    def destinations(report)
+      keyed(report.report_key).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq || []
+    end
 
     def later_than(dep_time)
        where("CAST(arr_time_local as UNSIGNED) >= ?", dep_time)

@@ -13,8 +13,9 @@ class Airport < ActiveRecord::Base
       by_code(code).first
     end
   end
-  def cached_name code
-    cached(code).name
+  def cached_name(code)
+    airport =  cached(code)
+    name = airport ? airport.name : 'Unknown Airport Name'
   end
 
   #def refresh_from_cxx cxx

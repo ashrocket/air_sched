@@ -11,7 +11,7 @@ class ProcessAttachmentWorker
 
       report = OagReport.where(msg_id: message_id).first
       if report
-        unless report.load_status["attachment_status"].eql?('uncompressed')
+        unless report.load_status['attachment_status'].eql?('uncompressed')
           report.process_oag_file
           report.report_status =  'queued' if report.report_status.eql? 'uninitialized'
           report.save

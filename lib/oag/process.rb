@@ -6,9 +6,9 @@ module Oag
 
     def refresh_airports(report)
         origins = []
-        destination = []
-        origins      += OagSchedule.keyed(report.report_key).pluck(:origin_apt, :origin_apt_name, :origin_apt_city).uniq
-        destinations += OagSchedule.keyed(report.report_key).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
+        destinations = []
+        origins      += OagSchedule.origins(report)
+        destinations += OagSchedule.destinations(report)
 
         airports = (origins + destinations).uniq!
         airports.each do |airport|
@@ -133,10 +133,10 @@ module Oag
     def finalize report
         Rails.logger.info "Finalizing #{report.attachment_path} import"
 
-        File.delete report.attachment_path
-        File.delete report.report_path
+        File.delete report.attachment_path if File.exist?(report.attachment_path)
+        File.delete report.report_path if File.exist?(report.report_path)
         Mastiff::Email.finalize([report.msg_id])
-        report.load_status["attachment_status"] = 'processed'
+        report.load_status['attachment_status'] = 'processed'
         report.report_status                    = 'finished'
         report.save
     end

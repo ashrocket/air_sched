@@ -19,7 +19,7 @@ ActiveAdmin.register AdminUser do
 
   form do |f|
     f.inputs "Admin Details" do
-      f.input :email
+      f.input :email, :as => :string
       f.input :password
       f.input :password_confirmation
     end

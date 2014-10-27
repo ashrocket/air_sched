@@ -10,7 +10,7 @@ module Oag
         origins      += OagSchedule.origins(report)
         destinations += OagSchedule.destinations(report)
 
-        airports = (origins + destinations).uniq!
+        airports = (origins + destinations).uniq
         airports.each do |airport|
            apt = Airport.where(code: airport[0]).first_or_create!
            apt.name = airport[1]
@@ -138,6 +138,7 @@ module Oag
         Mastiff::Email.finalize([report.msg_id])
         report.load_status['attachment_status'] = 'processed'
         report.report_status                    = 'finished'
+        report.complete = true
         report.save
     end
     def large_import(report)

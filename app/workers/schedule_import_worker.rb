@@ -48,8 +48,6 @@ class ScheduleImportWorker
               rkey = ReportKey.where(report_key: report.report_key).first_or_create
               rkey.active = true
               rkey.save
-              report.complete = true
-              report.save
           end
           unless report.complete or report.large_report?
             ScheduleImportWorker.perform_async(report_id)

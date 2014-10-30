@@ -81,7 +81,7 @@ module Oag
          end
          schedules << sched
       end
-      schedules
+      schedules.uniq
   end
   def process_schedule_chunk(report, schedules, options={})
     orig_airports = schedules.collect{ |n| n[:origin_apt] }

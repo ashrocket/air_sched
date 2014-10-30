@@ -8,21 +8,21 @@ class OagReport < ActiveRecord::Base
     load_status["report_path"]
   end
   def large_report?
-    attachment_lines > 10000
+    self.attachment_lines > 10000
   end
   def report_file_string
-    unless report_path and File.exist? report_path
-      if File.exist?(attachment_path)
+    unless self.report_path and File.exist? self.report_path
+      if File.exist?(self.attachment_path)
         process_oag_file
       end
     end
-    if report_path and File.exist? report_path
-      return  File.readlines(report_path).join
+    if self.report_path and File.exist? self.report_path
+      return  File.readlines(self.report_path).join
     end
   end
 
   def estimated_key
-      report_name = File.basename report_path
+      report_name = File.basename(self.report_path,File.extname(self.report_path))
       key_type    = report_name[0..2]
 
       if (['HUB','CXX', 'ABB'].include?(key_type))
@@ -33,27 +33,26 @@ class OagReport < ActiveRecord::Base
   end
 
   def process_oag_file
-    Rails.logger.info "Decompressing Email Attachment for message #{msg_id} #{attachment_path}"
-    byebug
-    if File.exist? attachment_path
-      update(attachment_status: 'stored',attachment_size: File.stat(attachment_path).size)
+    Rails.logger.info "Decompressing Email Attachment for message #{self.msg_id} #{self.attachment_path}"
+    if File.exist? self.attachment_path
+      update(attachment_status: 'stored',attachment_size: File.stat(self.attachment_path).size)
     end
 
-    ext = File.extname(attachment_path)
+    ext = File.extname(self.attachment_path)
 
     if ext.eql? '.csv'
-      if File.exists? attachment_path
+      if File.exists? self.attachment_path
         load_status["attachment_status"]  = 'uncompressed'
-        load_status["report_path"]        = attachment_path
+        load_status["report_path"]        = self.attachment_path
         load_status["report_size"]        = load_status["attachment_size"]
         save
 
       end
     elsif ext.eql? '.zip'
-      Zip::InputStream::open(attachment_path) {|io|
+      Zip::InputStream::open(self.attachment_path) {|io|
          entry = io.get_next_entry
          uncompressed_filename   = entry.name.squish.gsub(" ", "_")
-         uncompressed_path       = File.join( File.dirname(attachment_path), uncompressed_filename )
+         uncompressed_path       = File.join( File.dirname(self.attachment_path), uncompressed_filename )
          File.open(uncompressed_path, 'wb'){|f| f << io.read}
 
          load_status["report_path"] = uncompressed_path
@@ -63,15 +62,14 @@ class OagReport < ActiveRecord::Base
       }
     end
     #  TODO: Analyze why rejected status doesn't bubble up
-    report_key  = estimated_key
-    unless report_key
-      report_status ='rejected'
-      attachment_status = 'rejected'
-      File.delete attachment_path if File.exist? attachment_path
-      File.delete report_path if File.exist? report_path
-      complete = true
+    self.report_key  = estimated_key
+    unless self.report_key
+      self.report_status ='rejected'
+      self.attachment_status = 'rejected'
+      File.delete self.attachment_path if File.exist? self.self.attachment_path
+      File.delete report_path if File.exist? self.report_path
+      self.complete = true
     end
-    byebug
     save
 
   end

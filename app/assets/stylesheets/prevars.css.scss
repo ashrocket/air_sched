@@ -1,3 +1,9 @@
-$brand-primary:        #9e33aa;
+// Change primary or other brand colors here.
+// There is a newer way to do this kind of thing called bootstrap theme
+// but I haven't integreated it yet
 
-$font-size-base:          16px;
+// Uncomment to change primary color
+//$brand-primary:        #9e33aa;
+
+// This will mess up the basic layout so if you use it, re-configure layout
+// $font-size-base:          16px;

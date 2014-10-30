@@ -13,9 +13,10 @@ gem 'chronic'
 # Template language gems
 # Use SCSS for stylesheets
 gem 'coffee-rails', '~> 4.0'
+gem 'sprockets-rails', :require => 'sprockets/railtie'
 gem 'sass-rails', '~> 4.0'
 gem 'quiet_assets', :group => :development
-gem 'bootstrap-sass', '~> 3.1.0'
+gem 'bootstrap-sass'
 gem 'uglifier', '>= 1.3.0'
 gem 'haml-rails'
 

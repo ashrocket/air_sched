@@ -12,7 +12,18 @@ module AirSched
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
     config.autoload_paths += %W(#{config.root}/lib)
+
+    # config/application.rb
+    # bootstrap-sass asset paths
+    # root.join('vendor/assets/components/bootstrap-sass/assets').tap do |path|
+    #   config.sass.load_paths << path.join('stylesheets')
+    #   config.assets.paths += %w(javascripts fonts images).map(&path.method(:join))
+    # end
+    # byebug
+    #
+
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
+
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.

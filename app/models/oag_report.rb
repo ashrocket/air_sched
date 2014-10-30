@@ -26,15 +26,15 @@ class OagReport < ActiveRecord::Base
       key_type    = report_name[0..2]
 
       if (['HUB','CXX', 'ABB'].include?(key_type))
-        matches = report_name[3..-1].match /[^A-Za-z]([A-Za-z]+)_{0,1}/
+        matches = report_name[3..-1].match /[^A-Za-z]([A-Za-z0-9]+)_{0,1}/
         return  matches.captures.first.lstrip if matches
       end
       return nil
   end
 
   def process_oag_file
-    # TODO:  Check for Existing Report Key filenames.
-    
+    # TODO:  Check for Existing Report Key filename patterns and only process if Key Exists.
+
     Rails.logger.info "Decompressing Email Attachment for message #{self.msg_id} #{self.attachment_path}"
     if File.exist? self.attachment_path
       update(attachment_status: 'stored',attachment_size: File.stat(self.attachment_path).size)

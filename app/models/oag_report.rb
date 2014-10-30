@@ -13,7 +13,7 @@ class OagReport < ActiveRecord::Base
   def report_file_string
     unless report_path and File.exist? report_path
       if File.exist?(attachment_path)
-        process_oag_file(self)
+        process_oag_file
       end
     end
     if report_path and File.exist? report_path
@@ -26,14 +26,15 @@ class OagReport < ActiveRecord::Base
       key_type    = report_name[0..2]
 
       if (['HUB','CXX', 'ABB'].include?(key_type))
-        matches = report_name[3..-1].match /[^A-Za-z](.*)_/
-        return  matches.captures.first
+        matches = report_name[3..-1].match /[^A-Za-z](.*)_{0,1}/
+        return  matches.captures.first.lstrip if matches
       end
       return nil
   end
 
   def process_oag_file
     Rails.logger.info "Decompressing Email Attachment for message #{msg_id} #{attachment_path}"
+    byebug
     if File.exist? attachment_path
       update(attachment_status: 'stored',attachment_size: File.stat(attachment_path).size)
     end
@@ -61,14 +62,16 @@ class OagReport < ActiveRecord::Base
 
       }
     end
-    self.report_key  = estimated_key
-    unless self.report_key
+    #  TODO: Analyze why rejected status doesn't bubble up
+    report_key  = estimated_key
+    unless report_key
       report_status ='rejected'
       attachment_status = 'rejected'
       File.delete attachment_path if File.exist? attachment_path
       File.delete report_path if File.exist? report_path
-      report.complete = true
+      complete = true
     end
+    byebug
     save
 
   end

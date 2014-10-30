@@ -7,10 +7,6 @@ class ReportKey < ActiveRecord::Base
   #t.string :name
   #t.boolean :active
 
-
-
-
-
   class << self
     def keyed report_key
        where("report_key = ?",  report_key).first
@@ -27,5 +23,9 @@ class ReportKey < ActiveRecord::Base
      where(active: true).uniq.pluck(:report_key)
     end
 
+  end
+  def initialize(attributes = {})
+    name = "REPORT NAME IS REQUIRED"
+    super
   end
 end

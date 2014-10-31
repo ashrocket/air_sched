@@ -12,6 +12,7 @@ gem 'chronic'
 
 # Template language gems
 # Use SCSS for stylesheets
+gem 'js-routes'
 gem 'coffee-rails', '~> 4.0'
 gem 'sprockets-rails', :require => 'sprockets/railtie'
 gem 'sass-rails', '~> 4.0'

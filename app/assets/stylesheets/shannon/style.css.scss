@@ -3,17 +3,25 @@ body {
 }
 
 #header {
-	float: right;
 	margin: 0;
 	background: url(/assets/shannon/header-whole.png) no-repeat center center #c60651;
 	width: 100%;
 	height: 140px;
 }
 
+#footer {
+	margin: 0;
+	background: url(/assets/shannon/footer-whole.png) no-repeat center center #c60651;
+	width: 100%;
+	height: 180px;
+}
+
 .container {
     background: #fff;
     margin-top: 15px;
+    margin-bottom: 15px;
     width: 1040px;
+    min-height: 700px;
 }
 
 .search_inputs {

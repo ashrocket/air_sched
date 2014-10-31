@@ -36,6 +36,9 @@
       = form.hidden_field :origin_id
       = form.hidden_field :origin_code
 
+      %a#reverse_pair{href: "#", role:"button"}
+        %i.fa.fa-exchange
+
       = form.input :dest, label: false,
             input_html: { :placeholder => "TO", :class => "search-dest typeahead input-md",
             "data-dest-code" => @search_request.dest_code, "data-dest-name" => @search_request.dest}
@@ -53,6 +56,12 @@
            data:{behaviour:"datepicker"}},  label: false
 
       = form.submit "Search", class:"btn btn-primary"
+
+      %a.btn.btn-primary#analyze_pair{href: "#", role:"button"} Analyze Pair
+
+      %a.btn.btn-primary{href: "#{explore_destinations_url}"}
+        %i.fa.fa-globe
+        Explore
 
       -#= form.input :owrt, as: :boolean, label: "RoundTrip"
 

@@ -24,7 +24,8 @@ body {
     min-height: 700px;
 }
 
-.search_inputs {
+.search_request_depart, #search_request_depart, .search_request_ret_date, #search_request_ret_date, .search_request_dest, #search_request_dest, .search_request_origin, #search_request_origin {
+	width: 115px;
 }
 
 .table-responsive {

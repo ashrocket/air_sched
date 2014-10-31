@@ -1,0 +1,40 @@
+body {
+	background: #e8e8e8;
+}
+
+#header {
+	float: right;
+	margin: 0;
+	background: url(/assets/shannon/header-whole.png) no-repeat center center #c60651;
+	width: 100%;
+	height: 140px;
+}
+
+.container {
+    background: #fff;
+    margin-top: 15px;
+    width: 1040px;
+}
+
+.search_inputs {
+}
+
+.table-responsive {
+	margin: 15px;
+}
+
+.btn-primary, .btn-primary:hover {
+	color: white;
+	background-color: #f47735;
+	border: none;
+	border-radius: 8px;
+}
+
+.btn-primary:hover {
+	background-color: #EA773A;
+}
+
+.dataTable thead {
+	background: #c60651;
+	color: #fff;
+}

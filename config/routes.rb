@@ -2,8 +2,7 @@ Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
 
-  root 'home#index'
-
+  root 'search#index' 
 
   resource :emails, :controller => 'emails', as: 'mail', only: [:index] do
            get '/', action: :index

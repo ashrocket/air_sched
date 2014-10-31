@@ -3,35 +3,36 @@
     %br
   .row
     .col-sm-4
-      .h3
+      .h3.text-primary
         %a{href:"#{root_url}"}<
           %i.fa.fa-home
         %a{href:"#{admin_dashboard_url}"}<
           %i.fa.fa-gear
         Search For Flights
     .col-sm-2
-      %a.btn.btn-default#analyze_pair{href: "#", role:"button"} Analyze Pair
+      %a.btn.btn-primary#analyze_pair{href: "#", role:"button"} Analyze Pair
     .col-sm-2
-      %a.btn.btn-default#reverse_pair{href: "#", role:"button"}
+      %a.btn.btn-primary#reverse_pair{href: "#", role:"button"}
         %i.fa.fa-exchange
         Reverse
     .col-sm-2
-      %a.btn.btn-default{href: "#{explore_destinations_url}"}
+      %a.btn.btn-primary{href: "#{explore_destinations_url}"}
         %i.fa.fa-globe
         Explore
 
   .row
     %br
   .row
-    = render partial: 'search/search_form', locals: {search_form_url: search_url}
+    .col-sm-12
+      = render partial: 'search/search_form', locals: {search_form_url: search_url}
 
 
   .row
 
-    %br
+
     %br
     .table-responsive.hide
-      %table.table.table-hover.table-condensed#to_hub_table
+      %table.table.table-hover.table-striped#to_hub_table
         %thead
           %tr
             %th Eff
@@ -52,9 +53,8 @@
   .row
 
     %br
-    %br
     .table-responsive.hide
-      %table.table.table-hover.table-condensed#from_hub_table
+      %table.table.table-hover.table-striped#from_hub_table
         %thead
           %tr
             %th Eff

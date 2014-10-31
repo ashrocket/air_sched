@@ -24,19 +24,21 @@
   .row
     %br
   .row
-    = simple_form_for :destination  do |form|
+    .col-sm-12
+      = simple_form_for :destination  do |form|
 
-      = form.input :origin, label: false,
-           input_html:{class: 'explore-origin typeahead',
-                       placeholder: "Type the name of an origin airport to see where you can go in 1 stop"}
+        = form.input :origin, label: false,
+             input_html:{class: 'explore-origin typeahead',
+                         placeholder: "Type the name of an origin airport to see where you can go in 1 stop"}
 
 
-      = form.hidden_field :origin_id
-      = form.hidden_field :origin_code
+        = form.hidden_field :origin_id
+        = form.hidden_field :origin_code
 
   .row
-    - href = "search"
-    .panel#destinations_panel{data: {url: "#{href}"}}
+    .col-sm-12
+      - href = "search"
+      .panel#destinations_panel{data: {url: "#{href}"}}
 
   .row
     %br

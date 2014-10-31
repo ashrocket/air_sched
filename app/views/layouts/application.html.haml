@@ -29,5 +29,8 @@
 
 
   %body{class: "#{controller_name} #{action_name}" }
-    = yield
+    = render partial: "layouts/shannon/header"
+    .row
+      .col-sm-12
+        = yield
 

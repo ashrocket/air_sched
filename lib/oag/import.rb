@@ -24,7 +24,6 @@ module Oag
 
   def load_schedule(csvdata, options={})
       schedules = []
-
       csvdata.each do |row|
 
        #case row[:dupmarker]
@@ -81,6 +80,7 @@ module Oag
          end
          schedules << sched
       end
+      schedules.delete_if{|s| s[:disc_date].blank?}
       schedules.uniq
   end
   def process_schedule_chunk(report, schedules, options={})
@@ -121,7 +121,6 @@ module Oag
     OagSchedule.where(:report_key => report.report_key).delete_all
 
     Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key}"
-
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status["expired_schedules_count"] = expired.count
 

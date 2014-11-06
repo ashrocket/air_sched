@@ -68,7 +68,7 @@ class OagReport < ActiveRecord::Base
     unless self.report_key
       self.report_status ='rejected'
       self.attachment_status = 'rejected'
-      File.delete self.attachment_path if File.exist? self.self.attachment_path
+      File.delete self.attachment_path if File.exist? self.attachment_path
       File.delete report_path if File.exist? self.report_path
       self.complete = true
     end

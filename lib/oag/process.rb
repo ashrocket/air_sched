@@ -39,6 +39,7 @@ module Oag
     end
 
     def refresh_destinations report
+
         Destination.keyed(report.report_key).delete_all
 
         direct_flights = DirectFlight.keyed(report.report_key).to_a

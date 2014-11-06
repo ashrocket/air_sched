@@ -17,7 +17,7 @@ class OagSchedulesController < ApplicationController
     if origin.eql?  ABBConfig.hub.upcase
       @oag_schedules = OagSchedule.none
     else
-      @oag_schedules = OagSchedule.hub(ABBConfig.hub.upcase).departing(origin.upcase)
+      @oag_schedules = OagSchedule.keyed(ABBConfig.data_key).hub(ABBConfig.hub.upcase).departing(origin.upcase)
     end
 
     render :mkt
@@ -29,7 +29,7 @@ class OagSchedulesController < ApplicationController
       OagSchedule.none
       @oag_schedules = OagSchedule.none
     else
-      @oag_schedules = OagSchedule.hub(ABBConfig.hub.upcase).arriving(dest.upcase)
+      @oag_schedules = OagSchedule.keyed(ABBConfig.data_key).hub(ABBConfig.hub.upcase).arriving(dest.upcase)
     end
     render :mkt
 

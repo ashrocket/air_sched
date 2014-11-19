@@ -1,8 +1,8 @@
 jQuery ->
     loadDestinations = (origin_code) ->
-      $.getJSON "/cnx_pairs/" + origin_code, (data_a) ->
+      $.getJSON Routes.from_connections_url(origin_code), (data_a) ->
          unless $jqxhr?
-          pairs = data_a.cnx_pairs
+          pairs = data_a.dest_apts
           dest_apts = _.map pairs, (apt) ->
                         {dest_name: apt.dest_name, dest: apt.dest}
           dest_names = _.map dest_apts, (apt) ->
@@ -14,7 +14,6 @@ jQuery ->
           pnl = $("#destinations_panel")
           pnl.empty()
           origin_text = $('#destination_origin').val()
-          search_action = $('#destinations_panel').data('url')
           dest_apts = _.sortBy dest_apts, (apt) ->
             apt.dest_name
           search = new Object()
@@ -29,9 +28,9 @@ jQuery ->
                col = $(document.createElement('div')).addClass("dest_airport").addClass("col-sm-3")
                params = {}
 
-               params[search_action] = jQuery.extend({}, search)
+#               params[search_action] = jQuery.extend({}, search)
 
-               href = "/" + search_action + "/" + origin_code + "/" + apt.dest
+               href = Routes.search_url({origin_code: origin_code, dest_code: apt.dest})
                link = $(document.createElement('a'))
                link.prop('href', href)
                link.text(apt.dest_name + " (" + apt.dest + ")")
@@ -46,7 +45,7 @@ jQuery ->
     # -------------------------------
     $(".explore-origin.typeahead").typeahead(
       prefetch:
-        url: '/airports/origins'
+        url: Routes.origins_airports_url()
         filter: (data) ->
           retval = []
           i = 0

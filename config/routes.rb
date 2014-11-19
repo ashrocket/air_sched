@@ -22,14 +22,14 @@ Rails.application.routes.draw do
   end
 
   resources :oag_schedules,  only: [:mkt],  format: 'json' do
-   get 'mkt/:origin/:dest', action: :mkt,  on: :collection, format: 'json', origin: /[a-zA-Z]{3}/, dest: /[a-zA-Z]{3}/
+   get 'mkt/:origin/:dest', action: :mkt,  on: :collection, as: :markets, format: 'json', origin: /[a-zA-Z]{3}/, dest: /[a-zA-Z]{3}/
    get 'to_hub/:origin',   action: :to_hub,   on: :collection, format: 'json',  origin: /[a-zA-Z]{3}/
    get 'from_hub/:dest', action: :from_hub, on: :collection, format: 'json', dest: /[a-zA-Z]{3}/
   end
 
   resources :destinations,  only: [:index, :show] do
    get :explore, on: :collection
-   get 'hubs/:origin/:dest', action: :hubs, on: :collection, format: 'json'
+   get 'hubs/:origin/:dest', action: :hubs, on: :collection, as: :hubs, format: 'json'
   end
   resources :cnx_pairs, only: [:show], format: 'json'
   resources :cnx_pairs, only: [:destinations], path: 'connections', as: 'connections' ,format: 'json' do

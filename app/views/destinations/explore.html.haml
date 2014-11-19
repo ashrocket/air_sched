@@ -25,11 +25,12 @@
     %br
   .row
     .col-sm-12
-      = simple_form_for :destination  do |form|
+      = simple_form_for :destination,
+       :html => {id: 'destination_search_form'} do |form|
 
         = form.input :origin, label: false,
              input_html:{class: 'explore-origin typeahead',
-                         placeholder: "Type the name of an origin airport to see where you can go in 1 stop"}
+                         placeholder: 'Type the name of an origin airport to see where you can go in 1 stop'}
 
 
         = form.hidden_field :origin_id
@@ -37,8 +38,7 @@
 
   .row
     .col-sm-12
-      - href = "search"
-      .panel#destinations_panel{data: {url: "#{href}"}}
+      .panel#destinations_panel
 
   .row
     %br

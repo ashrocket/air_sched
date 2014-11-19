@@ -1,5 +1,6 @@
 = simple_form_for @search_request,  as: :search_request, :url => search_form_url,
-                      :html => { id: 'flight_search_form', class: 'form-inline' } do |form|
+                      :html => { id: 'flight_search_form',
+                                 class: 'form-inline' } do |form|
   - if @search_request.errors.any?
     #error_explanation
       %h5= "#{pluralize(@search_request.errors.count, "error")} prohibited this search from executing:"

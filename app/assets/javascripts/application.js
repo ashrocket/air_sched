@@ -16,6 +16,7 @@
 //= require jquery-ui/ui/core
 //= require jquery-ui/ui/progressbar
 //= require jquery-ui/ui/widget
+//= require js-routes
 //= require bootstrap
 //= require jasny-bootstrap/dist/js/jasny-bootstrap
 //= require datatables/media/js/jquery.dataTables
@@ -34,5 +35,5 @@
 //= require bootstrap-datepicker/js/bootstrap-datepicker
 //= require dates
 //= require bootstrap_init
-
+jQuery.extend(window, Routes)
 

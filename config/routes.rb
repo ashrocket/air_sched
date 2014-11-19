@@ -56,6 +56,7 @@ Rails.application.routes.draw do
     collection do
       get 'origins(/:query)', action: :origins, as: :origins
       get 'origins/dest'    , action: :dest
+      get 'airports',  action: :airports, as: :airports
     end
   end
 
@@ -143,5 +144,9 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   require 'sidetiq/web'
   mount Sidekiq::Web => '/sidekiq'
+
+
+  match '*any' => 'application#options', :via => [:options]
+
 
 end

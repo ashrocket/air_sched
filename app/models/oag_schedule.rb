@@ -60,7 +60,7 @@ class OagSchedule < ActiveRecord::Base
       #         :mkt => row[:routing], :mkt_cxrs => mkt_cxrs(row),
       #         :via_apts => row[:intairports]
   end
-
+ 
 
   def plated_flt_number
      "#{airline_code} #{flight_num}"
@@ -199,7 +199,7 @@ class OagSchedule < ActiveRecord::Base
         o_flights = []
         return_flights = []
 
-
+ 
         if req.include_direct
           o_flights =  keyed(req.data_key)
                         .connecting(req.origin_code, req.dest_code).effective(req.dep_date)
@@ -218,7 +218,7 @@ class OagSchedule < ActiveRecord::Base
 
         one_hub_trips = single_hub_connections(req)
 
-        answers =  {directs: directs, one_hub_trips: one_hub_trips}
+        answers = {directs: directs, one_hub_trips: one_hub_trips}
         return answers
     end
 

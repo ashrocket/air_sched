@@ -47,6 +47,10 @@ Rails.application.routes.draw do
   resources :direct_flight, only: [:none] do
   end
 
+  resources :city_pairs, only: [:show] do
+   get '(/:orig)(/:dest)(/:leave_date)/(/:return_date)',  action: :show,
+       on:  :member, format: 'json'
+  end
 
 
   resources :airports,  only: [:show],  format: 'json', id: /[a-zA-Z]{3}/ do

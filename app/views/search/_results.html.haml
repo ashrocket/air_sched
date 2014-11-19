@@ -1,4 +1,3 @@
-- byebug
 - no_connects = results.select{|r| r[:journeys][:f].blank?}
 - valids      = results.select{|r| not r[:journeys][:f].blank?}
 - invalids    = results.map{|r| r[:journeys][:mct_invalid]}

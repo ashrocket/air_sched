@@ -20,7 +20,6 @@ class SearchController < ApplicationController
 
         }
         format.html{
-          byebug
           @search_request  = validate_form params["search_request"]
           if @search_request.valid?
             @search_results   = OagSchedule.search_interlines @search_request

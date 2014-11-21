@@ -3,7 +3,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  before_filter :add_allow_credentials_headers
+  #before_filter :add_allow_credentials_headers
+  after_filter :cors_set_access_control_headers
 
 	def add_allow_credentials_headers                                                                                                                                                                                                                                                        
 	  # https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#section_5                                                                                                                                                                                                      
@@ -17,5 +18,12 @@ class ApplicationController < ActionController::Base
 
 	def options                                                                                                                                                                                                                                                                              
 	  head :status => 200, :'Access-Control-Allow-Headers' => 'accept, content-type'                                                                                                                                                                                                         
+	end
+
+	def cors_set_access_control_headers
+	    response.headers['Access-Control-Allow-Origin'] = '*'
+	    response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, PATCH, DELETE, OPTIONS'
+	    response.headers['Access-Control-Allow-Headers'] = 'Origin, Content-Type, Accept, Authorization, Token, Auth-Token, Email'
+	    response.headers['Access-Control-Max-Age'] = "1728000"
 	end
 end

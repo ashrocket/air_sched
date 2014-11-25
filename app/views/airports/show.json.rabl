@@ -1,2 +1,2 @@
 object @airport
-attributes :code, :name, :city
+attributes :code, :name, :city, :lat, :long

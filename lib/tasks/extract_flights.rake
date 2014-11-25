@@ -1,10 +1,10 @@
 namespace :extract do
 
-	desc "Extracts the possible flights for each day of month"
+	desc "Extracts the possible journeys for city pair for next 180 days"
 	task :flights => :environment do |t, args|
 
-		pf = PossibleFlights.new
-		pf.find
+		pf = CityPairJourneysFinder.new
+		pf.all
 
  	end
 end    

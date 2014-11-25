@@ -127,6 +127,7 @@ class OagSchedule < ActiveRecord::Base
 
     def connections_via_hub(data_key, o, d, hub, travel_date, mct, maxct, stops, cxrs)
         errors = []
+        
         scheds  = keyed(data_key).connecting(o, hub).for_cxrs(cxrs).travelling_on(travel_date).stops(stops)
 
         if scheds.blank?
@@ -162,7 +163,7 @@ class OagSchedule < ActiveRecord::Base
     end
 
     def single_hub_connections(req)
-
+      
       o_hubs  = Destination.hubs(req.data_key, req.origin_code,  req.dest_code)
       trips = {}
       o_voyages, rt_voyages = [],[]
@@ -180,7 +181,8 @@ class OagSchedule < ActiveRecord::Base
        r_hubs  = Destination.hubs(req.data_key, req.dest_code,  req.origin_code)
        r_hubs.each do |selected_hub|
          voyage = {hub: selected_hub}
-         voyage[:journeys] = connections_via_hub(req.data_key, req.dest_code, req.origin_code, selected_hub, req.depart, req.mct, req.maxct, req.stops, req.cxrs)
+         
+         voyage[:journeys] = connections_via_hub(req.data_key, req.dest_code, req.origin_code, selected_hub, req.ret_date, req.mct, req.maxct, req.stops, req.cxrs)
          voyage[:errors]    += voyage[:journeys][:errors]  unless voyage[:errors].blank?
          voyage[:errors]     = voyage[:journeys][:errors]  if voyage[:errors].blank?
          rt_voyages << voyage
@@ -199,13 +201,12 @@ class OagSchedule < ActiveRecord::Base
         o_flights = []
         return_flights = []
 
- 
         if req.include_direct
           o_flights =  keyed(req.data_key)
                         .connecting(req.origin_code, req.dest_code).effective(req.dep_date)
                         .stops(req.stops).operating(dep_date).map{|s| s.to_flight dep_date}
 
-
+          
           rt_flights = []
           if req.owrt.eql? "RT"
             rt_flights = keyed(req.data_key)
@@ -216,6 +217,7 @@ class OagSchedule < ActiveRecord::Base
           directs[:rt] = rt_flights
         end
 
+        
         one_hub_trips = single_hub_connections(req)
 
         answers = {directs: directs, one_hub_trips: one_hub_trips}

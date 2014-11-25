@@ -39,7 +39,6 @@
                 - valid_flt = hub_results[:journeys][:x].find{|x| x.id.eql? x_id}
                 - if valid_flt
                   %tr.flt{:data => {'xflt_ids' => hub_results[:journeys][:xmap][flt.id]}}
-                    -byebug
                     = render partial: "search/flight", locals: {flt: flt}
                   %tr.xflt
                     = render partial: "search/connection", locals: {flt: valid_flt}

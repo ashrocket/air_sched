@@ -1,1 +1,1 @@
-object @journies
+object @journeys

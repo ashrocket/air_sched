@@ -1,6 +1,6 @@
 namespace :extract do
 
-	desc "Extracts the possible flight data"
+	desc "Extracts the possible journeys data for the city pair and params"
 	task :flight_data => :environment do |t, args|
 
 		params = {
@@ -8,12 +8,12 @@ namespace :extract do
 			"origin_code" => 'JFK',
 			"dest" => 'Manchester (GB)',
 			"dest_code" => 'MAN',
-			"depart" => '11-23-2014',
-			"return" => '11-28-2014'
+			"depart" => '25-Nov-2014',
+			"return" => '11-Dec-2014'
 		}
 
-		pf = PossibleFlights.new
-		pf.find_with_params(params)
+		pf = CityPairJourneysFinder.new
+		pf.find(params)
 
  	end
 end    

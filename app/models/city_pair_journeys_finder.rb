@@ -61,7 +61,7 @@ class CityPairJourneysFinder
 	def origins
 	    origs = Destination.origins
 	    origs.to_a.sort_by!(&:name)
-	    origs.select{|a| a.code == 'MAN'}
+	    #origs.select{|a| a.code == 'MAN'}
 	end
 
 	def destinations_from(origin)

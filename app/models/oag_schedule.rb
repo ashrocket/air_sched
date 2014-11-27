@@ -219,7 +219,6 @@ class OagSchedule < ActiveRecord::Base
 
         
         one_hub_trips = single_hub_connections(req)
-
         answers = {directs: directs, one_hub_trips: one_hub_trips}
         return answers
     end

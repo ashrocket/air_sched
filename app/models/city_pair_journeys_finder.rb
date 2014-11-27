@@ -167,13 +167,16 @@ class CityPairJourneysFinder
 			:dep_time_local => flt.dep_time_local,
 			:dest_apt => flt.dest_apt,
 			:arr_time_local => flt.arr_time_local,
-			:arr_date => flt.arr_date
+			:arr_date => flt.arr_date,
+			:airline_code => flt.airline_code,
+			:airline_name => flt.airline_name,
+			:next_day_arrival => flt.next_day_arrival
 		}
 	end
 
 	def build_journies
 		@journies = []
-
+		
 		outbounds = @possible_flight_data[:ob]
 		returns = @possible_flight_data[:rt]
 

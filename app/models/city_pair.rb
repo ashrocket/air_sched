@@ -1,6 +1,6 @@
 class CityPair < ActiveRecord::Base
   
-  attr_accessor :journeys
+  attr_accessor :journeys, :one_way
 
   def self.search(params)
   	city_pair = CityPair.where(
@@ -20,6 +20,7 @@ class CityPair < ActiveRecord::Base
 
     finder = CityPairJourneysFinder.new
     city_pair.journeys = finder.find(fparams)
+    city_pair.one_way = fparams['return'].blank?
     city_pair
   end
 end

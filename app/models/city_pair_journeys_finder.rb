@@ -47,7 +47,13 @@ class CityPairJourneysFinder
 		@params["dest"] = "#{params['dest']}"
 		@params["dest_code"] = "#{params['dest_code']}"
 		@params["depart"] = Date.parse("#{params['depart']}").strftime("%d-%m-%Y")
-		@params["ret_date"] = Date.parse("#{params['return']}").strftime("%d-%m-%Y")
+		
+		if params['return']
+			@params["ret_date"] = Date.parse("#{params['return']}").strftime("%d-%m-%Y")
+		else
+			@params["owrt"]	= 'OW'
+		end
+
 		puts @params.inspect
 		puts ""
 		puts ""
@@ -114,7 +120,7 @@ class CityPairJourneysFinder
 		search_results = OagSchedule.search_interlines search_request
 		
 		find_results search_results[:one_hub_trips], :ob
-		find_results search_results[:one_hub_trips], :rt
+		find_results search_results[:one_hub_trips], :rt if rdate
 	end
 
 	def find_results(trips, way)
@@ -124,8 +130,10 @@ class CityPairJourneysFinder
 
 		valid_ids = []
 
+		out_date = way == :ob ? @params['depart'] : @params['ret_date']
+
 		if valids.blank?
-			puts "---------------------------------------------------> #{@params['depart']} - NO possible flights"
+			puts "---------------------------------------------------> #{way.to_s} - #{out_date} - NO possible flights"
 		else	
 			valids.each do |hub_results|
 				
@@ -147,9 +155,9 @@ class CityPairJourneysFinder
 				end
 			end
 			if valid_ids.empty?
-				puts "---------------------------------------------------> #{@params['depart']} - NO possible flights"
+				puts "---------------------------------------------------> #{way.to_s} - #{out_date} - NO possible flights"
 			else
-				puts "---------------------------------------------------> #{@params['depart']} - possible flights"
+				puts "---------------------------------------------------> #{way.to_s} - #{out_date} - possible flights"
 				if way == :ob
 					@possible_flight_days_outbound << "#{@month}:#{@day}"
 				else
@@ -180,29 +188,46 @@ class CityPairJourneysFinder
 		outbounds = @possible_flight_data[:ob]
 		returns = @possible_flight_data[:rt]
 
-		outbounds.each do |outbound|
-			returns.each do |ret|
-				#if (outbound[:ob][:arr_date] >= ret[:ib][:dep_date]) && (outbound[:ob][:arr_time_local] >= ret[:ib][:dep_time_local])
-					@journies << build_journey(outbound, ret)
-				#end
+		if returns.present?
+			outbounds.each do |outbound|
+				returns.each do |ret|
+					#if (outbound[:ob][:arr_date] >= ret[:ib][:dep_date]) && (outbound[:ob][:arr_time_local] >= ret[:ib][:dep_time_local])
+						@journies << build_journey(outbound, ret)
+					#end
+				end
+			end
+		else
+			outbounds.each do |outbound|
+				@journies << build_journey(outbound)
 			end
 		end
 	end
 
-	def build_journey(outbound, ret)
-		journey = {
-			:dep_start_date => outbound[:ob][:dep_date],
-			:dep_end_date => outbound[:ib][:arr_date],
-			:return_start_date => ret[:ob][:dep_date],
-			:return_end_date => ret[:ob][:arr_date],
-			:hub => @params["data_key"],
-			:origin => @params["origin_code"],
-			:dest => @params["dest_code"],
-			:trips => build_trips(outbound, ret)
-		}
+	def build_journey(outbound, ret=nil)
+		if ret.present?
+			return journey = {
+				:dep_start_date => outbound[:ob][:dep_date],
+				:dep_end_date => outbound[:ib][:arr_date],
+				:return_start_date => ret[:ob][:dep_date],
+				:return_end_date => ret[:ob][:arr_date],
+				:hub => @params["data_key"],
+				:origin => @params["origin_code"],
+				:dest => @params["dest_code"],
+				:trips => build_trips(outbound, ret)
+			}
+		else
+			return journey = {
+				:dep_start_date => outbound[:ob][:dep_date],
+				:dep_end_date => outbound[:ib][:arr_date],
+				:hub => @params["data_key"],
+				:origin => @params["origin_code"],
+				:dest => @params["dest_code"],
+				:trips => build_trips(outbound)
+			}
+		end
 	end
 
-	def build_trips(outbound, ret)
+	def build_trips(outbound, ret=nil)
 		trips = []
 		trips << {:segments => build_segments(outbound)} if outbound
 		trips << {:segments => build_segments(ret)} if ret

@@ -1,2 +1,2 @@
 object @city_pair
-attributes :orig, :dest, :outbound, :inbound, :journeys
+attributes :orig, :dest, :outbound, :inbound, :one_way, :journeys

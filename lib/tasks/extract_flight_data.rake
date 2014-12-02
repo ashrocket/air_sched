@@ -8,8 +8,8 @@ namespace :extract do
 			"origin_code" => 'JFK',
 			"dest" => 'Manchester (GB)',
 			"dest_code" => 'MAN',
-			"depart" => '29-Nov-2014',
-			"return" => '11-Dec-2014'
+			"depart" => '11-Dec-2014',
+			"return" => '12-Dec-2014'
 		}
 
 		pf = CityPairJourneysFinder.new

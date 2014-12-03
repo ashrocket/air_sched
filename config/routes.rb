@@ -47,6 +47,8 @@ Rails.application.routes.draw do
   resources :direct_flight, only: [:none] do
   end
 
+  resources :send_emails
+
   resources :city_pairs, only: [:show] do
    get '(/:orig)(/:dest)(/:leave_date)/(/:return_date)',  action: :show,
        on:  :member, format: 'json'
@@ -148,9 +150,5 @@ Rails.application.routes.draw do
   require 'sidekiq/web'
   require 'sidetiq/web'
   mount Sidekiq::Web => '/sidekiq'
-
-
-  match '*any' => 'application#options', :via => [:options]
-
 
 end

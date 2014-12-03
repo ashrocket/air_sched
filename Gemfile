@@ -32,6 +32,7 @@ gem 'css3-progress-bar-rails'
 
 
 
+gem 'rack-cors', :require => 'rack/cors'
 
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0',          group: :doc

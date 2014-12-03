@@ -1,0 +1,93 @@
+<div style="text-shadow: none !important; color: #000 !important; background-color: transparent !important; box-shadow: none !important; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; margin-left: -15px; margin-right: -15px;">
+  <div style="min-width: 600px; text-shadow: none !important; color: #000 !important; background-color: transparent !important; box-shadow: none !important; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; position: relative; min-height: 1px; float: left; width: 58.333333333333336%; margin-left: 5px; margin-bottom: 100px; margin-top: 25px; padding: 10px;">
+
+    <p>
+  		Dear Airfare Bargain Hunter
+  	</p>
+
+  	<p>
+	Here is your sample itinerary from Shannon Airport¹s new AirSched route finder tool.
+	</p>
+	
+	<p>
+		AirSched (sm) helps you find great itineraries that other websites wont find for you. Come back often as schedules change.
+	</p>
+	
+  	<table style="text-align:center;">
+
+  		<tr>
+  			<% @journey['trips'].each_with_index do |trip, index| %>
+  				<td>
+  					<table style="border: 1px solid #cccccc;">
+
+				  		<tr>
+				  			<th style="background-color:#cccccc;">
+				  				<% if index == 0 %>
+				                	<span> Leave <%= @journey['dep_start_date'] %></span> 
+				                <% else %>
+				                	<span> Return <%= @journey['return_start_date'] %></span> 
+				                <% end %>
+				  			</th>
+				  		</tr>
+
+				  		<% trip['segments'].each_with_index do |segment, seg_index| %>
+
+					  		<% if seg_index == 1 %>
+					  			<tr>
+					  				<td>
+							        <div class="result-col-content">
+							          <h6 style="font-size:smaller;">Via Shannon Airport</h6>
+
+							          <p style="font-size:smaller; color:red;">
+							            <%= "10" %>h <%= "30" %>m layover<Br>
+							            <% if segment['next_day'] %>
+							            	<span style="color:red;">NEXT-DAY CONNECTION</span>
+							            <% end %>
+							          </p>
+							        </div>
+							       </td>
+					  			</tr>
+							 <% end %>
+
+					  		<tr>
+					  			<td>
+					  				<div class="segment_logo">
+						            	<%= image_tag("shannon/#{segment['airline_code']}.gif", :style => 'width:150px;height:20px;') %>
+						            </div>
+						            <div class="result-col-content">
+						              <div style="font-size:smaller;">
+						                <%= segment['airline_code'] %><%= segment['flight_num'] %>
+						              </div>
+						              <strong><%= segment['dep_time_local'] %> - <%= segment['arr_time_local'] %></strong>
+						              <div class="trip-dest-org">
+						                <%= segment['origin_apt'] %> <span style="margin-left:30px;"><%= segment['dest_apt'] %></span> 
+						              </div>
+						            </div>
+					  			</td>
+					  		</tr>
+				  		<% end %>
+				  	</table>
+  				</td>
+  			<% end %>
+
+  			<td>
+  				<div class="journey-buttons" style="margin:left:20px;">
+	              <button class="btn-primary">Book</button>
+	            </div>
+  			</td>
+  		</tr>
+  	</table>
+
+  	<p>
+		Your Friends at Shannon Airport
+		http://dev1.airblackbox.com/shannonui
+	</p>
+
+	<p>
+		Disclaimer: This is a test site and all data is subject to change withoutnotice.
+	</p>
+
+
+
+  </div> 
+</div>  

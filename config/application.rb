@@ -35,5 +35,15 @@ module AirSched
 
     # Use SQL instead of AR schema dumper when creating the database
     config.active_record.schema_format = :sql
+
+    config.middleware.insert_before "ActionDispatch::Static", "Rack::Cors", :debug => true, :logger => Rails.logger do allow do origins '*'
+
+       resource '*',
+         :headers => :any,
+         :methods => [:get, :post, :delete, :put, :options],
+         :max_age => 0
+     end
+    end
+
   end
 end

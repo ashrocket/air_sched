@@ -209,7 +209,7 @@ class CityPairJourneysFinder
 				:dep_start_date => outbound[:ob][:dep_date],
 				:dep_end_date => outbound[:ib][:arr_date],
 				:return_start_date => ret[:ob][:dep_date],
-				:return_end_date => ret[:ob][:arr_date],
+				:return_end_date => ret[:ib][:arr_date],
 				:hub => @params["data_key"],
 				:origin => @params["origin_code"],
 				:dest => @params["dest_code"],

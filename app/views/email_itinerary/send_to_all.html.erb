@@ -17,57 +17,60 @@
 
   		<tr>
   			<% @journey['trips'].each_with_index do |trip, index| %>
-  				<td>
-  					<table style="border: 1px solid #cccccc;">
-
-				  		<tr>
-				  			<th style="background-color:#cccccc;">
-				  				<% if index == 0 %>
-				                	<span> Leave <%= @journey['dep_start_date'] %></span> 
-				                <% else %>
-				                	<span> Return <%= @journey['return_start_date'] %></span> 
-				                <% end %>
-				  			</th>
-				  		</tr>
-
-				  		<% trip['segments'].each_with_index do |segment, seg_index| %>
-
-					  		<% if seg_index == 1 %>
-					  			<tr>
-					  				<td>
-							        <div class="result-col-content">
-							          <h6 style="font-size:smaller;">Via Shannon Airport</h6>
-
-							          <p style="font-size:smaller; color:red;">
-							            <%= "10" %>h <%= "30" %>m layover<Br>
-							            <% if segment['next_day'] %>
-							            	<span style="color:red;">NEXT-DAY CONNECTION</span>
-							            <% end %>
-							          </p>
-							        </div>
-							       </td>
-					  			</tr>
-							 <% end %>
+  				<% if index == 0 or (index == 1 and !@one_way) %>
+  				
+	  				<td>
+	  					<table style="border: 1px solid #cccccc;">
 
 					  		<tr>
-					  			<td>
-					  				<div class="segment_logo">
-						            	<%= image_tag("shannon/#{segment['airline_code']}.gif", :style => 'width:150px;height:20px;') %>
-						            </div>
-						            <div class="result-col-content">
-						              <div style="font-size:smaller;">
-						                <%= segment['airline_code'] %><%= segment['flight_num'] %>
-						              </div>
-						              <strong><%= segment['dep_time_local'] %> - <%= segment['arr_time_local'] %></strong>
-						              <div class="trip-dest-org">
-						                <%= segment['origin_apt'] %> <span style="margin-left:30px;"><%= segment['dest_apt'] %></span> 
-						              </div>
-						            </div>
-					  			</td>
+					  			<th style="background-color:#cccccc;">
+					  				<% if index == 0 %>
+					                	<span> Leave <%= @journey['dep_start_date'] %></span> 
+					                <% else %>
+					                	<span> Return <%= @journey['return_start_date'] %></span> 
+					                <% end %>
+					  			</th>
 					  		</tr>
-				  		<% end %>
-				  	</table>
-  				</td>
+
+					  		<% trip['segments'].each_with_index do |segment, seg_index| %>
+
+						  		<% if seg_index == 1 %>
+						  			<tr>
+						  				<td>
+								        <div class="result-col-content">
+								          <h6 style="font-size:smaller;">Via Shannon Airport</h6>
+
+								          <p style="font-size:smaller; color:red;">
+								            <%= "10" %>h <%= "30" %>m layover<Br>
+								            <% if segment['next_day'] %>
+								            	<span style="color:red;">NEXT-DAY CONNECTION</span>
+								            <% end %>
+								          </p>
+								        </div>
+								       </td>
+						  			</tr>
+								 <% end %>
+
+						  		<tr>
+						  			<td>
+						  				<div class="segment_logo">
+							            	<%= image_tag("shannon/#{segment['airline_code']}.gif", :style => 'width:150px;height:20px;') %>
+							            </div>
+							            <div class="result-col-content">
+							              <div style="font-size:smaller;">
+							                <%= segment['airline_code'] %><%= segment['flight_num'] %>
+							              </div>
+							              <strong><%= segment['dep_time_local'] %> - <%= segment['arr_time_local'] %></strong>
+							              <div class="trip-dest-org">
+							                <%= segment['origin_apt'] %> <span style="margin-left:30px;"><%= segment['dest_apt'] %></span> 
+							              </div>
+							            </div>
+						  			</td>
+						  		</tr>
+					  		<% end %>
+					  	</table>
+	  				</td>
+	  			<% end %>
   			<% end %>
 
   			<td>

@@ -7,8 +7,9 @@ class EmailItinerary < ActionMailer::Base
 		'nil'
 	end
 
-	def send_to_all(emails, journey)
+	def send_to_all(emails, journey, one_way)
 		@journey = journey
+		@one_way = one_way
 	    subject = "Sample Itinerary"
 	    from = "Shannon Airport"
 	    to = emails.split(',')

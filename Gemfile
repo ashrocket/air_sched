@@ -8,6 +8,7 @@ gem 'friendly_id', '~> 5.0.0'
 gem 'activerecord-import'
 gem 'date_validator'
 gem 'chronic'
+gem 'time_diff'
 
 
 # Template language gems

@@ -41,8 +41,11 @@
 								          <div style="font-size:smaller;">Via Shannon<Br>Airport</div>
 
 								          <p style="font-size:smaller; color:red;">
-								            <%= "10" %>h <%= "30" %>m layover<Br>
-								            <% if segment['next_day'] %>
+
+								          	<% diffs = hour_min_diff(trip['segments'][0][:arr_date], trip['segments'][0][:arr_time_local], trip['segments'][1][:dep_date], trip['segments'][1][:arr_time_local]) %>
+
+								          	<%= "#{diffs[:hours]}h #{diffs[:mins]}m layover" %><Br>
+								            <% if next_day_connection(trip['segments'][0][:dep_date], trip['segments'][1][:dep_date])  %>
 								            	<span style="color:red;">NEXT-DAY CONNECTION</span>
 								            <% end %>
 								          </p>

@@ -2,6 +2,7 @@ class EmailItinerary < ActionMailer::Base
 
 	layout 'email'
 	default from: ''
+	helper :mailer
 
 	def session
 		'nil'

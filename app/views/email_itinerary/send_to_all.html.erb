@@ -6,13 +6,13 @@
   	</p>
 
   	<p>
-	Here is your sample itinerary from Shannon Airport¹s new AirSched route finder tool.
+	Here is your sample itinerary from Shannon Airport's new AirSched route finder tool.
 	</p>
 	
 	<p>
 		AirSched (sm) helps you find great itineraries that other websites wont find for you. Come back often as schedules change.
 	</p>
-	
+	<br>
   	<table style="text-align:center;">
 
   		<tr>
@@ -37,8 +37,8 @@
 						  		<% if seg_index == 1 %>
 						  			<tr>
 						  				<td>
-								        <div class="result-col-content">
-								          <h6 style="font-size:smaller;">Via Shannon Airport</h6>
+								        <div class="result-col-content"style="margin-top: 5px;">
+								          <div style="font-size:smaller;">Via Shannon<Br>Airport</div>
 
 								          <p style="font-size:smaller; color:red;">
 								            <%= "10" %>h <%= "30" %>m layover<Br>
@@ -53,11 +53,11 @@
 
 						  		<tr>
 						  			<td>
-						  				<div class="segment_logo">
+						  				<div class="segment_logo" style="margin-top: 10px;">
 							            	<%= image_tag("shannon/#{segment['airline_code']}.gif", :style => 'width:150px;height:20px;') %>
 							            </div>
 							            <div class="result-col-content">
-							              <div style="font-size:smaller;">
+							              <div style="font-size:smaller;margin-bottom: 10px;">
 							                <%= segment['airline_code'] %><%= segment['flight_num'] %>
 							              </div>
 							              <strong><%= segment['dep_time_local'] %> - <%= segment['arr_time_local'] %></strong>
@@ -75,19 +75,19 @@
 
   			<td>
   				<div class="journey-buttons" style="margin:left:20px;">
-	              <button class="btn-primary">Book</button>
+	              <button style="color: white;background-color: #f47735;border: none;border-radius: 8px;">Book</button>
 	            </div>
   			</td>
   		</tr>
   	</table>
-
+  	<Br>
   	<p>
-		Your Friends at Shannon Airport
+		Your Friends at Shannon Airport<Br>
 		http://dev1.airblackbox.com/shannonui
 	</p>
 
 	<p>
-		Disclaimer: This is a test site and all data is subject to change withoutnotice.
+		Disclaimer: This is a test site and all data is subject to change without notice.
 	</p>
 
 

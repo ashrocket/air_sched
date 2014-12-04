@@ -11,7 +11,7 @@ class EmailItinerary < ActionMailer::Base
 		@journey = journey
 		@one_way = one_way
 	    subject = "Sample Itinerary"
-	    from = "Shannon Airport"
+	    from = "shannon@airblackbox.com"
 	    to = emails.split(',')
 
 	    mail to: to, subject: subject, from: from

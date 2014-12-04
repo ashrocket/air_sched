@@ -31,7 +31,7 @@ Rails.application.configure do
   #       :enable_starttls_auto => true
   #     }
 
-  config.action_controller.asset_host = "http://dev1.airblackbox.com/shannon"
+  config.action_controller.asset_host = "http://dev1.airblackbox.com"
   config.action_mailer.default_url_options = { :host => 'http://dev1.airblackbox.com/shannon' }
 
   ActionMailer::Base.smtp_settings = {

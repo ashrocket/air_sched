@@ -33,6 +33,7 @@ Rails.application.configure do
 
   config.action_controller.asset_host = "http://dev1.airblackbox.com"
   config.action_mailer.default_url_options = { :host => 'http://dev1.airblackbox.com/shannon' }
+  config.action_mailer.asset_host = 'http://dev1.airblackbox.com'
 
   ActionMailer::Base.smtp_settings = {
       :address              => "localhost",

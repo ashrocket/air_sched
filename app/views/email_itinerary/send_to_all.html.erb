@@ -42,7 +42,7 @@
 
 								          <p style="font-size:smaller; color:red;">
 
-								          	<% diffs = hour_min_diff(trip['segments'][0][:arr_date], trip['segments'][0][:arr_time_local], trip['segments'][1][:dep_date], trip['segments'][1][:arr_time_local]) %>
+								          	<% diffs = hour_min_diff(trip['segments'][0][:arr_date], trip['segments'][0][:arr_time_local], trip['segments'][1][:dep_date], trip['segments'][1][:dep_time_local]) %>
 
 								          	<%= "#{diffs[:hours]}h #{diffs[:mins]}m layover" %><Br>
 								            <% if next_day_connection(trip['segments'][0][:dep_date], trip['segments'][1][:dep_date])  %>

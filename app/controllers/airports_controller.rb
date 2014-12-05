@@ -34,13 +34,12 @@ class AirportsController < ApplicationController
       :dest_airport_id =>  Airport.friendly.find(pair.dest.downcase).id,
       :lat =>  Airport.friendly.find(pair.dest.downcase).lat,
       :long =>  Airport.friendly.find(pair.dest.downcase).long)}
-    @cnx_pairs.each{|h| h.store('value',h.delete('dest_name'))}
-
+    @cnx_pairs.each{|h| 
+      h[:dest_name] = h[:dest_name].sub(' 00', '')
+      h.store('value',h.delete('dest_name'))
+    }
     render 'cnx_pairs/show'
   end
-
-  #http://localhost:3000/oag_schedules/mkt/MAN/SNN
-  #http://localhost:3000/oag_schedules/mkt/SNN/ALC
 
 
 end

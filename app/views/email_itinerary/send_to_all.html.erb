@@ -10,7 +10,7 @@
 	</p>
 	
 	<p>
-		AirSched (sm) helps you find great itineraries that other websites wont find for you. Come back often as schedules change.
+		AirSched (sm) helps you find great itineraries that other websites won't find for you. Come back often as schedules change.
 	</p>
 	<br>
   	<table style="text-align:center;">
@@ -20,7 +20,7 @@
   				<% if index == 0 or (index == 1 and !@one_way) %>
   				
 	  				<td>
-	  					<table style="border: 1px solid #cccccc;">
+	  					<table style="border: 1px solid #cccccc;text-align:center;">
 
 					  		<tr>
 					  			<th style="background-color:#cccccc;">
@@ -63,7 +63,7 @@
 							              <div style="font-size:smaller;margin-bottom: 10px;">
 							                <%= segment['airline_code'] %><%= segment['flight_num'] %>
 							              </div>
-							              <strong><%= segment['dep_time_local'] %> - <%= segment['arr_time_local'] %></strong>
+							              <strong><%= time_format(segment['dep_time_local']) %> - <%= time_format(segment['arr_time_local']) %></strong>
 							              <div class="trip-dest-org">
 							                <%= segment['origin_apt'] %> <span style="margin-left:30px;"><%= segment['dest_apt'] %></span> 
 							              </div>
@@ -76,8 +76,9 @@
 	  			<% end %>
   			<% end %>
 
-  			<td>
+  			<td style="border: 1px solid #ccc;">
   				<div class="journey-buttons" style="margin:left:20px;">
+  					To book this journey, please click the button below.<Br><Br>
 	              <button style="color: white;background-color: #f47735;border: none;border-radius: 8px;">Book</button>
 	            </div>
   			</td>

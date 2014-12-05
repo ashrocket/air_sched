@@ -6,6 +6,14 @@ class Airport < ActiveRecord::Base
 
   scope :by_code,   lambda {|code| where(:code => code)}
 
+  def correct_name
+    self.name.sub(' 00', '')
+  end
+
+  def correct_city
+    self.city.sub(' 00', '')
+  end
+
   class << self
 
   def cached code

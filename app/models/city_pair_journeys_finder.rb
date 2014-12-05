@@ -206,10 +206,10 @@ class CityPairJourneysFinder
 	def build_journey(outbound, ret=nil)
 		if ret.present?
 			return journey = {
-				:dep_start_date => outbound[:ob][:dep_date],
-				:dep_end_date => outbound[:ib][:arr_date],
-				:return_start_date => ret[:ob][:dep_date],
-				:return_end_date => ret[:ib][:arr_date],
+				:dep_start_date => outbound[:ob][:dep_date].strftime("%d-%b-%Y"),
+				:dep_end_date => outbound[:ib][:arr_date].strftime("%d-%b-%Y"),
+				:return_start_date => ret[:ob][:dep_date].strftime("%d-%b-%Y"),
+				:return_end_date => ret[:ib][:arr_date].strftime("%d-%b-%Y"),
 				:hub => @params["data_key"],
 				:origin => @params["origin_code"],
 				:dest => @params["dest_code"],
@@ -217,8 +217,8 @@ class CityPairJourneysFinder
 			}
 		else
 			return journey = {
-				:dep_start_date => outbound[:ob][:dep_date],
-				:dep_end_date => outbound[:ib][:arr_date],
+				:dep_start_date => outbound[:ob][:dep_date].strftime("%d-%b-%Y"),
+				:dep_end_date => outbound[:ib][:arr_date].strftime("%d-%b-%Y"),
 				:hub => @params["data_key"],
 				:origin => @params["origin_code"],
 				:dest => @params["dest_code"],

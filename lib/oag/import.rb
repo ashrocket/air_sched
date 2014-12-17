@@ -70,7 +70,7 @@ module Oag
              if sched[:op_cxr_code].eql? sched[:shared_airline_code]
                   sched[:op_cxr_name] = sched[:shared_airline_name]
              else
-                  sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
+               sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
              end
 
            else
@@ -237,7 +237,7 @@ module Oag
 
   def parse_and_load_large_report(report)
 
-    if report.report_status = 'queued'
+    if report.report_status.eql? 'queued'
       OagSchedule.where(:report_key => report.report_key).delete_all
       report.report_status = 'importing'
     end

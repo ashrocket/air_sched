@@ -8,41 +8,55 @@ class ScheduleImportWorker
   sidekiq_options :queue => :report_queue, :retry => 1, :backtrace => true
   sidekiq_options lock: { timeout: 1200000, name: 'lock-import-worker' }
 
-
+  sidekiq_options lock: {
+        timeout: proc { |_, timeout = 1_200_000 | timeout * 2 }, #
+        name: 'lock-import-worker'  # no need to pass timeout - not used
+  }
   def perform(report_id)
     Sidekiq::Logging.logger.info "Import Worker #{report_id}"
     Rails.logger = Sidekiq::Logging.logger
-
     if lock.acquire!
       begin
-
         report = OagReport.find_by(id: report_id)
         Sidekiq::Logging.logger.info "Import Worker Lock acquired, processing #{report_id}: #{report.report_key}"
 
         if report and !report.complete
           processor = Oag::Process.new
+
           case report.report_status
             when /queued/
+              Sidekiq::Logging.logger.info "Import Worker loading schedules #{report_id}: #{report.report_key}"
+
               if report.large_report?
+
                 ScheduleLargeImportWorker.perform_async(report_id)
               else
+
                 processor.import_oag_file(report)
-                rkey = ReportKey.where(report_key: report.report_key).first_or_create
-                report.save
               end
             when /schedules_loaded/
+
+              Sidekiq::Logging.logger.info "Import Worker refreshing airports  #{report_id}: #{report.report_key}"
               processor.refresh_airports(report)
               report.save
             when /airports_refreshed/
+
+              Sidekiq::Logging.logger.info "Import Worker refreshing direct flights  #{report_id}: #{report.report_key}"
               processor.refresh_direct_flights(report)
               report.save
             when /direct_flights_refreshed/
+
+              Sidekiq::Logging.logger.info "Import Worker refreshing destinations   #{report_id}: #{report.report_key}"
               processor.refresh_destinations(report)
               report.save
             when /destinations_refreshed/
+
+              Sidekiq::Logging.logger.info "Import Worker refreshing cnx_pairs   #{report_id}: #{report.report_key}"
               processor.refresh_cnx_pairs(report)
               report.save
             when /connections_refreshed/
+
+              Sidekiq::Logging.logger.info "Import Worker finalizing    #{report_id}: #{report.report_key}"
               report.save
               processor.finalize(report)
               rkey = ReportKey.where(report_key: report.report_key).first_or_create

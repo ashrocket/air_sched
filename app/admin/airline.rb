@@ -13,15 +13,13 @@ ActiveAdmin.register Airline do
     actions
   end
 
-  # permit_params :list, :of, :attributes, :on, :model
-  #
-  # or
-  #
-  # permit_params do
-  #  permitted = [:permitted, :attributes]
-  #  permitted << :other if resource.something?
-  #  permitted
-  # end
+  active_admin_import :validate => false,
+                      :csv_options => {:col_sep => "," },
+                      :before_import => proc{ Airline.delete_all},
+                      :batch_size => 1000
+
+
+
 
 
 end

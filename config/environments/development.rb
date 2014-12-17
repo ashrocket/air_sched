@@ -40,4 +40,6 @@ Rails.application.configure do
 
   # Require all existing scheduled jobs
   Dir[Rails.root.join "app/workers/**/*.rb"].each { |f| require f }
+
+  config.application_url = 'http://localhost:3000'
 end

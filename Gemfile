@@ -55,6 +55,7 @@ gem 'parallel'
 
 gem 'devise', '3.2.4'
 gem 'activeadmin', github: 'gregbell/active_admin'
+gem 'active_admin_import' , '2.1.1'
 
 gem "rails-settings-cached", "0.4.1"
 gem 'roo'

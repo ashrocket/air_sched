@@ -1,3 +1,3 @@
 JsRoutes.setup do |config|
-  config.url_links = Rails.application.config.application_url
+    config.url_links = AirSched::Application.config.application_url
 end

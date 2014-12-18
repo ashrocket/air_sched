@@ -26,19 +26,17 @@ class OagReport < ActiveRecord::Base
       key_type    = report_name[0..2]
 
       if (['HUB','CXX', 'ABB'].include?(key_type))
-        matches = report_name[3..-1].match /[^A-Za-z]([A-Za-z0-9]+)_{0,1}/
+        matches = report_name[3..-1].match /([A-Za-z0-9]+)_{0,1}/
+        # matches = report_name[3..-1].match /[^A-Za-z]([A-Za-z0-9]+)_{0,1}/
         return  matches.captures.first.lstrip if matches
       end
       return nil
   end
 
-  def process_oag_file
+  def process_attachment
     # TODO:  Check for Existing Report Key filename patterns and only process if Key Exists.
 
     Rails.logger.info "Decompressing Email Attachment for message #{self.msg_id} #{self.attachment_path}"
-    if File.exist? self.attachment_path
-      update(attachment_status: 'stored',attachment_size: File.stat(self.attachment_path).size)
-    end
 
     ext = File.extname(self.attachment_path)
 
@@ -51,6 +49,9 @@ class OagReport < ActiveRecord::Base
 
       end
     elsif ext.eql? '.zip'
+      if File.exist? self.attachment_path
+        update(attachment_status: 'stored',attachment_size: File.stat(self.attachment_path).size)
+      end
       Zip::InputStream::open(self.attachment_path) {|io|
          entry = io.get_next_entry
          uncompressed_filename   = entry.name.squish.gsub(" ", "_")
@@ -59,18 +60,10 @@ class OagReport < ActiveRecord::Base
 
          load_status["report_path"] = uncompressed_path
          load_status["report_size"] = File.stat(uncompressed_path).size
+         load_status["attachment_status"]  = 'uncompressed'
          save
 
       }
-    end
-    #  TODO: Analyze why rejected status doesn't bubble up
-    self.report_key  = estimated_key
-    unless self.report_key
-      self.report_status ='rejected'
-      self.attachment_status = 'rejected'
-      File.delete self.attachment_path if File.exist? self.self.attachment_path
-      File.delete report_path if File.exist? self.report_path
-      self.complete = true
     end
     save
 

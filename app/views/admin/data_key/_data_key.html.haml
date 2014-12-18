@@ -8,6 +8,8 @@
         Data Key
     .col-sm-3
       - ABBConfig.data_key = '' if ABBConfig.find_by(var: 'data_key').blank?
+      - unless ABBConfig.find_by(var: 'data_key').blank?
+        - ABBConfig.data_key = ABBConfig.find_by(var: 'data_key').value
       - @abb_config = ABBConfig.find_by(var: 'data_key')
       = simple_form_for [:admin, @abb_config], remote:true, html:{class: "admin-datakey-form form-inline"} do |form|
         - if ReportKey.active.blank?

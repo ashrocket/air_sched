@@ -7,9 +7,9 @@ module Oag
     def refresh_airports(report)
         origins = []
         destinations = []
+
         origins      += OagSchedule.origins(report)
         destinations += OagSchedule.destinations(report)
-
         airports = (origins + destinations).uniq
         airports.each do |airport|
            apt = Airport.where(code: airport[0]).first_or_create!
@@ -20,6 +20,8 @@ module Oag
         report.report_status = 'airports_refreshed'
         report.save
     end
+
+    # TODO Refresh Airlines
 
     def refresh_direct_flights(report)
         DirectFlight.keyed(report.report_key).delete_all
@@ -39,6 +41,7 @@ module Oag
     end
 
     def refresh_destinations report
+
         Destination.keyed(report.report_key).delete_all
 
         direct_flights = DirectFlight.keyed(report.report_key).to_a
@@ -80,6 +83,8 @@ module Oag
             end
           end
         end
+        #TODO consider changing this from a delete to a mark, indicating that there is also a potential direct
+        # flight for this market.
         Rails.logger.info "Unique Connection Pairs not filtered for Direct Flight Exclusion rule #{cnx.count} #{report.report_key}"
         cnx.delete_if{|row| direct_pairs_hash[row[0]].include? [row[0],row[2]] }
         Rails.logger.info "Unique Connection Pairs after filtered for Direct Flight Exclusion rule #{cnx.count} #{report.report_key}"
@@ -96,9 +101,12 @@ module Oag
                                           cxrs1: row[3], cxrs2: row[4]
            )
           end
+
           rules = InterlineCxrRule.keyed(report.report_key)
-          rules.sort_by(&:sequence).each do |rule|
-            connections = rule.apply(connections)
+          unless rules.blank?
+            rules.sort_by(&:sequence).each do |rule|
+              connections = rule.apply(connections)
+            end
           end
           Destination.import connections
           connections = []

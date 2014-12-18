@@ -17,7 +17,7 @@ class Airport < ActiveRecord::Base
   class << self
 
   def cached code
-    Rails.cache.fetch("airport_#{code}", :expires_in => 1.hour) do
+    Rails.cache.fetch("airport_#{code}", :expires_in => 4.minutes) do
       by_code(code).first
     end
   end

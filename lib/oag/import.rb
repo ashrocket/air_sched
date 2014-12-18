@@ -24,7 +24,6 @@ module Oag
 
   def load_schedule(csvdata, options={})
       schedules = []
-
       csvdata.each do |row|
 
        #case row[:dupmarker]
@@ -71,7 +70,7 @@ module Oag
              if sched[:op_cxr_code].eql? sched[:shared_airline_code]
                   sched[:op_cxr_name] = sched[:shared_airline_name]
              else
-                  sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
+               sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
              end
 
            else
@@ -81,6 +80,7 @@ module Oag
          end
          schedules << sched
       end
+      schedules.delete_if{|s| s[:disc_date].blank?}
       schedules.uniq
   end
   def process_schedule_chunk(report, schedules, options={})
@@ -121,7 +121,6 @@ module Oag
     OagSchedule.where(:report_key => report.report_key).delete_all
 
     Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key}"
-
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status["expired_schedules_count"] = expired.count
 
@@ -238,7 +237,7 @@ module Oag
 
   def parse_and_load_large_report(report)
 
-    if report.report_status = 'queued'
+    if report.report_status.eql? 'queued'
       OagSchedule.where(:report_key => report.report_key).delete_all
       report.report_status = 'importing'
     end

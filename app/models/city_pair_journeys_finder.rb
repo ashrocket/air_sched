@@ -2,7 +2,7 @@ class CityPairJourneysFinder
 
 	def initialize
 		@start_time = Time.now
-
+    ABBConfig.data_key = 'SNN'
 		@params = {  
 			"data_key"=>"SNN", 
 			"owrt"=>"RT", 

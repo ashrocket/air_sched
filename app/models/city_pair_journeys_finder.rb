@@ -46,10 +46,10 @@ class CityPairJourneysFinder
 		@params["dest_id"] = ''
 		@params["dest"] = "#{params['dest']}"
 		@params["dest_code"] = "#{params['dest_code']}"
-		@params["depart"] = Date.parse("#{params['depart']}").strftime("%d-%m-%Y")
+		@params["depart"] = Date.parse("#{params['depart']}").strftime("%m-%d-%Y")
 		
 		if params['return']
-			@params["ret_date"] = Date.parse("#{params['return']}").strftime("%d-%m-%Y")
+			@params["ret_date"] = Date.parse("#{params['return']}").strftime("%m-%d-%Y")
 		else
 			@params["owrt"]	= 'OW'
 		end
@@ -82,7 +82,7 @@ class CityPairJourneysFinder
 			actual_date = Time.now + num.days
 			@month = actual_date.month
 			@day = actual_date.day
-			date = (actual_date).strftime("%d-%m-%Y")
+			date = (actual_date).strftime("%m-%d-%Y")
 
 			find_flights_for_date(date, date)
 		end

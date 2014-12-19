@@ -61,7 +61,11 @@ class CityPairJourneysFinder
 		setup_storage
 		find_flights_for_date( @params["depart"], @params["ret_date"] )
 		build_journies
-		@journies
+    if @journies.count > 20
+      return @journies.take(20)
+    else
+		  return @journies
+    end
 	end
 
 	def origins

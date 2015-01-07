@@ -60,7 +60,7 @@ class OagSchedule < ActiveRecord::Base
       #         :mkt => row[:routing], :mkt_cxrs => mkt_cxrs(row),
       #         :via_apts => row[:intairports]
   end
- 
+
 
   def plated_flt_number
      "#{airline_code} #{flight_num}"
@@ -127,7 +127,6 @@ class OagSchedule < ActiveRecord::Base
 
     def connections_via_hub(data_key, o, d, hub, travel_date, mct, maxct, stops, cxrs)
         errors = []
-        
         scheds  = keyed(data_key).connecting(o, hub).for_cxrs(cxrs).travelling_on(travel_date).stops(stops)
 
         if scheds.blank?
@@ -163,7 +162,7 @@ class OagSchedule < ActiveRecord::Base
     end
 
     def single_hub_connections(req)
-      
+
       o_hubs  = Destination.hubs(req.data_key, req.origin_code,  req.dest_code)
       trips = {}
       o_voyages, rt_voyages = [],[]
@@ -181,7 +180,6 @@ class OagSchedule < ActiveRecord::Base
        r_hubs  = Destination.hubs(req.data_key, req.dest_code,  req.origin_code)
        r_hubs.each do |selected_hub|
          voyage = {hub: selected_hub}
-         
          voyage[:journeys] = connections_via_hub(req.data_key, req.dest_code, req.origin_code, selected_hub, req.ret_date, req.mct, req.maxct, req.stops, req.cxrs)
          voyage[:errors]    += voyage[:journeys][:errors]  unless voyage[:errors].blank?
          voyage[:errors]     = voyage[:journeys][:errors]  if voyage[:errors].blank?
@@ -206,7 +204,7 @@ class OagSchedule < ActiveRecord::Base
                         .connecting(req.origin_code, req.dest_code).effective(req.dep_date)
                         .stops(req.stops).operating(dep_date).map{|s| s.to_flight dep_date}
 
-          
+
           rt_flights = []
           if req.owrt.eql? "RT"
             rt_flights = keyed(req.data_key)
@@ -219,7 +217,7 @@ class OagSchedule < ActiveRecord::Base
 
         
         one_hub_trips = single_hub_connections(req)
-        answers = {directs: directs, one_hub_trips: one_hub_trips}
+        answers =  {directs: directs, one_hub_trips: one_hub_trips}
         return answers
     end
 

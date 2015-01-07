@@ -1,0 +1,8 @@
+Description:
+    This generator installs air_sched initializers into your app
+
+Example:
+    rails generate air_sched:views
+
+    This will run:
+

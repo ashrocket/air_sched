@@ -26,7 +26,6 @@ class ScheduleImportWorker
           case report.report_status
             when /queued/
               Sidekiq::Logging.logger.info "Import Worker loading schedules #{report_id}: #{report.report_key}"
-
               if report.large_report?
 
                 ScheduleLargeImportWorker.perform_async(report_id)

@@ -1,0 +1,474 @@
+Code,Name,City,Slug,Lat,Long
+SNN,Shannon,Shannon,snn,52.701978,-8.924817
+LCY,London City Apt,London (GB),lcy,51.505278,0.055278
+JFK,New York J F Kennedy International Apt,New York,jfk,40.639751,-73.778925
+MAN,Manchester (GB),Manchester (GB),man,53.353744,-2.27495
+EDI,Edinburgh,Edinburgh,edi,55.95,-3.3725
+AGP,Malaga Airport,Malaga,agp,36.6749,-4.499106
+STN,London Stansted Apt,London (GB),stn,51.885,0.235
+LPL,Liverpool,Liverpool,lpl,53.333611,-2.849722
+LGW,London Gatwick Apt,London (GB),lgw,51.148056,-0.190278
+ACE,Lanzarote,Lanzarote,ace,28.945464,-13.605225
+FUE,Fuerteventura,Fuerteventura,fue,28.452717,-13.863761
+FMM,Memmingen,Memmingen,fmm,47.988758,10.2395
+KRK,Krakow,Krakow,krk,50.077731,19.784836
+DUB,Dublin,Dublin,dub,53.421333,-6.270075
+PHX,Phoenix Sky Harbor Intl Apt,Phoenix,phx,33.434278,-112.011583
+NCE,Nice,Nice,nce,43.658411,7.215872
+YYZ,Lester B Pearson Intl,Toronto,yyz,43.677223,-79.630556
+ZRH,Zurich Airport,Zurich,zrh,47.464722,8.549167
+FAO,Faro,Faro,fao,37.014425,-7.965911
+ALC,Alicante,Alicante,alc,38.282169,-0.558156
+BVA,Paris Beauvais-Tille Airport,Paris,bva,49.454444,2.112778
+ORD,Chicago O'Hare International Apt,Chicago,ord,41.978603,-87.904842
+BOS,Boston Logan International Apt,Boston,bos,42.364347,-71.005181
+BRS,Bristol (GB) 00,Bristol (GB) 00,brs,51.382669,-2.719089
+LHR,London Heathrow Apt,London (GB),lhr,51.4775,-0.461389
+PMI,Palma de Mallorca,Palma de Mallorca,pmi,39.55361,2.727778
+PIS,Poitiers Biard Airport,Poitiers,pis,46.587745,0.306666
+WRO,Wroclaw,Wroclaw,wro,51.102683,16.885836
+SXF,Berlin Schoenefeld Apt,Berlin,sxf,52.380001,13.5225
+EWR,Newark Liberty International Apt,New York,ewr,40.6925,-74.168667
+BHX,Birmingham Airport,Birmingham (GB),bhx,52.453856,-1.748028
+WMI,Nowy Dwor Mazowiecki,Nowy Dwor Mazowiecki,wmi,52.451111,20.651667
+PHL,Philadelphia International Apt,Philadelphia,phl,39.871944,-75.241139
+TFS,Tenerife Sur Apt,Tenerife,tfs,28.044475,-16.572489
+MXP,Milan Malpensa Apt,Milan,mxp,45.630606,8.728111
+BEG,Belgrade,Belgrade,beg,44.818444,20.309139
+BOD,Bordeaux Merignac Apt,Bordeaux,bod,44.828335,-0.715556
+DXB,Dubai International,Dubai,dxb,25.252778,55.364444
+NRT,Tokyo Narita Intl,Tokyo,nrt,35.764722,140.386389
+PEK,Beijing Capital Intl Apt,Beijing,pek,40.080111,116.584556
+PRG,Prague Ruzyne,Prague,prg,50.100833,14.26
+PVG,Shanghai Pudong International Apt,Shanghai,pvg,31.143378,121.805214
+CTA,Catania,Catania,cta,37.466781,15.0664
+MCT,Muscat,Muscat,mct,23.593278,58.284444
+BCN,Barcelona Apt,Barcelona (ES),bcn,41.297078,2.078464
+LUX,Luxembourg,Luxembourg,lux,49.626575,6.211517
+SIN,Singapore Changi Apt,Singapore,sin,1.350189,103.994433
+IBZ,Ibiza,Ibiza,ibz,38.872858,1.373117
+VIE,Vienna International,Vienna,vie,48.110278,16.569722
+BEY,Beirut,Beirut,bey,33.820931,35.488389
+HAJ,Hannover,Hannover,haj,52.461056,9.685078
+OTP,Bucharest Henri Coanda Apt,Bucharest,otp,44.572161,26.102178
+HKG,Hong Kong International Apt,Hong Kong,hkg,22.308919,113.914603
+GRU,Sao Paulo Guarulhos Intl Apt,Sao Paulo,gru,-23.432075,-46.469511
+LIS,Lisbon,Lisbon,lis,38.781311,-9.135919
+TLV,Tel Aviv-yafo Ben Gurion International,Tel Aviv-yafo,tlv,32.011389,34.886667
+HAM,Hamburg Airport,Hamburg,ham,53.630389,9.988228
+KIV,Chisinau,Chisinau,kiv,46.927744,28.930978
+KBP,Kiev Borispol Intl Apt,Kiev,kbp,50.345,30.894722
+RUH,Riyadh,Riyadh,ruh,24.95764,46.698776
+SVO,Moscow Sheremetyevo International Apt,Moscow,svo,55.972642,37.414589
+DEL,Delhi,Delhi,del,28.5665,77.103088
+FCO,Rome Fiumicino Apt,Rome (IT),fco,41.804475,12.250797
+ATH,Athens (GR),Athens (GR),ath,37.936358,23.944467
+TIA,Tirana,Tirana,tia,41.414742,19.720561
+AMS,Amsterdam,Amsterdam,ams,52.308613,4.763889
+SUF,Lamezia Terme,Lamezia Terme,suf,38.905394,16.242269
+PMO,Palermo,Palermo,pmo,38.175958,13.091019
+DUS,Duesseldorf International Airport,Duesseldorf,dus,51.289453,6.766775
+LTN,London Luton Apt,London (GB),ltn,51.874722,-0.368333
+NAP,Naples Capodichino Apt,Naples (IT),nap,40.886033,14.290781
+JTR,Thira,Thira,jtr,36.399169,25.479333
+OLB,Olbia,Olbia,olb,40.898661,9.517628
+CAG,Cagliari,Cagliari,cag,39.251469,9.054283
+DBV,Dubrovnik,Dubrovnik,dbv,42.561353,18.268244
+HER,Irakleion,Irakleion,her,35.339719,25.180297
+JMK,Mykonos,Mykonos,jmk,37.435128,25.348103
+MAH,Menorca,Menorca,mah,39.862597,4.218647
+BRI,Bari,Bari,bri,41.138856,16.760594
+CDG,Paris Charles de Gaulle Apt,Paris,cdg,49.012779,2.55
+BDS,Brindisi,Brindisi,bds,40.657633,17.947033
+BRU,Brussels Airport,Brussels,bru,50.901389,4.484444
+CFU,Kerkyra,Kerkyra,cfu,39.601944,19.911667
+CPH,Copenhagen Kastrup Apt,Copenhagen,cph,55.617917,12.655972
+SPU,Split,Split,spu,43.538944,16.297964
+AHO,Alghero,Alghero,aho,40.632133,8.290772
+MAD,Madrid Adolfo Suarez-Barajas Apt,Madrid,mad,40.493556,-3.566764
+BUD,Budapest,Budapest,bud,47.436933,19.255592
+SFO,San Francisco International Apt,San Francisco,sfo,37.618972,-122.374889
+PNL,Pantelleria,Pantelleria,pnl,36.816519,11.968864
+ATL,Atlanta Hartsfield-jackson Intl Apt,Atlanta,atl,33.636719,-84.428067
+AUH,Abu Dhabi International Apt,Abu Dhabi,auh,24.432972,54.651138
+TXL,Berlin Tegel Apt,Berlin,txl,52.559686,13.287711
+SOF,Sofia,Sofia,sof,42.695194,23.406167
+OPO,Porto,Porto,opo,41.248055,-8.681389
+LYS,Lyon St-exupery Apt,Lyon,lys,45.726387,5.090833
+MRU,Mauritius,Mauritius,mru,-20.430235,57.6836
+MBA,Mombasa,Mombasa,mba,-4.034833,39.59425
+CAI,Cairo,Cairo,cai,30.121944,31.405556
+FRA,Frankfurt International Apt,Frankfurt,fra,50.026421,8.543125
+CMN,Casablanca Mohammed V Apt,Casablanca,cmn,33.367467,-7.589967
+RAK,Marrakech,Marrakech,rak,31.606886,-8.0363
+TUN,Tunis,Tunis,tun,36.851033,10.227217
+DJE,Djerba,Djerba,dje,33.875031,10.775461
+MIR,Monastir,Monastir,mir,35.758056,10.754722
+STR,Stuttgart Airport,Stuttgart,str,48.689878,9.221964
+CUN,Cancun,Cancun,cun,21.036528,-86.877083
+HAV,Havana (CU) 00,Havana (CU) 00,hav,22.989153,-82.409086
+GYD,Baku Heydar Aliyev International Apt,Baku,gyd,40.4675,50.046667
+IST,Istanbul Ataturk Airport,Istanbul,ist,40.976922,28.814606
+MUC,Munich International Airport,Munich,muc,48.353783,11.786086
+ADD,Addis Ababa,Addis Ababa,add,8.977889,38.799319
+DME,Moscow Domodedovo Apt,Moscow,dme,55.408611,37.906111
+HEL,Helsinki-Vantaa,Helsinki,hel,60.317222,24.963333
+BEM,Beni Mellal,Beni Mellal,bem,,
+NTE,Nantes Atlantique Airport,Nantes,nte,47.153189,-1.610725
+LED,St Petersburg Pulkovo Apt,St Petersburg,led,59.800292,30.262503
+CGN,Cologne/Bonn Apt,Cologne/Bonn,cgn,50.865917,7.142744
+DOH,Doha,Doha,doh,25.261125,51.565056
+KEF,Reykjavik Keflavik International Apt,Reykjavik,kef,63.985,-22.605556
+RIX,Riga,Riga,rix,56.923611,23.971111
+WAW,Warsaw,Warsaw,waw,52.16575,20.967122
+OSL,Oslo Gardermoen Airport,Oslo,osl,60.193917,11.100361
+SAW,Istanbul Sabiha Gokcen Apt,Istanbul,saw,40.898553,29.309219
+RHO,Rhodes,Rhodes,rho,36.405419,28.086192
+KGS,Kos,Kos,kgs,36.793335,27.091667
+MLA,Malta,Malta,mla,35.857497,14.4775
+ZTH,Zakinthos Island,Zakinthos Island,zth,37.750853,20.88425
+LMP,Lampedusa,Lampedusa,lmp,35.497914,12.618083
+MLE,Male,Male,mle,4.191833,73.529128
+JED,Jeddah,Jeddah,jed,21.679564,39.156536
+ALG,Algiers,Algiers,alg,36.691014,3.215408
+MIA,Miami International Apt,Miami,mia,25.79325,-80.290556
+DKR,Dakar,Dakar,dkr,14.739708,-17.490225
+BKK,Bangkok Suvarnabhumi International Apt,Bangkok,bkk,13.681108,100.747283
+LHE,Lahore,Lahore,lhe,31.521564,74.403594
+VKO,Moscow Vnukovo International Apt,Moscow,vko,55.591531,37.261486
+EFL,Kefallinia,Kefallinia,efl,38.120069,20.500481
+LCA,Larnaca,Larnaca,lca,34.875117,33.62485
+SNU,Santa Clara,Santa Clara,snu,22.492192,-79.943611
+ZNZ,Zanzibar,Zanzibar,znz,-6.222025,39.224886
+ICN,Seoul Incheon International Airport,Seoul,icn,37.469075,126.450517
+AMM,Amman Queen Alia International Apt,Amman,amm,31.722556,35.993214
+MSQ,Minsk International Apt,Minsk,msq,53.882469,28.030731
+LRM,La Romana,La Romana,lrm,18.450711,-68.911833
+BIO,Bilbao,Bilbao,bio,43.301097,-2.910608
+MRS,Marseille Provence Apt,Marseille,mrs,43.435555,5.213611
+IKA,Tehran Imam Khomeini International Apt,Tehran,ika,35.416111,51.152222
+FOR,Fortaleza,Fortaleza,for,-3.776283,-38.532556
+GDN,Gdansk,Gdansk,gdn,54.377569,18.466222
+LUZ,Lublin,Lublin,luz,51.239333,22.714083
+ISB,Islamabad,Islamabad,isb,33.616653,73.099233
+CYO,Cayo Largo del Sur,Cayo Largo del Sur,cyo,21.616453,-81.545989
+TAS,Tashkent,Tashkent,tas,41.257861,69.281186
+MBJ,Montego Bay,Montego Bay,mbj,18.503717,-77.913358
+SSH,Sharm El-Sheikh,Sharm El-Sheikh,ssh,27.977222,34.394722
+HOG,Holguin,Holguin,hog,20.785589,-76.315108
+TLS,Toulouse,Toulouse,tls,43.629075,1.363819
+GVA,Geneva,Geneva,gva,46.238064,6.10895
+OMO,Mostar,Mostar,omo,43.2829,17.845878
+DFW,Dallas/Fort Worth Intl Apt,Dallas/Fort Worth,dfw,32.896828,-97.037997
+VLC,Valencia Airport,Valencia (ES),vlc,39.489314,-0.481625
+SEA,Seattle-Tacoma International Apt,Seattle,sea,47.449,-122.309306
+LAS,Las Vegas McCarran International Apt,Las Vegas,las,36.080056,-115.15225
+UGC,Urgench,Urgench,ugc,41.5843,60.6417
+MED,Madinah,Madinah,med,24.553422,39.705061
+LBA,Leeds Bradford,,lba,53.865897,-1.660569
+CIA,Rome Ciampino Apt,Rome (IT),cia,41.799361,12.594936
+BGY,Milan Bergamo/orio al Serio Apt,Milan,bgy,45.673889,9.704166
+HHN,Frankfurt Hahn Airport,Frankfurt,hhn,49.948672,7.263892
+REU,Reus,Reus,reu,41.147392,1.167172
+PFO,Paphos,Paphos,pfo,34.718039,32.485731
+XRY,Jerez,,xry,36.744622,-6.060111
+NYO,Stockholm Skavsta Airport,Stockholm,nyo,58.788636,16.912189
+FKB,Karlsruhe/Baden-Baden Baden Airpark,Karlsruhe/Baden-Baden,fkb,48.7793,8.08048
+EMA,Nottingham East Midlands Airport,Nottingham,ema,52.831111,-1.328056
+LIG,Limoges,Limoges,lig,45.862778,1.179444
+TRS,Trieste,,trs,45.8275,13.472222
+BZG,Bydgoszcz,Bydgoszcz,bzg,53.0968,17.9777
+POZ,Poznan,Poznan,poz,52.421031,16.826325
+BIQ,Biarritz,Biarritz,biq,43.468419,-1.523325
+SCQ,Santiago de Compostela,Santiago de Compostela,scq,42.896333,-8.415144
+SZZ,Szczecin,Szczecin,szz,53.584731,14.902206
+PSA,Pisa,Pisa,psa,43.683917,10.39275
+ZAZ,Zaragoza Airport,Zaragoza,zaz,41.666242,-1.041553
+CRL,Brussels S. Charleroi Airport,Brussels,crl,50.459197,4.453817
+BTS,Bratislava,Bratislava,bts,48.170167,17.212667
+BRE,Bremen,Bremen,bre,53.0475,8.786667
+TUF,Tours Val de Loire Airport,Tours,tuf,47.432222,0.727606
+SVQ,Sevilla Airport,Sevilla,svq,37.418,-5.893106
+MPL,Montpellier Mediterranee Apt,Montpellier,mpl,43.576194,3.963014
+BLQ,Bologna Guglielmo Marconi,Bologna,blq,44.535444,11.288667
+GRO,Girona,Girona,gro,41.900969,2.760547
+CHQ,Chania,Chania,chq,35.531747,24.149678
+SDR,Santander,,sdr,43.427064,-3.820006
+TPS,Trapani,Trapani,tps,37.911403,12.487961
+FSC,Figari,Figari,fsc,41.500557,9.097777
+MST,Maastricht/Aachen,Maastricht/Aachen,mst,50.911658,5.770144
+GSE,Goteborg City Apt,Goteborg,gse,57.774722,11.870372
+SKG,Thessaloniki,Thessaloniki,skg,40.519725,22.97095
+GPA,Patrai,Patrai,gpa,38.151111,21.425556
+CIY,Comiso,Comiso,ciy,37,14.6144
+FEZ,Fes,Fes,fez,33.927261,-4.977958
+OUD,Oujda,Oujda,oud,34.78715,-1.923986
+RBA,Rabat,Rabat,rba,34.051467,-6.751519
+BOH,Bournemouth,Bournemouth,boh,50.78,-1.8425
+BES,Brest,,bes,48.447911,-4.418539
+LIL,Lille Lesquin Airport,,lil,50.561942,3.089444
+CFE,Clermont-Ferrand,Clermont-Ferrand,cfe,45.786661,3.169169
+VST,Stockholm Vasteras Apt,Stockholm,vst,59.589444,16.633611
+PIK,Glasgow Prestwick Apt,Glasgow (GB),pik,55.509444,-4.586667
+VNO,Vilnius,Vilnius,vno,54.634133,25.285767
+CCF,Carcassonne,Carcassonne,ccf,43.215978,2.306317
+KIR,Kerry,Kerry,kir,52.180878,-9.523783
+LRH,La Rochelle,La Rochelle,lrh,46.1792,-1.19528
+EBU,St-etienne,St-etienne,ebu,45.540554,4.296389
+OSI,Osijek,Osijek,osi,45.462667,18.810156
+ZAD,Zadar,Zadar,zad,44.108269,15.346697
+AAR,Aarhus Tirstrup Airport,Aarhus,aar,56.300017,10.619008
+RYG,Oslo Moss-rygge Airport,Oslo,ryg,59.378933,10.785389
+HAU,Haugesund,Haugesund,hau,59.345267,5.208364
+TSF,Venice Treviso/Sant'Angelo Apt,Venice,tsf,45.6484,12.194422
+ORK,Cork,Cork,ork,51.841269,-8.491111
+GOA,Genoa,Genoa,goa,44.413333,8.8375
+PSR,Pescara,Pescara,psr,42.431656,14.181067
+BLL,Billund,Billund,bll,55.740322,9.151778
+LEJ,Leipzig/Halle,,lej,51.432447,12.241633
+TLL,Tallinn,Tallinn,tll,59.413317,24.832844
+PGF,Perpignan,Perpignan,pgf,42.740442,2.870667
+PUY,Pula,Pula,puy,44.893533,13.922192
+TLN,Toulon/Hyeres,Toulon/Hyeres,tln,43.0973,6.14603
+NOC,Knock,Knock,noc,53.910297,-8.818492
+TRN,Turin Caselle Airport,Turin,trn,45.200761,7.649631
+DNR,Dinard/St-Malo,Dinard/St-Malo,dnr,48.587683,-2.079958
+KUN,Kaunas,Kaunas,kun,54.963919,24.084778
+NRN,Duesseldorf Weeze Airport,Duesseldorf,nrn,51.602222,6.141944
+XCR,Paris Chalons-Vatry Airport,Paris,xcr,48.776072,4.184492
+AGA,Agadir,Agadir,aga,30.381353,-9.546311
+NDR,Nador,,ndr,34.9888,-3.02821
+SXB,Strasbourg,Strasbourg,sxb,48.538319,7.628233
+LPA,Gran Canaria,Gran Canaria,lpa,27.931886,-15.386586
+KLX,Kalamata,Kalamata,klx,37.068319,22.025525
+LEI,Almeria,Almeria,lei,36.843936,-2.370097
+EIN,Eindhoven Airport,Eindhoven,ein,51.450139,5.374528
+LDY,Derry,Derry,ldy,55.042778,-7.161111
+BSL,Basel,Basel/Mulhouse,bsl,47.59,7.529167
+TNG,Tangier,Tangier,tng,35.726917,-5.916889
+EGC,Bergerac,Bergerac,egc,44.825279,0.518611
+DLE,Dole,Dole,dle,47.039014,5.42725
+TRF,,,trf,59.186703,10.258628
+AOI,Ancona,Ancona,aoi,43.616389,13.362222
+TMP,Tampere,Tampere,tmp,61.414147,23.604392
+MJV,Murcia,Murcia,mjv,37.774972,-0.812389
+DTM,Dortmund,,dtm,51.518314,7.612242
+ESU,Essaouira,Essaouira,esu,31.3975,-9.681667
+LCJ,Lodz,Lodz,lcj,51.721881,19.398133
+FNI,Nimes,Nimes,fni,43.757444,4.416347
+CUF,Cuneo,Cuneo,cuf,44.547019,7.623217
+KTW,Katowice,,ktw,50.474253,19.080019
+PMF,Milan Parma Apt,Milan,pmf,44.824483,10.296367
+RDZ,Rodez,Rodez,rdz,44.407869,2.482672
+RZE,Rzeszow,Rzeszow,rze,50.109958,22.019
+PEG,Perugia,,peg,43.095906,12.513222
+NCL,Newcastle,Newcastle (GB),ncl,55.0375,-1.691667
+VOL,Volos,Volos,vol,39.219619,22.794339
+NUE,Nuremberg,Nuremberg,nue,49.4987,11.066897
+VLL,Valladolid,,vll,41.706111,-4.851944
+TGD,Podgorica,Podgorica,tgd,42.359392,19.251894
+BZR,Beziers,Beziers,bzr,43.323522,3.353903
+LNZ,Linz Blue Danube,Linz,lnz,48.233219,14.187511
+LDE,Lourdes/Tarbes,Lourdes/Tarbes,lde,43.178675,-0.006439
+RNS,Rennes St Jacques Airport,Rennes,rns,48.069508,-1.734794
+RJK,Rijeka,Rijeka,rjk,45.216889,14.570267
+SZG,Salzburg W A Mozart,Salzburg,szg,47.793304,13.004333
+LBC,Hamburg Luebeck-Blankensee Airport,Hamburg,lbc,53.805367,10.719222
+PDV,Plovdiv,Plovdiv,pdv,42.067806,24.850833
+MMX,Malmo Airport,Malmo,mmx,55.530193,13.371639
+LPP,Lappeenranta,Lappeenranta,lpp,61.044553,28.144397
+GRQ,Groningen,Groningen,grq,53.11972,6.579444
+FMO,Muenster/Osnabrueck,Muenster/Osnabrueck,fmo,52.134642,7.684831
+BRQ,Brno,Brno,brq,49.151269,16.694433
+TFN,Tenerife Norte,,tfn,28.482653,-16.341536
+VXO,Vaxjo,Vaxjo,vxo,56.929144,14.727994
+OSR,Ostrava,Ostrava,osr,49.696292,18.111053
+BVE,Brive-La-Gaillarde,Brive-La-Gaillarde,bve,45.150833,1.469167
+CRV,Crotone,Crotone,crv,38.997225,17.080169
+SFT,Skelleftea,Skelleftea,sft,64.624772,21.076892
+KIX,Osaka Kansai International Airport,Osaka,kix,34.434722,135.244167
+TPE,Taipei Taiwan Taoyuan International Apt,Taipei,tpe,25.077731,121.232822
+MNL,Manila Ninoy Aquino International Apt,Manila,mnl,14.508647,121.019581
+HKT,Phuket,Phuket,hkt,8.1132,98.316872
+SGN,Ho Chi Minh City,Ho Chi Minh City,sgn,10.818797,106.651856
+CGK,Jakarta Soekarno-Hatta Apt,Jakarta,cgk,-6.125567,106.655897
+HGH,Hangzhou,Hangzhou,hgh,30.229503,120.434453
+KUL,Kuala Lumpur International Airport,Kuala Lumpur,kul,2.745578,101.709917
+HAK,Haikou,Haikou,hak,19.934856,110.458961
+PNH,Phnom Penh,Phnom Penh,pnh,11.546556,104.844139
+PER,Perth,Perth,per,-31.940278,115.966944
+DPS,Denpasar-Bali,Denpasar-Bali,dps,-8.748169,115.167172
+SUB,Surabaya,Surabaya,sub,-7.379831,112.786858
+DRW,Darwin International,Darwin,drw,-12.408333,130.87266
+MEL,Melbourne Airport,Melbourne (AU),mel,-37.673333,144.843333
+SYD,Sydney Kingsford Smith Apt,Sydney (AU),syd,-33.946111,151.177222
+KNO,Medan Kuala Namu,Medan,kno,51.3222,3.29306
+BOM,Mumbai,Mumbai,bom,19.088686,72.867919
+MAA,Chennai,Chennai,maa,12.994414,80.180517
+RGN,Yangon,Yangon,rgn,16.907305,96.133222
+FUK,Fukuoka,Fukuoka,fuk,33.585942,130.450686
+PEN,Penang,Penang,pen,5.297139,100.276864
+REP,Siem Reap,Siem Reap,rep,13.410666,103.81284
+SWA,Shantou,Shantou,swa,23.4,116.683
+HBE,Alexandria Borg el Arab,Alexandria (EG),hbe,30.917669,29.696408
+JIK,Ikaria Island,Ikaria Island,jik,37.682717,26.347061
+JTY,Astypalaia Island,Astypalaia Island,jty,36.579886,26.375822
+JNX,Naxos Is,Naxos Is,jnx,37.080556,25.368056
+JKL,Kalymnos Island,Kalymnos Island,jkl,36.963333,26.940556
+YUL,Montreal Pierre Elliott Trudeau Int Apt,Montreal,yul,45.470556,-73.740833
+MLO,Milos,Milos,mlo,36.696111,24.4775
+KIT,Kythira,Kythira,kit,36.274258,23.016978
+JSY,Syros Island,Syros Island,jsy,37.422792,24.950936
+JSI,Skiathos,Skiathos,jsi,39.1771,23.503675
+BAH,Bahrain,Bahrain,bah,26.270834,50.63361
+PAS,Paros,Paros,pas,37.010278,25.127778
+AOK,Karpathos,Karpathos,aok,35.421408,27.146008
+LRS,Leros,Leros,lrs,37.184903,26.800289
+EVN,Yerevan,Yerevan,evn,40.147275,44.395881
+KRR,Krasnodar,Krasnodar,krr,45.034689,39.170539
+BGO,Bergen,Bergen,bgo,60.293386,5.218142
+SVG,Stavanger,Stavanger,svg,58.876778,5.637856
+TRD,,,trd,63.457556,10.92425
+GOT,Goteborg Landvetter Apt,Goteborg,got,57.662836,12.279819
+TOS,,,tos,69.683333,18.918919
+AES,,,aes,62.560372,6.110164
+AAL,,,aal,57.092789,9.849164
+ARN,Stockholm Arlanda Apt,Stockholm,arn,59.651944,17.918611
+FLL,,,fll,26.072583,-80.15275
+LAX,Los Angeles International Apt,Los Angeles,lax,33.942536,-118.408075
+MCO,Orlando International Apt,Orlando,mco,28.429394,-81.308994
+BGI,Barbados,Barbados,bgi,13.074603,-59.492456
+UVF,Hewanorra Intl,St Lucia,uvf,13.733194,-60.952597
+ANU,,,anu,17.136749,-61.792667
+BFS,Belfast International Apt,Belfast,bfs,54.6575,-6.215833
+BIA,Bastia,Bastia,bia,42.552664,9.483731
+AYT,Antalya,Antalya,ayt,36.898731,30.800461
+DLM,Dalaman,Dalaman,dlm,36.713056,28.7925
+VCE,Venice Marco Polo Apt,Venice,vce,45.505278,12.351944
+TJM,Tyumen,,tjm,57.189567,65.3243
+ORY,Paris Orly Apt,,ory,48.725278,2.359444
+LIN,Milan Linate Apt,Milan,lin,45.445103,9.276739
+ORN,Oran Ahmed Ben Bella Apt,,orn,35.623858,-0.621183
+KUF,Samara,,kuf,53.5,50.15
+OVD,Asturias,,ovd,43.563567,-6.034622
+RTM,Rotterdam Apt,,rtm,51.956944,4.437222
+EAS,San Sebastian,,eas,43.356519,-1.790611
+MLN,Melilla,,mln,35.279817,-2.956256
+LEN,Leon,,len,42.589,-5.655556
+SPC,Santa Cruz de la Palma,Santa Cruz de la Palma,spc,28.626478,-17.755611
+CWL,Cardiff (GB) 00,Cardiff (GB) 00,cwl,51.396667,-3.343333
+VRN,Verona Villafranca Airport,Verona,vrn,45.395706,10.888533
+KZN,Kazan,,kzn,55.606186,49.278728
+ZAG,Zagreb,,zag,45.742931,16.068778
+LCG,A Coruna,,lcg,43.302061,-8.377256
+FLR,Florence Amerigo Vespucci,,flr,43.809953,11.2051
+KJA,Krasnoyarsk,,kja,56.18,92.475
+UFA,Ufa,,ufa,54.557511,55.874417
+CLJ,Cluj-Napoca,,clj,46.785167,23.686167
+RGS,Burgos,,rgs,42.357628,-3.620764
+SLM,Salamanca,,slm,40.952117,-5.501986
+EZE,Buenos Aires Ministro Pistarini,,eze,-34.822222,-58.535833
+GLA,Glasgow International Airport,Glasgow (GB),gla,55.871944,-4.433056
+VGO,Vigo,,vgo,42.2318,-8.626775
+ROV,Rostov,,rov,47.258208,39.818089
+GRX,Granada,,grx,37.188731,-3.777356
+SVX,Yekaterinburg,,svx,56.743108,60.802728
+CLT,Charlotte,,clt,35.214,-80.943139
+SEN,London Southend Apt,,sen,51.571389,0.695556
+FNC,Funchal,Funchal,fnc,32.697889,-16.774453
+RMI,Rimini,,rmi,44.020292,12.611747
+OVB,Novosibirsk,,ovb,55.012622,82.650656
+IEV,Kiev Zhuliany Intl Apt,,iev,50.401694,30.449697
+KGD,Kaliningrad,,kgd,54.89005,20.592633
+DRS,Dresden,,drs,51.132767,13.767161
+FAE,Faroe Islands,,fae,62.063628,-7.277219
+BJL,Banjul,Banjul,bjl,13.337961,-16.652206
+TGM,Tirgu Mures,,tgm,46.467714,24.412525
+BOG,Bogota,,bog,4.701594,-74.146947
+BRN,Berne Belp,,brn,46.9141,7.497153
+CRA,Craiova,,cra,44.318139,23.888611
+TSR,Timisoara,,tsr,45.809861,21.337861
+BJZ,Badajoz,,bjz,38.89125,-6.821333
+RVN,Rovaniemi,Rovaniemi,rvn,66.564822,25.830411
+GNB,Lyon Grenoble-St Geoirs Apt,Lyon,gnb,45.362944,5.329375
+ABZ,Aberdeen (GB),Aberdeen (GB),abz,57.201944,-2.197778
+JER,Jersey,Jersey,jer,49.207947,-2.195508
+GIB,Gibraltar,Gibraltar,gib,36.151219,-5.349664
+BJV,Bodrum Milas Airport,Bodrum,bjv,37.249,27.667
+INN,Innsbruck,Innsbruck,inn,47.260219,11.343964
+AJA,Ajaccio,Ajaccio,aja,41.923637,8.802917
+IOM,Isle of Man,Isle of Man,iom,54.083333,-4.623889
+ADB,Izmir Adnan Menderes Apt,Izmir,adb,38.292392,27.156953
+HRG,Hurghada,Hurghada,hrg,27.178317,33.799436
+INV,Inverness,Inverness,inv,57.5425,-4.0475
+NBE,Enfidha,Enfidha,nbe,36.075833,10.438611
+SID,Sal Island,Sal Island,sid,16.741389,-22.949444
+CCC,Cayo Coco,Cayo Coco,ccc,22.5132,-78.511
+PIT,Pittsburgh International Apt,Pittsburgh,pit,40.491467,-80.232872
+PNQ,Pune,Pune,pnq,18.582111,73.919697
+BLR,Bengaluru,Bengaluru,blr,12.949986,77.668206
+DMK,Bangkok Don Mueang International Arpt,Bangkok,dmk,13.912583,100.60675
+UBP,Ubon Ratchathani,Ubon Ratchathani,ubp,15.251278,104.870231
+UTH,Udon Thani,Udon Thani,uth,17.386436,102.788247
+CEI,Chiang Rai,Chiang Rai,cei,19.952342,99.882928
+CNX,Chiang Mai,Chiang Mai,cnx,18.766847,98.962644
+NST,Nakhon Si Thammarat,Nakhon Si Thammarat,nst,8.539617,99.944725
+HDY,Hat Yai,Hat Yai,hdy,6.933206,100.392975
+TST,Trang,Trang,tst,7.508744,99.616578
+LOE,Loei,Loei,loe,17.439133,101.722064
+MAQ,Mae Sot,Mae Sot,maq,16.699856,98.545056
+UNN,Ranong,Ranong,unn,9.777622,98.585483
+KKC,Khon Kaen,Khon Kaen,kkc,16.466628,102.783661
+BFV,Buriram,Buriram,bfv,15.229539,103.253231
+KOP,Nakhon Phanom,Nakhon Phanom,kop,17.383794,104.643022
+SNO,Sakon Nakhon,Sakon Nakhon,sno,17.195142,104.118625
+NNT,Nan,Nan,nnt,18.807914,100.783419
+LPT,Lampang,Lampang,lpt,18.270933,99.504167
+PHS,Phitsanulok,Phitsanulok,phs,16.782939,100.279122
+PRH,Phrae,Phrae,prh,18.132169,100.164664
+KBV,Krabi,Krabi,kbv,8.095969,98.988764
+CJM,Chumphon,Chumphon,cjm,10.7112,99.361706
+URT,Surat Thani,Surat Thani,urt,9.1325,99.135556
+TSN,Tianjin,Tianjin,tsn,39.124353,117.346183
+ROI,Roi Et,Roi Et,roi,16.116761,103.773797
+OOL,Gold Coast,Gold Coast,ool,-28.164444,153.504722
+NKG,Nanjing,Nanjing,nkg,31.742042,118.862025
+TAO,Qingdao,Qingdao,tao,36.266108,120.374436
+SHE,Shenyang,Shenyang,she,41.3824,123.2901
+BNE,Brisbane,Brisbane,bne,-27.384167,153.1175
+HAN,Hanoi,Hanoi,han,21.221192,105.807178
+GND,,,gnd,12.004247,-61.786192
+TAB,Tobago,Tobago,tab,11.149658,-60.832194
+BHD,Belfast George Best City Apt,Belfast,bhd,54.618056,-5.8725
+EXT,Exeter (GB) 00,Exeter (GB) 00,ext,50.734444,-3.413889
+SOU,Southampton,Southampton,sou,50.950261,-1.356803
+BVC,Boa Vista Island,Boa Vista Island,bvc,16.136531,-22.888897
+GCI,Guernsey,Guernsey,gci,49.434956,-2.601969
+NWI,Norwich,Norwich,nwi,52.675833,1.282778
+NQY,Newquay,Newquay,nqy,50.440558,-4.995408
+POP,Puerto Plata,Puerto Plata,pop,19.7579,-70.570033
+IAD,Washington Dulles International Apt,Washington,iad,38.944533,-77.455811
+KTT,Kittila,Kittila,ktt,67.701022,24.84685
+PUJ,Punta Cana,Punta Cana,puj,18.567367,-68.363431
+GOI,Goa,Goa,goi,15.380833,73.831422
+KHI,Karachi,Karachi,khi,24.906547,67.160797
+VRA,Juan G Gomez Intl,Varadero,vra,23.034445,-81.435278
+IVL,Ivalo,Ivalo,ivl,68.607269,27.405328
+FDH,Friedrichshafen,Friedrichshafen,fdh,47.671317,9.511486
+CMF,Chambery/Aix-Les-Bains,Chambery/Aix-Les-Bains,cmf,45.63805,5.880225
+KAO,Kuusamo,Kuusamo,kao,65.987575,29.239381
+LXR,Luxor,Luxor,lxr,25.671028,32.706583
+PVR,Puerto Vallarta,Puerto Vallarta,pvr,20.680083,-105.254167
+SFB,Orlando Sanford International Airport,Orlando,sfb,28.777639,-81.237489
+PVK,Preveza/Lefkada,Preveza/Lefkada,pvk,38.925467,20.765311
+YVR,Vancouver International Apt,Vancouver,yvr,49.193889,-123.184444
+YYC,Calgary,Calgary,yyc,51.113888,-114.020278
+BOJ,Burgas,Burgas,boj,42.569583,27.515236
+VAR,Varna,Varna,var,43.232072,27.825106
+MJT,Mytilini,Mytilini,mjt,39.056667,26.598333
+LJU,Ljubljana,Ljubljana,lju,46.223686,14.457611
+AUS,Austin-Bergstrom International Apt,Austin,aus,30.194528,-97.669889
+MID,Merida,Merida,mid,20.936981,-89.657672
+KVA,Kavala,Kavala,kva,40.913306,24.619223
+PXO,Porto Santo,Porto Santo,pxo,33.073386,-16.349975
+ANR,Antwerp,Antwerp,anr,51.189444,4.460278

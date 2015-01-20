@@ -70,7 +70,13 @@ module Oag
              if sched[:op_cxr_code].eql? sched[:shared_airline_code]
                   sched[:op_cxr_name] = sched[:shared_airline_name]
              else
-               sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
+               airline = Airline.by_code(sched[:op_cxr_code])
+
+                unless airline.blank?
+                  sched[:op_cxr_name] = airline.name
+                else
+                  sched[:op_cxr_name] = 'Unidentified Airline'
+                end
              end
 
            else

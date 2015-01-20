@@ -38,6 +38,7 @@ class ScheduleImportWorker
               Sidekiq::Logging.logger.info "Import Worker refreshing airports  #{report_id}: #{report.report_key}"
               processor.refresh_airports(report)
               report.save
+              UpdateAirportsWorker.perform_async()
             when /airports_refreshed/
 
               Sidekiq::Logging.logger.info "Import Worker refreshing direct flights  #{report_id}: #{report.report_key}"

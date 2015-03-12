@@ -9,7 +9,7 @@ gem 'activerecord-import'
 gem 'date_validator'
 gem 'chronic'
 gem 'time_diff'
-
+gem 'mail', '2.6.1'
 
 # Template language gems
 # Use SCSS for stylesheets
@@ -53,8 +53,13 @@ gem 'rabl'
 
 gem 'parallel'
 
-gem 'devise', '3.2.4'
-gem 'activeadmin', github: 'gregbell/active_admin'
+gem 'devise', :git => 'https://github.com/plataformatec/devise.git'
+#gem 'devise', '3.2.4'
+gem 'activeadmin', github: 'activeadmin'
+gem 'inherited_resources', github: 'josevalim/inherited_resources', branch: 'rails-4-2'
+#gem 'activeadmin', github: 'gregbell/active_admin'
+
+
 gem 'active_admin_import' , '2.1.1'
 
 gem "rails-settings-cached", "0.4.1"

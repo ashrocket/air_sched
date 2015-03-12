@@ -4,6 +4,8 @@ class CreateAirports < ActiveRecord::Migration
       t.string :code
       t.string :name
       t.string :city
+      t.decimal :lat, {:precision=>10, :scale=>6}
+    	t.decimal :long, {:precision=>10, :scale=>6}
       t.string :slug
 
 

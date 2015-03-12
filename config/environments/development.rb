@@ -32,8 +32,10 @@ Rails.application.configure do
   #     }
 
   config.action_controller.asset_host = "http://dev1.airblackbox.com"
+  # config.action_controller.asset_host = "localhost:3000"
   config.action_mailer.default_url_options = { :host => 'http://dev1.airblackbox.com/shannon' }
   config.action_mailer.asset_host = 'http://dev1.airblackbox.com'
+  # config.action_mailer.asset_host = 'localhost:3000'
 
   ActionMailer::Base.smtp_settings = {
       :address              => "localhost",
@@ -65,5 +67,6 @@ Rails.application.configure do
   # Require all existing scheduled jobs
   Dir[Rails.root.join "app/workers/**/*.rb"].each { |f| require f }
 
-  config.application_url = 'http://localhost:3000'
+  config.application_url = 'http://localhost'
+  config.application_url = '3000'
 end

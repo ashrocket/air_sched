@@ -111,7 +111,7 @@ CREATE TABLE admin_users (
     reset_password_token text,
     reset_password_sent_at timestamp with time zone,
     remember_created_at timestamp with time zone,
-    sign_in_count bigint DEFAULT 0::bigint NOT NULL,
+    sign_in_count bigint DEFAULT (0)::bigint NOT NULL,
     current_sign_in_at timestamp with time zone,
     last_sign_in_at timestamp with time zone,
     current_sign_in_ip text,
@@ -269,6 +269,39 @@ CREATE SEQUENCE carriers_id_seq
 --
 
 ALTER SEQUENCE carriers_id_seq OWNED BY carriers.id;
+
+
+--
+-- Name: city_pairs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE city_pairs (
+    id integer NOT NULL,
+    hub character varying,
+    orig character varying,
+    dest character varying,
+    outbound text,
+    inbound text
+);
+
+
+--
+-- Name: city_pairs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE city_pairs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: city_pairs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE city_pairs_id_seq OWNED BY city_pairs.id;
 
 
 --
@@ -610,6 +643,39 @@ ALTER SEQUENCE oag_schedules_id_seq OWNED BY oag_schedules.id;
 
 
 --
+-- Name: possible_flights; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE possible_flights (
+    id integer NOT NULL,
+    hub character varying,
+    orig character varying,
+    dest character varying,
+    outbound text,
+    inbound text
+);
+
+
+--
+-- Name: possible_flights_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE possible_flights_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: possible_flights_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE possible_flights_id_seq OWNED BY possible_flights.id;
+
+
+--
 -- Name: report_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -742,6 +808,13 @@ ALTER TABLE ONLY carriers ALTER COLUMN id SET DEFAULT nextval('carriers_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY city_pairs ALTER COLUMN id SET DEFAULT nextval('city_pairs_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY cnx_pairs ALTER COLUMN id SET DEFAULT nextval('cnx_pairs_id_seq'::regclass);
 
 
@@ -799,6 +872,13 @@ ALTER TABLE ONLY oag_reports ALTER COLUMN id SET DEFAULT nextval('oag_reports_id
 --
 
 ALTER TABLE ONLY oag_schedules ALTER COLUMN id SET DEFAULT nextval('oag_schedules_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY possible_flights ALTER COLUMN id SET DEFAULT nextval('possible_flights_id_seq'::regclass);
 
 
 --
@@ -872,6 +952,14 @@ ALTER TABLE ONLY carriers
 
 
 --
+-- Name: city_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY city_pairs
+    ADD CONSTRAINT city_pairs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: cnx_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -941,6 +1029,14 @@ ALTER TABLE ONLY oag_reports
 
 ALTER TABLE ONLY oag_schedules
     ADD CONSTRAINT oag_schedules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: possible_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY possible_flights
+    ADD CONSTRAINT possible_flights_pkey PRIMARY KEY (id);
 
 
 --
@@ -1163,10 +1259,24 @@ CREATE INDEX index_active_admin_comments_on_resource_type_and_resource_id ON act
 
 
 --
+-- Name: index_city_pairs_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_city_pairs_on_hub_and_orig_and_dest ON city_pairs USING btree (hub, orig, dest);
+
+
+--
 -- Name: index_interline_cxr_rules_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_interline_cxr_rules_on_report_key_id ON interline_cxr_rules USING btree (report_key_id);
+
+
+--
+-- Name: index_possible_flights_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_possible_flights_on_hub_and_orig_and_dest ON possible_flights USING btree (hub, orig, dest);
 
 
 --
@@ -1222,4 +1332,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140821204002');
 INSERT INTO schema_migrations (version) VALUES ('20140929190724');
 
 INSERT INTO schema_migrations (version) VALUES ('20141003133309');
+
+INSERT INTO schema_migrations (version) VALUES ('20141119191319');
+
+INSERT INTO schema_migrations (version) VALUES ('20141124142205');
 

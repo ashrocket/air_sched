@@ -30,7 +30,7 @@ jQuery ->
 
 #               params[search_action] = jQuery.extend({}, search)
 
-               href = Routes.search_path({origin_code: origin_code, dest_code: apt.dest})
+               href = Routes.search_path({origin_code: origin_code, dest_code: apt.dest,  format: '', trailing_slash: false})
                link = $(document.createElement('a'))
                link.prop('href', href)
                link.text(apt.dest_name + " (" + apt.dest + ")")

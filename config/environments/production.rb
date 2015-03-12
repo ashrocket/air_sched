@@ -83,4 +83,20 @@ Rails.application.configure do
 
   Sidekiq.default_worker_options = { :queue => :schedule_loader }
 
+
+  config.action_controller.asset_host = "http://dev1.airblackbox.com"
+  config.action_mailer.default_url_options = { :host => 'http://dev1.airblackbox.com/shannon' }
+  config.action_mailer.asset_host = 'http://dev1.airblackbox.com'
+
+   ActionMailer::Base.smtp_settings = {
+       :address              => "localhost",
+       :port                 => 25
+   }
+
+    # Require all existing scheduled jobs
+  Dir[Rails.root.join "app/workers/**/*.rb"].each { |f| require f }
+
+  config.application_url = 'http://dev1.airblackbox.com/shannon'
+  config.application_port = '80'
+
 end

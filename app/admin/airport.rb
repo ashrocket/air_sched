@@ -13,6 +13,11 @@ ActiveAdmin.register Airport do
     column :city
     actions
   end
+
+  active_admin_import :validate => false,
+                      :csv_options => {:col_sep => "," },
+                      :before_import => proc{ Airport.delete_all},
+                      :batch_size => 1000
   #
   # or
   #

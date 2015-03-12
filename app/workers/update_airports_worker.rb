@@ -3,23 +3,23 @@ class UpdateAirportsWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
   include Sidetiq::Schedulable
-  recurrence { minutely }
+  recurrence { hourly }
 
   sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
 
   sidekiq_options lock: {
         timeout: proc { |_, timeout = 1_200_000 | timeout * 2 },      # you don't use user_id here thus the naming
-        name:    proc { |message_id| "lock:updateairports" } # no need to pass timeout - not used
+        name:    "lock:updateairports"  # no need to pass timeout - not used
       }
 
 
-  def perform()
+  def perform
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
     begin
       airports = {}
 
-     	File.foreach(File.join('lib', 'assets', 'airports.csv')) do |csv_line|
+     	File.foreach(File.join('lib', 'assets', 'global_airports.csv')) do |csv_line|
      		escaped_text = csv_line.gsub('\'', '""')
      		row = CSV.parse(escaped_text, :col_sep => ',', :row_sep => :auto).first
 
@@ -33,25 +33,26 @@ class UpdateAirportsWorker
      			airports[row[4].upcase] = airport
      		end
      	end
-
-     	Airport.all.each do |db_airport|
-     		code = db_airport.code.upcase
+      log_data = []
+     	Airport.all.sort_by(&:code).each do |db_airport|
+        code = db_airport.code.upcase
      		found_airport = airports[code]
      		if found_airport
-     			puts found_airport.inspect
-     			puts ""
+          log_data << found_airport.inspect
      			db_airport.update_columns(:lat => found_airport[:lat], :long => found_airport[:long])
      		else
-     			puts "------------------------------------NOT found #{code}"
+          log_data <<  "------------------------------------NOT found #{code}"
      		end
-
      	end
       ensure
+        log_data.each do |line|
+          Sidekiq::Logging.logger.info line
+        end
         lock.release!
       end
     else
       Sidekiq::Logging.logger.info "Update Airports Worker, busy, delaying  for 1 minute"
-      UpdateAirportsWorker.delay_for(2.minute).perform_async()
+      UpdateAirportsWorker.delay_for(10.minute).perform_async()
     end
     #Do Something here with the message
     #

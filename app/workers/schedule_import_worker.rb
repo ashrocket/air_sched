@@ -26,7 +26,6 @@ class ScheduleImportWorker
           case report.report_status
             when /queued/
               Sidekiq::Logging.logger.info "Import Worker loading schedules #{report_id}: #{report.report_key}"
-
               if report.large_report?
 
                 ScheduleLargeImportWorker.perform_async(report_id)
@@ -39,6 +38,7 @@ class ScheduleImportWorker
               Sidekiq::Logging.logger.info "Import Worker refreshing airports  #{report_id}: #{report.report_key}"
               processor.refresh_airports(report)
               report.save
+              UpdateAirportsWorker.perform_async()
             when /airports_refreshed/
 
               Sidekiq::Logging.logger.info "Import Worker refreshing direct flights  #{report_id}: #{report.report_key}"

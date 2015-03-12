@@ -9,7 +9,7 @@ class OagSchedulesController < ApplicationController
       o = params[:origin].upcase
       d = params[:dest].upcase
     end
-    @oag_schedules = OagSchedule.market(o,d)
+    @oag_schedules = OagSchedule.keyed(ABBConfig.data_key).market(o,d)
 
   end
   def to_hub

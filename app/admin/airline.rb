@@ -9,7 +9,6 @@ ActiveAdmin.register Airline do
   index do
     column :code
     column :name
-    column :country
     actions
   end
 

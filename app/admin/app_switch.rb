@@ -14,6 +14,12 @@ ActiveAdmin.register AppSwitch do
   #  permitted << :other if resource.something?
   #  permitted
   # end
-
+  form do |f|
+      f.inputs 'App Switch' do
+          f.input :name, as: :string, input_html:{ type: 'string', size: 64 }
+          f.input :enabled
+      end
+      f.actions
+  end
 
 end

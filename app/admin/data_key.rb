@@ -4,7 +4,8 @@ ActiveAdmin.register_page 'Active Data Key' do
 
   content :title => 'System Settings' do
     div do
-      render 'data_key'
+      render :partial => 'admin/data_key/data_key'
+      # render 'data_key'
      end
   end
 

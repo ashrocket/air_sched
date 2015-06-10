@@ -23,6 +23,20 @@ class ReportKey < ActiveRecord::Base
      where(active: true).uniq.pluck(:report_key)
     end
 
+    def match_key(pattern)
+      key = nil
+      matched_list = []
+      all.each do |report_key|
+        matches = pattern.match(report_key.file_pattern)
+        matched_list <<  {key: report_key, match: matches.captures.first.lstrip} if matches
+      end
+      unless matched_list.empty?
+        matched_list.sort_by! { |m| m[:match].length}
+        key = matched_list.last[:key]
+      end
+      key
+    end
+
   end
   def initialize(attributes = {})
     name = "REPORT NAME IS REQUIRED"

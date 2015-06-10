@@ -15,7 +15,7 @@ class UpdateAirportsWorker
 
   def perform
     Rails.logger = Sidekiq::Logging.logger
-    if lock.acquire!
+    if lock.acquire! and AppSwitch.on?('update_airports')
     begin
       airports = {}
 
@@ -51,8 +51,13 @@ class UpdateAirportsWorker
         lock.release!
       end
     else
-      Sidekiq::Logging.logger.info "Update Airports Worker, busy, delaying  for 1 minute"
-      UpdateAirportsWorker.delay_for(10.minute).perform_async()
+      if AppSwitch.on?('update_airports')
+        Sidekiq::Logging.logger.info "Update Airports Worker, busy, delaying  for 1 hour"
+      else
+        Sidekiq::Logging.logger.info "Update Airports disabled, retry in 1 hour"
+      end
+        UpdateAirportsWorker.delay_for(60.minute).perform_async()
+
     end
     #Do Something here with the message
     #

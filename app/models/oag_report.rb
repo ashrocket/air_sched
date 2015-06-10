@@ -7,6 +7,9 @@ class OagReport < ActiveRecord::Base
   def report_path
     load_status["report_path"]
   end
+  def report_name
+    File.basename(self.report_path,File.extname(self.report_path))
+  end
   def large_report?
     self.attachment_lines > 10000
   end
@@ -22,15 +25,7 @@ class OagReport < ActiveRecord::Base
   end
 
   def estimated_key
-      report_name = File.basename(self.report_path,File.extname(self.report_path))
-      key_type    = report_name[0..2]
-
-      if (['HUB','CXX', 'ABB'].include?(key_type))
-        matches = report_name[3..-1].match /([A-Za-z0-9]+)_{0,1}/
-        # matches = report_name[3..-1].match /[^A-Za-z]([A-Za-z0-9]+)_{0,1}/
-        return  matches.captures.first.lstrip if matches
-      end
-      return nil
+      ReportKey.match_key(report_name)
   end
 
   def process_attachment

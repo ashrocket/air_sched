@@ -30,6 +30,12 @@ module Oag
        #when /D|P/
        #end
 
+
+
+       # TODO: We may need to add a local arrival day as an integer, in the event that there are flights
+       # TODO: that could possibly span two day timezone, I don't think this is possible, but Ryan Air had a schedule
+       # TODO: mistake that had a '2' in the localarrday value, and so now we are just looking for > 0 in the boolean
+
          sched =
          {
              :eff_date     =>  row[:efffrom],  :disc_date 	  => row[:effto],
@@ -42,7 +48,8 @@ module Oag
              :dest_apt_name => row[:arrairportname],
              :dest_apt_city => row[:arrcityname],
              :dep_time_local   => row[:localdeptime], :arr_time_local   => row[:localarrtime],
-             :next_day_arrival => row[:localarrday],
+             :next_day_arrival => (not row[:localarrday].nil? and
+                 (0 + row[:localarrday].to_i)  > 0),
              :dep_op_days => row[:localdaysofop], :arr_op_days => row[:arrdaysofop],
              :duration    => row[:elapsedtime],
              :stops => row[:stops],  :restrictions => row[:restrictions],

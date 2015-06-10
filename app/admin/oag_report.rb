@@ -37,6 +37,6 @@ ActiveAdmin.register OagReport, :as => 'OAG Imports' do
             report.load_status
           end
 
-     end
-
+    actions
+   end
 end

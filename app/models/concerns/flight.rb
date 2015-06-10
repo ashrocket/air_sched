@@ -77,7 +77,8 @@ class Flight
   end
 
   def next_day?
-    next_day_arrival.eql? "1"
+    next_day_arrival.eql? "1" or
+    next_day_arrival.eql? true
   end
   def dep_time_loc_minutes
     dep_minutes_since_midnight

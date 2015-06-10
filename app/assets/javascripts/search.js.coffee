@@ -65,7 +65,7 @@ $ ->
 
     loadToHubSchedule = (o, d) ->
       $jqxhr = null
-      $.getJSON(Routes.markets_oag_schedules_url(o,d), (schedules) ->
+      $.getJSON(Routes.markets_oag_schedules_path(o,d), (schedules) ->
         unless $jqxhr?
           if schedules.length > 0
             renderToHubSchedules(schedules)
@@ -78,7 +78,7 @@ $ ->
 
     loadFromHubSchedule = (o, d) ->
       $jqxhr = null
-      $.getJSON(Routes.markets_oag_schedules_url(o,d), (schedules) ->
+      $.getJSON(Routes.markets_oag_schedules_path(o,d), (schedules) ->
         unless $jqxhr?
           if schedules.length > 0
             renderFromHubSchedules(schedules)
@@ -93,7 +93,7 @@ $ ->
 
     loadHubs = (o,d) ->
       $jqxhr = null
-      $.getJSON(Routes.hubs_destinations_url(o,d), (airports) ->
+      $.getJSON(Routes.hubs_destinations_path(o,d), (airports) ->
         unless $jqxhr?
           if airports.length > 0
             renderHubs(airports)
@@ -137,7 +137,7 @@ $ ->
     # Twitter typeahead.js library calls
     # -------------------------------
     dest_prefetch = {
-      url: Routes.origins_airports_url()
+      url: Routes.origins_airports_path()
       cache: false
       replace: (url, uriEncodedQuery) ->
         apt = $('#search_request_origin_code').val()
@@ -187,7 +187,7 @@ $ ->
 
     $(".search-origin.typeahead").typeahead(
       prefetch:
-        url: Routes.origins_airports_url()
+        url: Routes.origins_airports_path()
         filter: (data) ->
           retval = []
           i = 0

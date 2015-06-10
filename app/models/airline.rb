@@ -70,10 +70,15 @@ class Airline < ActiveRecord::Base
        end
     end
 
-    def cached_name code
-       Rails.cache.fetch("airline_name_#{code}", :expires_in => 1.hour) do
-         by_code(code).first.name
+    def cached code
+      Rails.cache.fetch("airline_name_#{code}", :expires_in => 1.hour) do
+         by_code(code).first
        end
+    end
+
+    def cached_name code
+      airline =  cached(code)
+      name = airline ? airline.name : 'Unknown Airline Name'
     end
 
   end

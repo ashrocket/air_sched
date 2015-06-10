@@ -1,6 +1,6 @@
 jQuery ->
     loadDestinations = (origin_code) ->
-      $.getJSON Routes.from_connections_url(origin_code), (data_a) ->
+      $.getJSON Routes.from_connections_path(origin_code), (data_a) ->
          unless $jqxhr?
           pairs = data_a.dest_apts
           dest_apts = _.map pairs, (apt) ->
@@ -30,7 +30,7 @@ jQuery ->
 
 #               params[search_action] = jQuery.extend({}, search)
 
-               href = Routes.search_url({origin_code: origin_code, dest_code: apt.dest})
+               href = Routes.search_path({origin_code: origin_code, dest_code: apt.dest,  format: '', trailing_slash: false})
                link = $(document.createElement('a'))
                link.prop('href', href)
                link.text(apt.dest_name + " (" + apt.dest + ")")
@@ -45,7 +45,7 @@ jQuery ->
     # -------------------------------
     $(".explore-origin.typeahead").typeahead(
       prefetch:
-        url: Routes.origins_airports_url()
+        url: Routes.origins_airports_path()
         filter: (data) ->
           retval = []
           i = 0

@@ -57,40 +57,55 @@ module Oag
              :via_apts => row[:intairports]
 
          }
-         sched[:op] = true if row[:opcar].eql? 'O'
-         case row[:opcar]
-         when /O/
-           if not sched[:shared_airline_code].blank?
+
+
+         if row[:opcar].eql? 'O'
+            sched[:op]  = true
+          else
+            sched[:op]  = false
+         end
+
+         # Set Operating Carrier Info
+         if sched[:op]
+           if not sched[:shared_airline_code].blank? and not sched[:shared_airline_code].eql? '0'
              sched[:op_cxr_code] = sched[:shared_airline_code]
              sched[:op_cxr_name] = sched[:shared_airline_name]
+              sched[:op_flight_num] = sched[:flight_num]
            else
              sched[:op_cxr_code]   = sched[:airline_code]
              sched[:op_cxr_name]   = sched[:airline_name]
              sched[:op_flight_num] = sched[:flight_num]
-
            end
-         when /N/
-           if not row[:dupcar1].blank?
+         else # When Flight is a marketing flight, the dupcar1 field contains the operating carrier flight info
+           if not row[:dupcar1].eql? '0' and not row[:dupcar1].blank?
              op_data = row[:dupcar1].split ' '
              sched[:op_cxr_code] = op_data[0]
              sched[:op_flight_num] = op_data[1]
+              # The operating carrier name is usually in the shared airline name field
              if sched[:op_cxr_code].eql? sched[:shared_airline_code]
                   sched[:op_cxr_name] = sched[:shared_airline_name]
+              else  # If not, just look it up by code
+                if Airline.by_code(sched[:op_cxr_code])
+                     sched[:op_cxr_name] = Airline.by_code(sched[:op_cxr_code]).name
              else
-               airline = Airline.by_code(sched[:op_cxr_code])
-
-                unless airline.blank?
-                  sched[:op_cxr_name] = airline.name
-                else
-                  sched[:op_cxr_name] = 'Unidentified Airline'
+                     sched[:op_cxr_name] = "Unknown Carrier"
+                     Rails.logger.error "Unknow Carrier #{sched[:op_cxr_code]} #{sched}"
                 end
-             end
+              end
+           else # Operating Carrier Information is Missing from DupCar field
 
-           else
+             if not sched[:shared_airline_code].blank? and not sched[:shared_airline_code].eql? '0' and
+                not sched[:shared_airline_name].blank? and not sched[:shared_airline_name].eql? '0'
             sched[:op_cxr_code] = sched[:shared_airline_code]
             sched[:op_cxr_name] = sched[:shared_airline_name]
+                   sched[:op_flight_num] = sched[:flight_num]
+
            end
          end
+
+         end
+
+
          schedules << sched
       end
       schedules.delete_if{|s| s[:disc_date].blank?}

@@ -28,10 +28,11 @@
 
 
 
+  -#%body{class: "#{controller_name} #{action_name}" }
+  -#  = render partial: "layouts/shannon/header"
+  -#  .row
+  -#    .col-sm-12
+  -#      = yield
+  -#  = render partial: "layouts/shannon/footer"
   %body{class: "#{controller_name} #{action_name}" }
-    = render partial: "layouts/shannon/header"
-    .row
-      .col-sm-12
-        = yield
-    = render partial: "layouts/shannon/footer"
-
+    = yield

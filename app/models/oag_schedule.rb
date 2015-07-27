@@ -97,6 +97,10 @@ class OagSchedule < ActiveRecord::Base
       keyed(data_key).pluck(:airline_code).uniq!
     end
 
+    def carriers_details_for_report(report)
+      keyed(report.report_key).pluck(:airline_code, :airline_name).uniq!
+    end
+
 
 
 
@@ -247,18 +251,71 @@ class OagSchedule < ActiveRecord::Base
     (self.mkt_cxrs.split ';').map{|v| (v.split ' ')[0]}
   end
 
+  def effective_overlaps? sched
+    (self.eff_date..self.disc_date).overlaps?(sched.eff_date..sched.disc_date)
+   end
+
   def effective_window sched
-    begin_date =  [self.eff_date, sched.eff_date].max
-    end_date = [self.disc_date, sched.disc_date].min
-    return {eff: begin_date, disc: end_date} if begin_date <= end_date
-    return nil
+    if self.effective_overlaps?(sched)
+      {eff: [self.eff_date,sched.eff_date].max,
+       disc: [self.disc_date,sched.disc_date].min}
+    else
+      nil
+    end
   end
 
-  def day_of_week_aligned? sched
+
+  def connection_days_of_week sched, up_to_days
+
+    departure_days_with_connections = []
+    self.dep_op_days.each do |day_num|
+      if sched.dep_op_days.include?(day_num) and
+          (self.arr_time_loc_minutes + 60) < sched.dep_time_loc_minutes
+          departure_days_with_connections << day_num
+      elsif up_to_days > 0
+
+
+      #  Add the number of days to each operating day of departure to create a range
+      #  Add the same number to the connecting schedule to account for overruns
+      #  So if we had 6 as the daynum, and 2 as the 'extra' days, then we'll test if 6, 7, or 8 is in the
+      #  connecting array if it is then Departing Day six can connect on the 6th, the 7th or the 8th Day.
+      result = [*day_num+1..day_num+up_to_days] & (sched.dep_op_days + [*sched.dep_op_days.last..sched.dep_op_days.last+up_to_days]).uniq
+      departure_days_with_connections << day_num unless result.empty?
+      end
+
+    end
 
 
   end
 
+
+  def day_of_week_aligned? sched, hours
+
+
+
+  end
+
+  def dep_time_loc_minutes
+      dep_minutes_since_midnight
+  end
+  def dep_minutes_since_midnight
+    (dep_time_local[0..1].to_i * 60) + dep_time_local[2..3].to_i
+  end
+  def dep_minutes_since_prev_midnight
+      1440 + dep_minutes_since_midnight
+  end
+  def arr_time_loc_minutes
+     arr_minutes_since_midnight
+  end
+  def arr_minutes_since_midnight
+    (arr_time_local[0..1].to_i * 60) + arr_time_local[2..3].to_i
+  end
+  def arr_minutes_since_prev_midnight
+    1440 + arr_minutes_since_midnight
+  end
+  def arr_minutes_till_midnight
+    1440 - arr_minutes_since_midnight
+  end
 
   private
   def self.format_trip_type val

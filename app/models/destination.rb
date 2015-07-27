@@ -8,6 +8,7 @@ class Destination < ActiveRecord::Base
   # :cxr2
   # :dest
   # :dest_code
+  # :eff_days
   scope :keyed,  lambda {|report_key| where("report_key = ?",  report_key)}
   class << self
     #

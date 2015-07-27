@@ -1,4 +1,5 @@
 ActiveAdmin.register Destination do
+  # filter :cxrs1_contains, as: :select, multiple: true
   menu :parent => "Connections"
 
   # See permitted parameters documentation:
@@ -23,6 +24,9 @@ ActiveAdmin.register Destination do
     column :cxrs2
     column :dest
     column :dest_code
+    column :eff_days do |dest|
+      JSON.parse(dest.eff_days.first)
+    end
   end
 
 end

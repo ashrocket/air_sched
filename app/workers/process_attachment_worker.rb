@@ -31,7 +31,7 @@ class ProcessAttachmentWorker
           key  = report.estimated_key
 
           unless key.is_a? ReportKey
-            processor.finalize(report)
+            processor.finalize(report, 'fail')
             report.report_status ='rejected'
             report.load_status['attachment_status'] = 'undefined or invalid report key'
             report.attachment_status = 'undefined or invalid report key'

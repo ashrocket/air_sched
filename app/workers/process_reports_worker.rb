@@ -1,3 +1,5 @@
+# app/workers/process_reports_worker.rb
+
 #require 'sidekiq-lock'
 #
 #class ProcessInboxWorker

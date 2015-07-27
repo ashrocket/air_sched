@@ -1,4 +1,5 @@
-# app/workers/process_attachment_worker.rb
+# app/workers/update_airports_worker.rb
+
 class UpdateAirportsWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker

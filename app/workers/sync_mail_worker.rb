@@ -1,3 +1,5 @@
+# app/workers/sync_mail_worker.rb
+
 require 'sidekiq-lock'
 
 class SyncMailWorker

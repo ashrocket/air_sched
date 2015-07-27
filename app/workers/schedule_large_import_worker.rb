@@ -1,4 +1,5 @@
-# app/workers/process_attachment_worker.rb
+# app/workers/schedule_large_import_worker.rb
+
 require 'sidekiq-lock'
 require 'oag/process'
 class ScheduleLargeImportWorker
@@ -34,7 +35,7 @@ class ScheduleLargeImportWorker
             when /destinations_refreshed/
               processor.refresh_cnx_pairs(report)
             when /connections_refreshed/
-              processor.finalize(report)
+              processor.finalize(report, 'processed')
               rkey = ReportKey.where(report_key: report.report_key).first_or_create
               rkey.active = true
               rkey.save

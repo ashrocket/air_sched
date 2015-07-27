@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'rails', '~> 4.1'
 # ORM related gems
 gem 'pg', '~> 0.18.0.pre20140820094244'
+gem 'postgres_ext'
 # gem 'mysql2'
 gem 'friendly_id', '~> 5.0.0'
 gem 'activerecord-import'
@@ -68,8 +69,8 @@ gem "rails-settings-cached", "0.4.1"
 gem 'roo'
 
 
-gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
-#gem 'mastiff', path: '../mastiff'
+# gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
+gem 'mastiff', path: '../mastiff'
 
 
 group :development, :test do

@@ -181,7 +181,9 @@ CREATE TABLE airports (
     code text,
     name text,
     city text,
-    slug text
+    slug text,
+    lat numeric(10,6),
+    long numeric(10,6)
 );
 
 
@@ -343,15 +345,16 @@ ALTER SEQUENCE cnx_pairs_id_seq OWNED BY cnx_pairs.id;
 
 CREATE TABLE destinations (
     id integer NOT NULL,
-    report_key character varying(255),
-    origin character varying(255),
-    origin_code character varying(255),
-    cxrs1 character varying(255)[] DEFAULT '{}'::character varying[],
-    hub_name character varying(255),
-    hub_code character varying(255),
-    cxrs2 character varying(255)[] DEFAULT '{}'::character varying[],
-    dest character varying(255),
-    dest_code character varying(255)
+    report_key character varying,
+    origin character varying,
+    origin_code character varying,
+    cxrs1 character varying[] DEFAULT '{}'::character varying[],
+    hub_name character varying,
+    hub_code character varying,
+    cxrs2 character varying[] DEFAULT '{}'::character varying[],
+    dest character varying,
+    dest_code character varying,
+    eff_days character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -404,6 +407,75 @@ CREATE SEQUENCE direct_flights_id_seq
 --
 
 ALTER SEQUENCE direct_flights_id_seq OWNED BY direct_flights.id;
+
+
+--
+-- Name: export_market_data_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE export_market_data_reports (
+    id integer NOT NULL,
+    status character varying,
+    location character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: export_market_data_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE export_market_data_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: export_market_data_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE export_market_data_reports_id_seq OWNED BY export_market_data_reports.id;
+
+
+--
+-- Name: export_smart_route_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE export_smart_route_reports (
+    id integer NOT NULL,
+    brand_key character varying,
+    status character varying,
+    origin character varying,
+    dest character varying,
+    number_of_segments character varying,
+    brand_routes text,
+    location character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: export_smart_route_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE export_smart_route_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: export_smart_route_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE export_smart_route_reports_id_seq OWNED BY export_smart_route_reports.id;
 
 
 --
@@ -512,52 +584,21 @@ ALTER SEQUENCE interline_cxr_rules_id_seq OWNED BY interline_cxr_rules.id;
 
 
 --
--- Name: market_data_exports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE market_data_exports (
-    id integer NOT NULL,
-    status character varying(255),
-    location character varying(255),
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: market_data_exports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE market_data_exports_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: market_data_exports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE market_data_exports_id_seq OWNED BY market_data_exports.id;
-
-
---
 -- Name: oag_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE oag_reports (
     id integer NOT NULL,
-    msg_id character varying(255),
-    report_key character varying(255),
+    msg_id character varying,
+    report_key character varying,
     load_status text,
-    report_status character varying(255) DEFAULT 'uninitialized'::character varying,
-    attachment_status character varying(255) DEFAULT 'unstored'::character varying,
+    report_status character varying DEFAULT 'uninitialized'::character varying,
+    attachment_status character varying DEFAULT 'unstored'::character varying,
     received timestamp without time zone,
     attachment_lines integer DEFAULT 0,
-    attachment_path character varying(255),
+    attachment_path character varying,
     attachment_size integer,
+    carriers character varying[] DEFAULT '{}'::character varying[],
     complete boolean DEFAULT false,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -588,38 +629,38 @@ ALTER SEQUENCE oag_reports_id_seq OWNED BY oag_reports.id;
 --
 
 CREATE TABLE oag_schedules (
-    id bigint NOT NULL,
-    report_key text,
-    eff_date timestamp with time zone,
-    disc_date timestamp with time zone,
-    airline_code text,
-    airline_name text,
-    flight_num text,
-    op boolean DEFAULT false NOT NULL,
-    op_cxr_code text,
-    op_cxr_name text,
-    op_flight_num text,
-    shared_airline_code text,
-    shared_airline_name text,
-    mkt_cxrs text,
-    origin_apt text,
-    origin_apt_name text,
-    origin_apt_city text,
-    dest_apt text,
-    dest_apt_name text,
-    dest_apt_city text,
-    dep_op_days text,
-    arr_op_days text,
-    dep_time_local text,
-    arr_time_local text,
-    next_day_arrival boolean DEFAULT false NOT NULL,
-    duration text,
-    stops bigint,
-    restrictions text,
-    via_apts text,
-    mkt text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    id integer NOT NULL,
+    report_key character varying,
+    eff_date timestamp without time zone,
+    disc_date timestamp without time zone,
+    airline_code character varying,
+    airline_name character varying,
+    flight_num character varying,
+    op boolean DEFAULT false,
+    op_cxr_code character varying,
+    op_cxr_name character varying,
+    op_flight_num character varying,
+    shared_airline_code character varying,
+    shared_airline_name character varying,
+    mkt_cxrs character varying,
+    origin_apt character varying,
+    origin_apt_name character varying,
+    origin_apt_city character varying,
+    dest_apt character varying,
+    dest_apt_name character varying,
+    dest_apt_city character varying,
+    dep_op_days integer[] DEFAULT '{}'::integer[],
+    arr_op_days integer[] DEFAULT '{}'::integer[],
+    dep_time_local character varying,
+    arr_time_local character varying,
+    next_day_arrival boolean DEFAULT false,
+    duration character varying,
+    stops integer,
+    restrictions character varying,
+    via_apts character varying,
+    mkt character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -756,6 +797,26 @@ ALTER SEQUENCE settings_id_seq OWNED BY settings.id;
 
 
 --
+-- Name: tztrddxw; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW tztrddxw AS
+ SELECT destinations.id,
+    destinations.report_key,
+    destinations.origin,
+    destinations.origin_code,
+    destinations.cxrs1,
+    destinations.hub_name,
+    destinations.hub_code,
+    destinations.cxrs2,
+    destinations.dest,
+    destinations.dest_code,
+    destinations.eff_days
+   FROM destinations
+  WHERE ((destinations.report_key)::text = 'TZTRDDXW'::text);
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -836,6 +897,20 @@ ALTER TABLE ONLY direct_flights ALTER COLUMN id SET DEFAULT nextval('direct_flig
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY export_market_data_reports ALTER COLUMN id SET DEFAULT nextval('export_market_data_reports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY export_smart_route_reports ALTER COLUMN id SET DEFAULT nextval('export_smart_route_reports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY friendly_id_slugs ALTER COLUMN id SET DEFAULT nextval('friendly_id_slugs_id_seq'::regclass);
 
 
@@ -851,13 +926,6 @@ ALTER TABLE ONLY hubs ALTER COLUMN id SET DEFAULT nextval('hubs_id_seq'::regclas
 --
 
 ALTER TABLE ONLY interline_cxr_rules ALTER COLUMN id SET DEFAULT nextval('interline_cxr_rules_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY market_data_exports ALTER COLUMN id SET DEFAULT nextval('market_data_exports_id_seq'::regclass);
 
 
 --
@@ -984,6 +1052,22 @@ ALTER TABLE ONLY direct_flights
 
 
 --
+-- Name: export_market_data_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY export_market_data_reports
+    ADD CONSTRAINT export_market_data_reports_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: export_smart_route_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY export_smart_route_reports
+    ADD CONSTRAINT export_smart_route_reports_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: friendly_id_slugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1005,14 +1089,6 @@ ALTER TABLE ONLY hubs
 
 ALTER TABLE ONLY interline_cxr_rules
     ADD CONSTRAINT interline_cxr_rules_pkey PRIMARY KEY (id);
-
-
---
--- Name: market_data_exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY market_data_exports
-    ADD CONSTRAINT market_data_exports_pkey PRIMARY KEY (id);
 
 
 --
@@ -1182,48 +1258,6 @@ CREATE UNIQUE INDEX idx_23498_index_hubs_on_slug ON hubs USING btree (slug);
 
 
 --
--- Name: idx_23519_index_oag_schedules_on_dest_apt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23519_index_oag_schedules_on_dest_apt ON oag_schedules USING btree (dest_apt);
-
-
---
--- Name: idx_23519_index_oag_schedules_on_mkt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23519_index_oag_schedules_on_mkt ON oag_schedules USING btree (mkt);
-
-
---
--- Name: idx_23519_oag_comp_mkt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23519_oag_comp_mkt ON oag_schedules USING btree (origin_apt, dest_apt);
-
-
---
--- Name: idx_23519_oag_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23519_oag_eff_date ON oag_schedules USING btree (report_key, eff_date);
-
-
---
--- Name: idx_23519_oag_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23519_oag_eff_disc_dates ON oag_schedules USING btree (report_key, eff_date, disc_date);
-
-
---
--- Name: idx_23519_oag_flight_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23519_oag_flight_id ON oag_schedules USING btree (airline_code, flight_num);
-
-
---
 -- Name: idx_23537_unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1273,6 +1307,27 @@ CREATE INDEX index_interline_cxr_rules_on_report_key_id ON interline_cxr_rules U
 
 
 --
+-- Name: index_oag_schedules_on_dest_apt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_oag_schedules_on_dest_apt ON oag_schedules USING btree (dest_apt);
+
+
+--
+-- Name: index_oag_schedules_on_mkt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_oag_schedules_on_mkt ON oag_schedules USING btree (mkt);
+
+
+--
+-- Name: index_oag_schedules_on_origin_apt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_oag_schedules_on_origin_apt ON oag_schedules USING btree (origin_apt);
+
+
+--
 -- Name: index_possible_flights_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1291,6 +1346,55 @@ CREATE UNIQUE INDEX index_report_keys_on_report_key ON report_keys USING btree (
 --
 
 CREATE UNIQUE INDEX index_report_keys_on_slug ON report_keys USING btree (slug);
+
+
+--
+-- Name: oag_comp_mkt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_comp_mkt ON oag_schedules USING btree (origin_apt, dest_apt);
+
+
+--
+-- Name: oag_disc_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_disc_date ON oag_schedules USING btree (report_key, disc_date);
+
+
+--
+-- Name: oag_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_eff_date ON oag_schedules USING btree (report_key, eff_date);
+
+
+--
+-- Name: oag_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_eff_disc_dates ON oag_schedules USING btree (report_key, eff_date, disc_date);
+
+
+--
+-- Name: oag_flight_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_flight_id ON oag_schedules USING btree (airline_code, flight_num);
+
+
+--
+-- Name: oag_flight_id_time; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_flight_id_time ON oag_schedules USING btree (dep_time_local, flight_num);
+
+
+--
+-- Name: oag_origins; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_origins ON oag_schedules USING btree (report_key, eff_date, disc_date, origin_apt, dep_time_local);
 
 
 --
@@ -1330,6 +1434,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140821200706');
 INSERT INTO schema_migrations (version) VALUES ('20140821204002');
 
 INSERT INTO schema_migrations (version) VALUES ('20140929190724');
+
+INSERT INTO schema_migrations (version) VALUES ('20140940100000');
 
 INSERT INTO schema_migrations (version) VALUES ('20141003133309');
 

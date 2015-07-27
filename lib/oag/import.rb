@@ -35,7 +35,6 @@ module Oag
        # TODO: We may need to add a local arrival day as an integer, in the event that there are flights
        # TODO: that could possibly span two day timezone, I don't think this is possible, but Ryan Air had a schedule
        # TODO: mistake that had a '2' in the localarrday value, and so now we are just looking for > 0 in the boolean
-
          sched =
          {
              :eff_date     =>  row[:efffrom],  :disc_date 	  => row[:effto],
@@ -50,14 +49,20 @@ module Oag
              :dep_time_local   => row[:localdeptime], :arr_time_local   => row[:localarrtime],
              :next_day_arrival => (not row[:localarrday].nil? and
                  (0 + row[:localarrday].to_i)  > 0),
-             :dep_op_days => row[:localdaysofop], :arr_op_days => row[:arrdaysofop],
+             :dep_op_days => row[:localdaysofop].gsub(/\s+/, "").scan(/./).map(&:to_i), :arr_op_days => [],
              :duration    => row[:elapsedtime],
              :stops => row[:stops],  :restrictions => row[:restrictions],
              :mkt => row[:routing], :mkt_cxrs => OagSchedule.mkt_cxrs(row),
              :via_apts => row[:intairports]
 
          }
-
+         if sched[:next_day_arrival]
+           sched[:arr_op_days] = sched[:dep_op_days].map{|d| d + 1}
+           sched[:arr_op_days].map{|d|  d <= 7 ? d : d % 7 }
+           sched[:arr_op_days].sort!
+         else
+           sched[:arr_op_days] = sched[:dep_op_days]
+         end
 
          if row[:opcar].eql? 'O'
             sched[:op]  = true
@@ -122,7 +127,10 @@ module Oag
     report.load_status['schedules_count'] +=  schedules.count
     schedule_records = []
     loaded = 0
-    schedules.in_groups_of(500) do |schedule_group|
+    group_size = 500
+    schedule_count = schedules.count
+    schedules.in_groups_of(group_size) do |schedule_group|
+      schedule_count = schedule_count - group_size
       schedule_group.compact.each do |sched|
         begin
           schedule_records << OagSchedule.new(sched.merge(:report_key => report.report_key))
@@ -132,7 +140,7 @@ module Oag
             raise RuntimeError, e
         end
       end
-      Rails.logger.info "Loading  #{schedule_records.count} (of #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+      Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
       loaded += schedule_records.count
       OagSchedule.import schedule_records
       schedule_records = []
@@ -158,9 +166,13 @@ module Oag
 
     schedule_records = []
     loaded = 0
-    schedules.in_groups_of(500) do |schedule_group|
+    group_size = 500
+    schedule_count = schedules.count
+
+    schedules.in_groups_of(group_size) do |schedule_group|
     schedule_group.compact.each do |sched|
       begin
+        schedule_count = schedule_count - group_size
         schedule_records << OagSchedule.new(sched.merge(:report_key => report.report_key))
       rescue Exception => e
           Rails.logger.error sched
@@ -168,7 +180,8 @@ module Oag
           raise RuntimeError, e
       end
     end
-    Rails.logger.info "Loading  #{schedule_records.count} (of #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+    Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+
     loaded += schedule_records.count
     OagSchedule.import schedule_records
     schedule_records = []

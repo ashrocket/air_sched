@@ -15,6 +15,8 @@ Mastiff.configure do |config|
 
   end
 
+
+
   # Redis Objects Option configuration
   Mastiff::Email::Message.redis = Redis.new(config.redis_options)
 

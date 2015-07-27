@@ -5,7 +5,7 @@ class MarketDataExportsController < ApplicationController
    render :default
   end
   def generate
-      MarketExportWorker.perform_async
+      ExportMarketDataWorker.perform_async
       respond_to do |format|
         format.html{
            redirect_to admin_market_exports_path

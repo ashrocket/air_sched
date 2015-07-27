@@ -22,8 +22,8 @@ class CreateOagSchedules < ActiveRecord::Migration
        t.string :dest_apt
        t.string :dest_apt_name
        t.string :dest_apt_city
-       t.string :dep_op_days
-       t.string :arr_op_days
+       t.integer :dep_op_days, array: true, default: []
+       t.integer :arr_op_days, array: true, default: []
        t.string :dep_time_local
        t.string :arr_time_local
        t.boolean :next_day_arrival, default: false

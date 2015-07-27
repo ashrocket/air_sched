@@ -1,5 +1,7 @@
 require 'zip'
 require 'aws-sdk'
+module Oag
+
 class MarketDataExporter
   def initialize(attrs)
     # @s3_path = attrs.fetch('s3_path')
@@ -66,5 +68,7 @@ class MarketDataExporter
   def bucket_name
      ENV['bucket_name'] or raise 'AWS bucket path'
   end
+
+end
 
 end

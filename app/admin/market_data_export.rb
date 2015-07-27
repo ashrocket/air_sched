@@ -1,4 +1,4 @@
-ActiveAdmin.register MarketDataExport, :as => "Market Exports" do
+ActiveAdmin.register ExportMarketDataReport, :as => "Market Exports" do
   menu :parent => "Reports"
   actions :all, :except => [:new]
 

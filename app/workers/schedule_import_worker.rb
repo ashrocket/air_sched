@@ -1,17 +1,18 @@
-# app/workers/process_attachment_worker.rb
+# app/workers/schedule_import_worker.rb
+
 require 'sidekiq-lock'
 require 'oag/process'
 class ScheduleImportWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
 
-  sidekiq_options :queue => :report_queue, :retry => 1, :backtrace => true
+  sidekiq_options :queue => :report_queue, :retry => 3, :backtrace => true
   sidekiq_options lock: { timeout: 1200000, name: 'lock-import-worker' }
 
-  sidekiq_options lock: {
-        timeout: proc { |_, timeout = 1_200_000 | timeout * 2 }, #
-        name: 'lock-import-worker'  # no need to pass timeout - not used
-  }
+  # sidekiq_options lock: {
+  #       timeout: proc { |_, timeout = 1_200_000 | timeout * 2 }, #
+  #       name: 'lock-import-worker'  # no need to pass timeout - not used
+  # }
   def perform(report_id)
     Sidekiq::Logging.logger.info "Import Worker #{report_id}"
     Rails.logger = Sidekiq::Logging.logger
@@ -39,7 +40,17 @@ class ScheduleImportWorker
               processor.refresh_airports(report)
               report.save
               UpdateAirportsWorker.perform_async()
+
             when /airports_refreshed/
+
+              Sidekiq::Logging.logger.info "Import Worker refreshing airlines  #{report_id}: #{report.report_key}"
+              processor.refresh_airlines(report)
+              report.save
+              UpdateAirportsWorker.perform_async()
+
+            when /airlines_refreshed/
+
+
 
               Sidekiq::Logging.logger.info "Import Worker refreshing direct flights  #{report_id}: #{report.report_key}"
               processor.refresh_direct_flights(report)
@@ -47,7 +58,10 @@ class ScheduleImportWorker
             when /direct_flights_refreshed/
 
               Sidekiq::Logging.logger.info "Import Worker refreshing destinations   #{report_id}: #{report.report_key}"
+              report.load_status[:destinations_map_status] = 'refreshing'
               processor.refresh_destinations(report)
+              report.load_status[:destinations_map_status] = 'refreshed'
+              WFilterDestinationsWorker(report_id)
               report.save
             when /destinations_refreshed/
 
@@ -58,7 +72,7 @@ class ScheduleImportWorker
 
               Sidekiq::Logging.logger.info "Import Worker finalizing    #{report_id}: #{report.report_key}"
               report.save
-              processor.finalize(report)
+              processor.finalize(report, 'processed')
               rkey = ReportKey.where(report_key: report.report_key).first_or_create
               rkey.active = true
               rkey.save

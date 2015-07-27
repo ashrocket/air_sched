@@ -1,12 +1,14 @@
-require 'oag/market_data_exporter'
+# app/workers/export_market_data_worker.rb
+
+require 'oag/exporters/market_data_exporter'
 require 'sidekiq-lock'
 
-class MarketExportWorker
+class ExportMarketDataWorker
 include Sidekiq::Worker
 include Sidekiq::Lock::Worker
 include Sidetiq::Schedulable
 sidekiq_options :queue => :export_queue, :retry => false, :backtrace => true
-sidekiq_options lock: { timeout: 600000, name: 'lock-export-worker' }
+sidekiq_options lock: { timeout: 600000, name: 'lock-export-market-worker' }
 
 recurrence { daily(1) }
 

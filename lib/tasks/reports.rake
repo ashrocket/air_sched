@@ -57,6 +57,8 @@ namespace :reports do
 
   desc "Build Smart Market Routes"
   task :build_market_smart_routes => :environment do |t, args|
+
+
     # b = Brand.create(brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW"], description: "Scoot Interline Network")
     brand = Brand.first
     r = Oag::Report.new

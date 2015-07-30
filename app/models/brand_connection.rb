@@ -8,6 +8,16 @@ class BrandConnection < ActiveRecord::Base
   scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
+  scope :arriving,        lambda {|dest|   where(:dest => dest)            }
+  scope :departing,       lambda {|origin| where(:origin =>  origin)       }
+
+  # class method
+
+
+  # instance methods
+  def connects_with
+    BrandConnection.where(sched1_id: sched2_id)
+  end
 
   def market
     origin + dest
@@ -20,7 +30,7 @@ class BrandConnection < ActiveRecord::Base
     "#{origin}-#{via}-#{dest}"
   end
    def key
-     "#{path_key}-#{sched1.airline_code},#{sched2.airline_code}"
+     "#{path_key}-#{sched1_cxr},#{sched2_cxr}"
    end
    def full_key
      [key, eff_window_key].join('...')
@@ -58,8 +68,9 @@ class BrandConnection < ActiveRecord::Base
    end
 
   def to_route_requests
+
     rr1 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
-    rr2 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
+    rr2 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: via,  dest: dest, cxrs: [sched2_cxr],   host: brand.host_map[sched2_cxr]).first_or_create!
 
     [rr1,rr2]
 

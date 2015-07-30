@@ -67,4 +67,5 @@ Rails.application.configure do
 
   config.application_url = 'http://0.0.0.0'
   config.application_port = '3000'
+
 end

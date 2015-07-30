@@ -58,14 +58,23 @@ class BrandedMarketRequest < ActiveRecord::Base
     branded_route_requests.map{|r| r.key}.join('->')
   end
 
+  def airport_currency(brand, origin)
+    airport_currency = AirportCurrency.where(iata: origin).first
+    if airport_currency
+      currency = airport_currency.currency_code
+    else
+      brand.default_currency
+    end
+  end
 
   def brrs_to_journey
     journeys = []
     branded_route_requests.each_with_index do |brr, i|
+
       journeys << {
           host: brr.host,
           airlines: brr.cxrs,
-          currency: brand.default_currency,
+          currency: airport_currency(brand, origin),
           origin: brr.origin,
           destination: brr.dest,
           order: i + 1}

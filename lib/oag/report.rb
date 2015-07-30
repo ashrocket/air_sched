@@ -346,7 +346,6 @@ module Oag
 
       build_brand_market_routes(brand, 1)
 
-      # ActiveRecord::Base.logger.level = 2
       build_brand_market_routes(brand, 2)
 
       build_brand_market_routes(brand, 3)
@@ -417,7 +416,7 @@ module Oag
                 roundtrip: roundtrip
         }}
         market_maps.merge! market_map
-        # puts JSON.pretty_generate(market_map)
+        puts JSON.pretty_generate(market_map)
         # byebug
         # pp market_map
 

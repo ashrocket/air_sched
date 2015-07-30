@@ -141,6 +141,41 @@ ALTER SEQUENCE admin_users_id_seq OWNED BY admin_users.id;
 
 
 --
+-- Name: airline_hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE airline_hosts (
+    id integer NOT NULL,
+    host_key character varying NOT NULL,
+    name character varying NOT NULL,
+    description character varying,
+    active boolean,
+    slug character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: airline_hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE airline_hosts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: airline_hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE airline_hosts_id_seq OWNED BY airline_hosts.id;
+
+
+--
 -- Name: airlines; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -236,6 +271,221 @@ CREATE SEQUENCE app_switches_id_seq
 --
 
 ALTER SEQUENCE app_switches_id_seq OWNED BY app_switches.id;
+
+
+--
+-- Name: brand_connections; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE brand_connections (
+    id integer NOT NULL,
+    brand_id integer NOT NULL,
+    brand_key character varying NOT NULL,
+    origin character varying,
+    via character varying,
+    dest character varying,
+    sched1_id integer,
+    sched2_id integer,
+    sched1_cxr character varying,
+    sched2_cxr character varying,
+    sched1_eff_dates json,
+    sched1_operating json,
+    sched2_eff_dates json,
+    sched2_operating json,
+    ct_minutes json,
+    eff date,
+    disc date,
+    operating_window integer[] DEFAULT '{}'::integer[],
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: brand_connections_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE brand_connections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: brand_connections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE brand_connections_id_seq OWNED BY brand_connections.id;
+
+
+--
+-- Name: branded_market_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_market_requests (
+    id integer NOT NULL,
+    brand_id integer,
+    brand_key character varying NOT NULL,
+    origin character varying,
+    dest character varying
+);
+
+
+--
+-- Name: branded_market_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_market_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_market_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_market_requests_id_seq OWNED BY branded_market_requests.id;
+
+
+--
+-- Name: branded_market_route_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_market_route_requests (
+    id integer NOT NULL,
+    branded_route_request_id integer,
+    branded_market_request_id integer
+);
+
+
+--
+-- Name: branded_market_route_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_market_route_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_market_route_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_market_route_requests_id_seq OWNED BY branded_market_route_requests.id;
+
+
+--
+-- Name: branded_market_segments_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_market_segments_requests (
+    id integer NOT NULL,
+    brand_id integer,
+    brand_key character varying NOT NULL,
+    origin character varying,
+    dest character varying,
+    segment_count integer,
+    branded_market_request_ids integer[] DEFAULT '{}'::integer[]
+);
+
+
+--
+-- Name: branded_market_segments_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_market_segments_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_market_segments_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_market_segments_requests_id_seq OWNED BY branded_market_segments_requests.id;
+
+
+--
+-- Name: branded_route_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_route_requests (
+    id integer NOT NULL,
+    brand_id integer,
+    brand_key character varying NOT NULL,
+    key character varying,
+    origin character varying,
+    dest character varying,
+    cxrs character varying[] DEFAULT '{}'::character varying[],
+    host character varying
+);
+
+
+--
+-- Name: branded_route_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_route_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_route_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
+
+
+--
+-- Name: brands; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE brands (
+    id integer NOT NULL,
+    brand_key character varying NOT NULL,
+    name character varying NOT NULL,
+    report_keys character varying[] DEFAULT '{}'::character varying[],
+    description character varying,
+    host_map json,
+    active boolean,
+    slug character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: brands_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE brands_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: brands_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE brands_id_seq OWNED BY brands.id;
 
 
 --
@@ -841,6 +1091,13 @@ ALTER TABLE ONLY admin_users ALTER COLUMN id SET DEFAULT nextval('admin_users_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY airline_hosts ALTER COLUMN id SET DEFAULT nextval('airline_hosts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY airlines ALTER COLUMN id SET DEFAULT nextval('airlines_id_seq'::regclass);
 
 
@@ -856,6 +1113,48 @@ ALTER TABLE ONLY airports ALTER COLUMN id SET DEFAULT nextval('airports_id_seq':
 --
 
 ALTER TABLE ONLY app_switches ALTER COLUMN id SET DEFAULT nextval('app_switches_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY brand_connections ALTER COLUMN id SET DEFAULT nextval('brand_connections_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branded_market_requests ALTER COLUMN id SET DEFAULT nextval('branded_market_requests_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branded_market_route_requests ALTER COLUMN id SET DEFAULT nextval('branded_market_route_requests_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branded_market_segments_requests ALTER COLUMN id SET DEFAULT nextval('branded_market_segments_requests_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branded_route_requests ALTER COLUMN id SET DEFAULT nextval('branded_route_requests_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY brands ALTER COLUMN id SET DEFAULT nextval('brands_id_seq'::regclass);
 
 
 --
@@ -988,6 +1287,14 @@ ALTER TABLE ONLY admin_users
 
 
 --
+-- Name: airline_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY airline_hosts
+    ADD CONSTRAINT airline_hosts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: airlines_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1009,6 +1316,54 @@ ALTER TABLE ONLY airports
 
 ALTER TABLE ONLY app_switches
     ADD CONSTRAINT app_switches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: brand_connections_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY brand_connections
+    ADD CONSTRAINT brand_connections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branded_market_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_market_requests
+    ADD CONSTRAINT branded_market_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branded_market_route_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_market_route_requests
+    ADD CONSTRAINT branded_market_route_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branded_market_segments_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_market_segments_requests
+    ADD CONSTRAINT branded_market_segments_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branded_route_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_route_requests
+    ADD CONSTRAINT branded_route_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: brands_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY brands
+    ADD CONSTRAINT brands_pkey PRIMARY KEY (id);
 
 
 --
@@ -1293,6 +1648,41 @@ CREATE INDEX index_active_admin_comments_on_resource_type_and_resource_id ON act
 
 
 --
+-- Name: index_airline_hosts_on_host_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airline_hosts_on_host_key ON airline_hosts USING btree (host_key);
+
+
+--
+-- Name: index_airline_hosts_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airline_hosts_on_slug ON airline_hosts USING btree (slug);
+
+
+--
+-- Name: index_branded_route_requests_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_branded_route_requests_on_key ON branded_route_requests USING btree (key);
+
+
+--
+-- Name: index_brands_on_brand_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_brands_on_brand_key ON brands USING btree (brand_key);
+
+
+--
+-- Name: index_brands_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_brands_on_slug ON brands USING btree (slug);
+
+
+--
 -- Name: index_city_pairs_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1442,4 +1832,18 @@ INSERT INTO schema_migrations (version) VALUES ('20141003133309');
 INSERT INTO schema_migrations (version) VALUES ('20141119191319');
 
 INSERT INTO schema_migrations (version) VALUES ('20141124142205');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000010');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000020');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000030');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000120');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000160');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000180');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000200');
 

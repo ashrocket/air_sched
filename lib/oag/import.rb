@@ -130,7 +130,6 @@ module Oag
     group_size = 500
     schedule_count = schedules.count
     schedules.in_groups_of(group_size) do |schedule_group|
-      schedule_count = schedule_count - group_size
       schedule_group.compact.each do |sched|
         begin
           schedule_records << OagSchedule.new(sched.merge(:report_key => report.report_key))
@@ -141,6 +140,7 @@ module Oag
         end
       end
       Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+      schedule_count = schedule_count - schedule_records.count
       loaded += schedule_records.count
       OagSchedule.import schedule_records
       schedule_records = []
@@ -172,8 +172,8 @@ module Oag
     schedules.in_groups_of(group_size) do |schedule_group|
     schedule_group.compact.each do |sched|
       begin
-        schedule_count = schedule_count - group_size
         schedule_records << OagSchedule.new(sched.merge(:report_key => report.report_key))
+
       rescue Exception => e
           Rails.logger.error sched
           Rails.logger.error e.message
@@ -181,6 +181,7 @@ module Oag
       end
     end
     Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+    schedule_count = (schedule_count - schedule_records.count)
 
     loaded += schedule_records.count
     OagSchedule.import schedule_records

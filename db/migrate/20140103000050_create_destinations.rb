@@ -11,6 +11,9 @@ class CreateDestinations < ActiveRecord::Migration
       t.string :dest
       t.string :dest_code
       t.string :eff_days, array: true, default: []
+
+      t.timestamps
+
     end
   end
 end

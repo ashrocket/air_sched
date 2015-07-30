@@ -41,6 +41,10 @@ Mastiff.configure do |config|
   config.attachment_dir      = "data/attachments/pending"
   #config.process_dir      = "data/attachments/processed"
 
+  # Mailbox Options
+  config.mailbox_folders = config.mailbox_folders.merge({processed: 'processed',
+                                                         rejected: 'rejected',
+                                                         processing: 'processing'})
   ul = config.attachment_uploader.new
   File.directory?(ul.store_dir) or
       abort "Gem requires local storage path for mail attachments - #{ul.store_dir} does not exist!\n" +

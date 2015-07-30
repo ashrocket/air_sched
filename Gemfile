@@ -4,6 +4,7 @@ gem 'rails', '~> 4.1'
 # ORM related gems
 gem 'pg', '~> 0.18.0.pre20140820094244'
 gem 'postgres_ext'
+gem 'arel-helpers'
 # gem 'mysql2'
 gem 'friendly_id', '~> 5.0.0'
 gem 'activerecord-import'

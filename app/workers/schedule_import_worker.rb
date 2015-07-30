@@ -1,6 +1,7 @@
 # app/workers/schedule_import_worker.rb
 
 require 'sidekiq-lock'
+require 'filter_destinations_worker'
 require 'oag/process'
 class ScheduleImportWorker
   include Sidekiq::Worker
@@ -9,10 +10,12 @@ class ScheduleImportWorker
   sidekiq_options :queue => :report_queue, :retry => 3, :backtrace => true
   sidekiq_options lock: { timeout: 1200000, name: 'lock-import-worker' }
 
-  # sidekiq_options lock: {
-  #       timeout: proc { |_, timeout = 1_200_000 | timeout * 2 }, #
-  #       name: 'lock-import-worker'  # no need to pass timeout - not used
-  # }
+
+  sidekiq_retries_exhausted do |msg|
+    Sidekiq.logger.warn "Failed #{msg['class']} with #{msg['args']}: #{msg['error_message']}"
+  end
+
+
   def perform(report_id)
     Sidekiq::Logging.logger.info "Import Worker #{report_id}"
     Rails.logger = Sidekiq::Logging.logger
@@ -58,10 +61,10 @@ class ScheduleImportWorker
             when /direct_flights_refreshed/
 
               Sidekiq::Logging.logger.info "Import Worker refreshing destinations   #{report_id}: #{report.report_key}"
-              report.load_status[:destinations_map_status] = 'refreshing'
+              report.load_status['destinations_map_status'] = 'refreshing'
               processor.refresh_destinations(report)
-              report.load_status[:destinations_map_status] = 'refreshed'
-              WFilterDestinationsWorker(report_id)
+              report.load_status['destinations_map_status'] = 'refreshed'
+              FilterDestinationsWorker.perform_async(report_id)
               report.save
             when /destinations_refreshed/
 

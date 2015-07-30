@@ -2,17 +2,17 @@
 
 require 'sidekiq-lock'
 require 'oag/process'
-class WFilterDestinationsWorker
+class FilterDestinationsWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
 
   sidekiq_options :queue => :report_queue, :retry => 1, :backtrace => true
-  sidekiq_options lock: { timeout: 1_200_000, name: 'lock-filter-destinations-worker' }
+  sidekiq_options lock: { timeout: 2_400_000, name: 'lock-filter-destinations-worker' }
 
-  sidekiq_options lock: {
-        timeout: proc { |_, timeout = 1_200_000 | timeout * 2 }, #
-        name: 'lock-filter-destinations-worker' # no need to pass timeout - not used
-  }
+  # sidekiq_options lock: {
+  #       timeout: proc { |_, timeout = 1_200_000 | timeout * 2 }, #
+  #       name: 'lock-filter-destinations-worker' # no need to pass timeout - not used
+  # }
   def perform(report_id)
     Sidekiq::Logging.logger.info "Filter Destinations Worker #{report_id}"
     Rails.logger = Sidekiq::Logging.logger
@@ -21,13 +21,13 @@ class WFilterDestinationsWorker
         report = OagReport.find_by(id: report_id)
         Sidekiq::Logging.logger.info "Filter Destinations Worker Lock acquired, processing #{report_id}: #{report.report_key}"
 
-        if report and report.load_status and report.load_status[:destinations_map_status] == 'refreshed'
+        if report and report.load_status and report.load_status['destinations_map_status'] == 'refreshed'
           processor = Oag::Process.new
 
           Sidekiq::Logging.logger.info "Filter Destinations Worker filtering destinations   #{report_id}: #{report.report_key}"
-          report.load_status[:destinations_map_status] = 'filtering_eff_days'
+          report.load_status['destinations_map_status'] = 'filtering_eff_days'
           processor.filter_destinations(report)
-          report.load_status[:destinations_map_status] == 'filtered_eff_days'
+          report.load_status['destinations_map_status'] == 'filtered_eff_days'
           report.save
 
         end

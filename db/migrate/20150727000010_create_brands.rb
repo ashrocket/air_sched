@@ -1,0 +1,20 @@
+class CreateBrands < ActiveRecord::Migration
+  def change
+    create_table :brands do |t|
+      t.string :brand_key,  null: false
+      t.string :name,  null: false
+      t.string :report_keys, array: true, default: []
+      t.string :description
+      t.json :host_map
+
+      t.boolean :active
+      t.string :slug
+
+
+      t.timestamps
+    end
+    add_index :brands, :brand_key, unique: true
+    add_index :brands, :slug, unique: true
+
+  end
+end

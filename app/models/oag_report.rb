@@ -37,6 +37,7 @@ class OagReport < ActiveRecord::Base
 
     if ext.eql? '.csv'
       if File.exists? self.attachment_path
+        update(attachment_status: 'stored',attachment_size: File.stat(self.attachment_path).size)
         load_status["attachment_status"]  = 'uncompressed'
         load_status["report_path"]        = self.attachment_path
         load_status["report_size"]        = load_status["attachment_size"]

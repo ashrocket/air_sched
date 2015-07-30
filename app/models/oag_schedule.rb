@@ -27,6 +27,7 @@ class OagSchedule < ActiveRecord::Base
 
 
   scope :keyed,     lambda {|report_key| where("report_key = ?",  report_key)}
+  scope :branded,     lambda {|report_keys| where("report_key IN (?)",  report_keys)}
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}
   scope :for_cxrs,   lambda {|carriers| where({:airline_code => carriers})}
   #scope :except_cxrs lambda {|carriers| where.not(:conditions => {:airline_code => carriers})}
@@ -233,9 +234,20 @@ class OagSchedule < ActiveRecord::Base
 
   end
 
+
+  def dow_table
+    unless @arrivals_to_departures
+      # => {1=>[1, 2], 2=>[2, 3], 3=>[3, 4], 4=>[4, 5], 5=>[5, 6], 6=>[6, 7], 7=>[7, 1]}
+      @arrivals_to_departures = Hash[*([*1..7].map{ |daynum| [daynum, daynum == 7 ? [7,1] : [daynum, daynum+1]] }.flatten(1))]
+    end
+    return @arrivals_to_departures
+  end
+
   def as_json(options={})
      super(options.merge(:except => [:created_at, :updated_at] ))
   end
+
+
 
 
 ##############################
@@ -255,6 +267,11 @@ class OagSchedule < ActiveRecord::Base
     (self.eff_date..self.disc_date).overlaps?(sched.eff_date..sched.disc_date)
    end
 
+  def effective_dates
+    {eff: self.eff_date,
+     disc: self.disc_date}
+  end
+
   def effective_window sched
     if self.effective_overlaps?(sched)
       {eff: [self.eff_date,sched.eff_date].max,
@@ -263,6 +280,8 @@ class OagSchedule < ActiveRecord::Base
       nil
     end
   end
+
+
 
 
   def connection_days_of_week sched, up_to_days
@@ -279,21 +298,22 @@ class OagSchedule < ActiveRecord::Base
       #  Add the same number to the connecting schedule to account for overruns
       #  So if we had 6 as the daynum, and 2 as the 'extra' days, then we'll test if 6, 7, or 8 is in the
       #  connecting array if it is then Departing Day six can connect on the 6th, the 7th or the 8th Day.
-      result = [*day_num+1..day_num+up_to_days] & (sched.dep_op_days + [*sched.dep_op_days.last..sched.dep_op_days.last+up_to_days]).uniq
-      departure_days_with_connections << day_num unless result.empty?
+        unless (dow_table[day_num] & sched.dep_op_days).blank?
+           departure_days_with_connections << day_num
+        end
+
       end
-
     end
-
-
-  end
-
-
-  def day_of_week_aligned? sched, hours
-
-
+    departure_days_with_connections
 
   end
+
+
+
+
+  # def x_time(sched2)
+  #     return sched2.dep_minutes_since_midnight - self.arr_minutes_since_midnight
+  #  end
 
   def dep_time_loc_minutes
       dep_minutes_since_midnight

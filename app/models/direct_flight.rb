@@ -15,9 +15,17 @@ class DirectFlight < ActiveRecord::Base
     #def hub apt
     #  where("hub = ?",  apt)
     #end
+
+
+
     def keyed report_key
       where("report_key = ?",  report_key)
     end
+
+    def multi_keyed report_keys
+      where("report_key IN (?)",  report_keys)
+    end
+
     def pair o,d
       where(origin: o, dest: d)
     end

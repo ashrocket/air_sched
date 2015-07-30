@@ -8,7 +8,12 @@ module Oag
     def filter_destinations(report)
 
       dests = Destination.keyed(report.report_key)
-      dests.each do  |dest|
+
+      group_size = 200
+      tot = dests.count
+      dests.in_groups_of(group_size) do |dest_group|
+
+        dest_group.compact.each do  |dest|
 
         leg1_scheds = OagSchedule.keyed(report.report_key).departing(dest.origin_code).arriving(dest.hub_code)
         leg2_scheds  = OagSchedule.keyed(report.report_key).departing(dest.hub_code).arriving(dest.dest_code)
@@ -40,7 +45,11 @@ module Oag
              dest.eff_days = eff_days
              dest.save
 
+        end
+        Rails.logger.info "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key}"
+        tot = tot - dest_group.compact.count
       end
+
       report.load_status[:destinations_map_status] = 'eff_days_filtered'
       report.save
 
@@ -134,19 +143,14 @@ module Oag
               df2 =  DirectFlight.keyed(report.report_key).where(origin: hub, dest: dest).first
               cxrs2 =  df2.blank? ? [""] : df2.carriers.uniq
 
-              # r1 = []
-              # r2 = []
-
-
               cnx << [o_apt,hub,dest, cxrs1, cxrs2] unless o_apt.eql? dest
             end
           end
         end
-        report.load_status[:destinations_map_status] = 'mapped'
 
         tot = cnx.count
         cnx.in_groups_of(1000) do |cnx_group|
-          Rails.logger.info "Building #{cnx_group.count} connections out of #{tot} remaining for #{report.report_key}"
+          Rails.logger.info "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
@@ -167,8 +171,9 @@ module Oag
           Destination.import connections
           connections = []
         end
-        report.report_status = 'destinations_refreshed'
-        report.save
+      report.load_status[:destinations_map_status] = 'refreshed'
+      report.report_status = 'destinations_refreshed'
+      report.save
     end
 
 
@@ -184,9 +189,10 @@ module Oag
 
           pairs =  Destination.keyed(report.report_key).pluck(:origin_code, :dest_code).uniq
           tot = pairs.count
-          pairs.in_groups_of(1000) do |pair_group|
+          group_size = 1000
+          pairs.in_groups_of(group_size) do |pair_group|
             Rails.logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
-            tot -= 1000
+            tot -= group_size
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
                d_name = Airport.cached_name(pair[1])
@@ -238,6 +244,9 @@ module Oag
                Rails.logger.info report.inspect
         end
     end
+
+
+
 
 
   end

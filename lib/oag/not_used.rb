@@ -25,7 +25,7 @@ def host_combination_permutation combo
 
 
    def build_routes(brand)
-     BrandRouteMap.keyed(brand.brand_key).delete_all
+     BrandedRouteMap.keyed(brand.brand_key).delete_all
 
      # build_brand_connections(brand)
 
@@ -100,7 +100,7 @@ def host_combination_permutation combo
      tot = brand_route_maps.count
      brand_route_maps.in_groups_of(group_size) do |brand_route_map_group|
 
-         BrandRouteMap.import brand_route_map_group.compact
+         BrandedRouteMap.import brand_route_map_group.compact
          Rails.logger.info "Saving brand route maps #{brand_route_map_group.compact.count} " +
                                   " of #{tot} remaining for #{brand.brand_key}"
          tot = tot - brand_route_map_group.compact.count

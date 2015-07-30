@@ -8,4 +8,8 @@ class BrandedMarketSegmentsRequest < ActiveRecord::Base
   scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
+
+  def branded_market_requests
+    BrandedMarketRequest.where(id: branded_market_request_ids)
+  end
 end

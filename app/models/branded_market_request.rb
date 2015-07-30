@@ -2,7 +2,7 @@ class BrandedMarketRequest < ActiveRecord::Base
   include ArelHelpers::ArelTable
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
-  has_many :branded_market_route_request
+  has_many :branded_market_route_request, :dependent => :destroy
   has_many :branded_route_requests, through: :branded_market_route_request
 
   scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
@@ -33,6 +33,8 @@ class BrandedMarketRequest < ActiveRecord::Base
   end
 
   def through_market_request
+      # Disable this for now
+      return nil
 
       brr_list = branded_route_requests.to_a
       brr_list = shrink_ray(brr_list)
@@ -50,6 +52,38 @@ class BrandedMarketRequest < ActiveRecord::Base
         return nil
       end
 
+  end
+
+  def key
+    branded_route_requests.map{|r| r.key}.join('->')
+  end
+
+
+  def brrs_to_journey
+    journeys = []
+    branded_route_requests.each_with_index do |brr, i|
+      journeys << {
+          host: brr.host,
+          airlines: brr.cxrs,
+          currency: brand.default_currency,
+          origin: brr.origin,
+          destination: brr.dest,
+          order: i + 1}
+
+    end
+    journeys
+  end
+
+  def to_journey(order, direction)
+       [
+             {
+               type: direction,
+               origin: origin,
+               destination: dest,
+               order: 1,
+               journey_legs:  brrs_to_journey
+             }
+       ]
   end
 
 end

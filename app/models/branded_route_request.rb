@@ -2,7 +2,7 @@ class BrandedRouteRequest < ActiveRecord::Base
   include ArelHelpers::ArelTable
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
-  has_many :branded_market_route_request
+  has_many :branded_market_route_request, :dependent => :destroy
   has_many :branded_market_requests, through: :branded_market_route_request
 
   scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
@@ -22,6 +22,9 @@ class BrandedRouteRequest < ActiveRecord::Base
 
 
   def through_route_request other
+    #disable this for now
+    return nil
+
     if( host.eql? other.host)
       pr2 = BrandedRouteRequest.where(
           attributes.deep_symbolize_keys.except(:id, :dest, :cxrs, :key)

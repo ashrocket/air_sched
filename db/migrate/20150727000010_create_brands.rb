@@ -5,6 +5,7 @@ class CreateBrands < ActiveRecord::Migration
       t.string :name,  null: false
       t.string :report_keys, array: true, default: []
       t.string :description
+      t.string :default_currency
       t.json :host_map
 
       t.boolean :active

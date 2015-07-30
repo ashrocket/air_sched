@@ -5,9 +5,10 @@ module Oag
 
 
     def build_brand_connections(brand)
-      BrandConnection.keyed(brand.brand_key).delete_all
+      filtered_cxrs = ['TZ','DD', 'XW']
+      BrandConnection.keyed(brand.brand_key).destroy_all
 
-      origins = OagSchedule.branded(brand.report_keys).for_cxrs(['TZ','DD'])
+      origins = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
                            .pluck(:origin_apt)
                            .sort.uniq
 
@@ -17,7 +18,7 @@ module Oag
       origins.each_with_index do |origin_code, index|
 
         via_points =
-            OagSchedule.branded(brand.report_keys).for_cxrs(['TZ','DD'])
+            OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
                 .departing(origin_code)
                 .pluck(:dest_apt).sort.uniq
 
@@ -27,11 +28,11 @@ module Oag
                   "for #{origin_code} #{index} of (#{origins.count}) through #{via_code}  " +
                   " #{via_index} of (#{via_points.count})  - #{brand.brand_key}"
 
-           leg1_scheds = OagSchedule.branded(brand.report_keys).for_cxrs(['TZ','DD'])
+           leg1_scheds = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
                                     .departing(origin_code)
                                     .arriving(via_code)
 
-           leg2_scheds = OagSchedule.branded(brand.report_keys).for_cxrs(['TZ','DD'])
+           leg2_scheds = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
                                     .departing(via_code)
                                     .reject{|sched| sched.dest_apt == origin_code}
 
@@ -130,9 +131,9 @@ module Oag
      #  No Stops
 
       direct_route_requests = []
-      direct_markets = DirectFlight.pair(origin ,dest).multi_keyed(brand.report_keys).compact
+      direct_flight_markets = DirectFlight.pair(origin ,dest).multi_keyed(brand.report_keys).compact
 
-      direct_markets.each do |df|
+      direct_flight_markets.each do |df|
         direct_host_templates = df.carriers.map{|cxr| {cxr: cxr, host: brand.host_map[cxr]}}.uniq
         dht_by_host = direct_host_templates.group_by{|ht| ht[:host]}
         dht_by_host.each do |host, cxr_host_list |
@@ -202,6 +203,7 @@ module Oag
 
       through_requests = mkt_route_requests.map{|bmr| bmr.through_market_request}.compact
       market_route_map = mkt_route_requests + through_requests
+
       market_route_map.compact
    end
 
@@ -209,122 +211,81 @@ module Oag
 
        #  1 Stops
        markets = []
-       three_segment_connects = Hash.new []
-       three_segment_mkt_connects = Hash.new(Hash.new([]))
 
+       one_seg_markets = DirectFlight.multi_keyed(brand.report_keys).pluck(:origin, :dest).uniq
        two_seg_markets = BrandConnection.keyed(brand.brand_key).pluck(:origin, :dest).sort.uniq
-       two_seg_markets.each_with_index do |ts_mkt, index|
-         ts_origin, ts_dest = ts_mkt
-         Rails.logger.info "(#{brand.brand_key}) Building connections  #{ts_origin} #{ts_dest} for #{index} of (#{two_seg_markets.count}) two seg markets"
 
-         BrandConnection.keyed(brand.brand_key).market(ts_origin, ts_dest).each do |bc|
+       Rails.logger.info "(#{brand.brand_key}) There are  #{one_seg_markets.count} one segment markets"
+       Rails.logger.info "(#{brand.brand_key}) There are  #{two_seg_markets.count} two segment markets"
+
+       existing_markets = one_seg_markets | two_seg_markets
+       Rails.logger.info "(#{brand.brand_key}) There are  #{existing_markets.count} combined one/two segment markets"
+
+       three_segment_mkt_connects = Hash.new([])
+
+       existing_markets.each_with_index do |e_mkt, index|
+         e_origin, e_dest = e_mkt
+
+         Rails.logger.info "(#{brand.brand_key}) Building connections  #{e_origin} #{e_dest} for #{index} of (#{existing_markets.count}) one/two seg markets"
+
+         BrandConnection.keyed(brand.brand_key).market(e_origin, e_dest).each do |bc|
          # bc_list.each do |bc|
            origin = bc.origin
            connecting_bcs = bc.connects_with.to_a
            destinations = connecting_bcs.pluck(:dest).sort.uniq
            destinations.each do |dest|
-
+             mkt = "#{origin}-#{dest}"
              markets = markets | [[origin, dest]]
 
-             three_segment_mkt_connects[[origin, dest]][bc.id] =
-                  # connecting_bcs.arriving(dest).map{|other| other.id}
-                  connecting_bcs.select{|cbc| cbc.dest == dest}.map{|other| other.id}
 
+             c1 = ConnRef.new(id: bc.id, key: bc.key)
+             cb_list = connecting_bcs.select{|cbc| cbc.dest == dest}
+             uniq_cb_list = cb_list.map{|other| ConnRef.new(id: other.id, key: other.key)}.uniq{|cr| cr.key}
+
+             multi_connections = uniq_cb_list.map{|c2| MultiConnRef.new(conns: [c1,c2])}.uniq{|mc| mc.key}
+             three_segment_mkt_connects[mkt] = multi_connections
            end
          end
-       end
-       byebug
-       pp markets
-
-       markets.each do |origin, dest|
 
        end
+       # pp  three_segment_mkt_connects.keys.map{|k| [k,three_segment_mkt_connects[k].count]}
+       brand_market_reqs = Hash.new([])
 
-       # mkt_connections = BrandConnection.keyed(brand.brand_key).market(origin,dest)
-       #
-       # routes =  mkt_connections.to_a.uniq{|c| c.key}
-       #
-       # routes_requests = routes.map{|c| c.to_route_requests}
-       #
-       # grouped_rrs = routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
-       # grouped_rrs.each do |keys, group|
-       #      brr0 =
-       #      BrandedRouteRequest.where(
-       #      group.first[0].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
-       #          .merge(cxrs: group.map{|rr_list| rr_list[0].cxrs}
-       #          .flatten.sort.uniq)
-       #      ).first_or_create!
-       #      brr1 =
-       #      BrandedRouteRequest.where(
-       #      group.first[1].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
-       #          .merge(cxrs: group.map{|rr_list| rr_list[1].cxrs}
-       #          .flatten.sort.uniq)
-       #      ).first_or_create!
-       #
-       #      bmr = BrandedMarketRequest.joins(:branded_route_requests)
-       #                .where(BrandedRouteRequest[:id].in [brr0.id, brr1.id])
-       #                .where(brand_key: brand.brand_key, brand_id: brand.id,
-       #                       origin: origin, dest: dest).first_or_create!
-       #
-       #      bmr.branded_route_requests << [brr0,brr1] if  bmr.branded_route_requests.blank?
-       #
-       #      grouped_rrs[keys] = bmr
-       #
-       # end
-       # mkt_route_requests = grouped_rrs.values
-       #
-       # through_requests = mkt_route_requests.map{|bmr| bmr.through_market_request}.compact
-       # market_route_map = mkt_route_requests + through_requests
-       # market_route_map.compact
+       three_segment_mkt_connects.each do |mkt, mkt_conns|
+         origin, dest = mkt.split('-')
+         mkt_connections = []
+         mkt_conns.each do |mcr|
+           bcs = mcr.conns.map{|c| BrandConnection.find(c.id)}
+           rrs = bcs.map{|c| c.to_route_requests}.flatten.uniq
+           rr_ids = rrs.map{|rr| rr.id}
+
+           bmr = BrandedMarketRequest.joins(:branded_route_requests)
+                       .where(BrandedRouteRequest[:id].in rr_ids)
+                       .where(brand_key: brand.brand_key, brand_id: brand.id,
+                              origin: origin, dest: dest).first_or_create!
+
+           bmr.branded_route_requests << rrs if  bmr.branded_route_requests.blank?
+           mkt_connections << bmr
+
+         end
+
+         # TODO:  Generate Through Requests
+         
+         unless  mkt_connections.blank?
+            BrandedMarketSegmentsRequest.create(brand_id: brand.id, brand_key: brand.brand_key,
+                           origin: origin, dest:dest, segment_count: 3,
+                           branded_market_request_ids: mkt_connections.map{|bmr| bmr.id} )
+         end
+
+       end
     end
 
-
-   # def two_stop_market_routes(brand, origin, dest)
-   #
-   #     #  2 Stops
-   #      mkt_connections = BrandConnection.keyed(brand.brand_key).market(origin,dest)
-   #      routes =  mkt_connections.to_a.uniq{|c| c.key}
-   #      segmented_routes_requests = routes.map{|c| c.to_route_requests}
-   #
-   #      byebug
-   #      grouped_rrs = routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
-   #      grouped_rrs.each do |keys, group|
-   #           brr0 =
-   #           BrandedRouteRequest.where(
-   #           group.first[0].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
-   #               .merge(cxrs: group.map{|rr_list| rr_list[0].cxrs}
-   #               .flatten.sort.uniq)
-   #           ).first_or_create!
-   #           brr1 =
-   #           BrandedRouteRequest.where(
-   #           group.first[1].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
-   #               .merge(cxrs: group.map{|rr_list| rr_list[1].cxrs}
-   #               .flatten.sort.uniq)
-   #           ).first_or_create!
-   #
-   #           bmr = BrandedMarketRequest.joins(:branded_route_requests)
-   #                     .where(BrandedRouteRequest[:id].in [brr0.id, brr1.id])
-   #                     .where(brand_key: brand.brand_key, brand_id: brand.id,
-   #                            origin: origin, dest: dest).first_or_create!
-   #
-   #           bmr.branded_route_requests << [brr0,brr1] if  bmr.branded_route_reqRails air_sched: developmentuests.blank?
-   #
-   #           grouped_rrs[keys] = bmr
-   #
-   #      end
-   #      mkt_route_requests = grouped_rrs.values
-   #
-   #      byebug
-   #      through_requests = mkt_route_requests.map{|bmr| bmr.through_market_request}.compact
-   #      market_route_map = mkt_route_requests + through_requests
-   #      market_route_map.compact
-   #   end
 
 
    def build_brand_market_routes(brand, segment_count)
        BrandedMarketSegmentsRequest.branded(brand)
                                    .where(segment_count: segment_count)
-                                    .delete_all
+                                    .destroy_all
 
        market_requests = []
        case segment_count
@@ -361,11 +322,6 @@ module Oag
 
          when 3
            market_requests = two_stop_routes(brand)
-           unless  market_requests.blank?
-                  BrandedMarketSegmentsRequest.create(brand_id: brand.id, brand_key: brand.brand_key,
-                                 origin: origin, dest:dest, segment_count: segment_count,
-                                 branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
-           end
          else
            byebug
            "Bad Case"
@@ -383,16 +339,100 @@ module Oag
 
     def build_brand_market_smart_routes(brand)
 
-      # build_brand_market_routes(brand, 1)
+      BrandedMarketSegmentsRequest.branded(brand).destroy_all
+      BrandedRouteRequest.branded(brand).destroy_all
+      BrandedMarketRequest.branded(brand).destroy_all
+
+
+      build_brand_market_routes(brand, 1)
 
       # ActiveRecord::Base.logger.level = 2
-      # build_brand_market_routes(brand, 2)
+      build_brand_market_routes(brand, 2)
 
       build_brand_market_routes(brand, 3)
 
 
 
     end
+
+
+    def market_route_map(brand, origin, dest)
+          requests = []
+          [*1..3].each do |seg_count|
+                bmr =   BrandedMarketSegmentsRequest.branded(brand)
+                        .market(origin, dest)
+                        .where(segment_count: seg_count).first
+
+
+                requests = (requests + bmr.branded_market_requests) if bmr and not bmr.branded_market_requests.blank?
+
+          end
+
+          requests.uniq
+
+    end
+
+
+    def build_brand_route_maps(brand)
+      
+
+      markets = BrandedMarketSegmentsRequest.branded(brand).pluck(:origin, :dest).sort.uniq
+
+      market_maps = {}
+
+      markets.each do |mkt|
+        origin, dest = mkt
+        mkt_key = "#{origin}-#{dest}"
+
+        mkt_requests        = market_route_map(brand, origin, dest)
+        reverse_mkt_request = market_route_map(brand, dest, origin)
+        return_mkt_request = mkt_requests.product reverse_mkt_request
+
+        one_way = []
+        mkt_requests.each do |mkt_request|
+               one_way <<
+               {
+               	type: 'oneway',
+                   journeys: [
+                       mkt_request.to_journey(1, 'outbound')
+                   ]
+               }
+        end
+
+        roundtrip = []
+
+        return_mkt_request.each do |return_mkt_req|
+          roundtrip <<
+              {
+                type: 'return',
+                   journeys: [
+                       return_mkt_req[0].to_journey(1, 'outbound'),
+                       return_mkt_req[1].to_journey(2, 'inbound')
+                   ]
+              }
+        end
+        market_map = {
+            "#{mkt_key}" => {
+                oneway: one_way,
+                roundtrip: roundtrip
+        }}
+        market_maps.merge! market_map
+        # puts JSON.pretty_generate(market_map)
+        # byebug
+        # pp market_map
+
+      end
+      BrandedRouteMap.where(brand_id: brand.id, brand_key: brand.brand_key).destroy_all
+      BrandedRouteMap.create(brand_id: brand.id, brand_key: brand.brand_key,
+                        route_map: market_maps)
+
+      File.open("#{brand.brand_key.downcase}_route_map.json", 'w') {|f| f.write(
+          JSON.pretty_generate(market_maps)
+      )
+      }
+
+    end
+    
 
   #End Class
   end

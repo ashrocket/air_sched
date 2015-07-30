@@ -74,4 +74,25 @@ namespace :reports do
     # bc.to_market_request
 
   end
+
+  desc "Build Smart Market Route Maps"
+   task :build_market_route_maps => :environment do |t, args|
+
+
+     # b = Brand.create(brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW"], description: "Scoot Interline Network")
+     brand = Brand.first
+     r = Oag::Report.new
+
+
+     # origin = 'TPE'
+     # dest   = 'SYD'
+     # r.build_brand_market_routes(b, origin, dest)
+
+     r.build_brand_route_maps(brand)
+
+     # bc = BrandConnection.first
+     # bc.to_market_request
+
+   end
+
 end    

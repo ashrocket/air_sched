@@ -208,6 +208,43 @@ ALTER SEQUENCE airlines_id_seq OWNED BY airlines.id;
 
 
 --
+-- Name: airport_currencies; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE airport_currencies (
+    id integer NOT NULL,
+    name character varying,
+    city character varying,
+    iata character varying,
+    icao character varying,
+    country character varying,
+    country_code character varying,
+    latitude numeric(64,12),
+    longitude numeric(64,12),
+    currency_code character varying
+);
+
+
+--
+-- Name: airport_currencies_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE airport_currencies_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: airport_currencies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE airport_currencies_id_seq OWNED BY airport_currencies.id;
+
+
+--
 -- Name: airports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -417,6 +454,37 @@ ALTER SEQUENCE branded_market_segments_requests_id_seq OWNED BY branded_market_s
 
 
 --
+-- Name: branded_route_maps; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_route_maps (
+    id integer NOT NULL,
+    brand_id integer,
+    brand_key character varying NOT NULL,
+    route_map json
+);
+
+
+--
+-- Name: branded_route_maps_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_route_maps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_route_maps_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_route_maps_id_seq OWNED BY branded_route_maps.id;
+
+
+--
 -- Name: branded_route_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -465,7 +533,8 @@ CREATE TABLE brands (
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    default_currency character varying(256)
 );
 
 
@@ -1105,6 +1174,13 @@ ALTER TABLE ONLY airlines ALTER COLUMN id SET DEFAULT nextval('airlines_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY airport_currencies ALTER COLUMN id SET DEFAULT nextval('airport_currencies_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY airports ALTER COLUMN id SET DEFAULT nextval('airports_id_seq'::regclass);
 
 
@@ -1141,6 +1217,13 @@ ALTER TABLE ONLY branded_market_route_requests ALTER COLUMN id SET DEFAULT nextv
 --
 
 ALTER TABLE ONLY branded_market_segments_requests ALTER COLUMN id SET DEFAULT nextval('branded_market_segments_requests_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branded_route_maps ALTER COLUMN id SET DEFAULT nextval('branded_route_maps_id_seq'::regclass);
 
 
 --
@@ -1303,6 +1386,14 @@ ALTER TABLE ONLY airlines
 
 
 --
+-- Name: airport_currencies_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY airport_currencies
+    ADD CONSTRAINT airport_currencies_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: airports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1348,6 +1439,14 @@ ALTER TABLE ONLY branded_market_route_requests
 
 ALTER TABLE ONLY branded_market_segments_requests
     ADD CONSTRAINT branded_market_segments_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branded_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_route_maps
+    ADD CONSTRAINT branded_route_maps_pkey PRIMARY KEY (id);
 
 
 --
@@ -1846,4 +1945,8 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000160');
 INSERT INTO schema_migrations (version) VALUES ('20150727000180');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000200');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000400');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000500');
 

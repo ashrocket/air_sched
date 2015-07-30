@@ -1,4 +1,5 @@
 class BrandConnection < ActiveRecord::Base
+
   belongs_to :brand
   belongs_to :sched1, :class_name => 'OagSchedule'
   belongs_to :sched2, :class_name => 'OagSchedule'
@@ -10,13 +11,14 @@ class BrandConnection < ActiveRecord::Base
 
   scope :arriving,        lambda {|dest|   where(:dest => dest)            }
   scope :departing,       lambda {|origin| where(:origin =>  origin)       }
+  scope :via,             lambda {|via| where(:via =>  via)       }
 
   # class method
 
 
   # instance methods
   def connects_with
-    BrandConnection.where(sched1_id: sched2_id)
+    BrandConnection.where(sched1_id: sched2_id).where.not(sched2_id: sched1_id).where.not(dest: origin)
   end
 
   def market

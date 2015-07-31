@@ -74,7 +74,7 @@ class BrandedMarketRequest < ActiveRecord::Base
       journeys << {
           host: brr.host,
           airlines: brr.cxrs,
-          currency: airport_currency(brand, origin),
+          currency: airport_currency(brand, brr.origin),
           origin: brr.origin,
           destination: brr.dest,
           order: i + 1}
@@ -87,6 +87,7 @@ class BrandedMarketRequest < ActiveRecord::Base
        [
              {
                type: direction,
+               required_currency: airport_currency(brand, origin),
                origin: origin,
                destination: dest,
                order: 1,

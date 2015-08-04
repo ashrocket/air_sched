@@ -49,7 +49,7 @@ class ScheduleImportWorker
               Sidekiq::Logging.logger.info "Import Worker refreshing airlines  #{report_id}: #{report.report_key}"
               processor.refresh_airlines(report)
               report.save
-              UpdateAirportsWorker.perform_async()
+              # UpdateAirlinesWorker.perform_async()
 
             when /airlines_refreshed/
 

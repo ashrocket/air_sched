@@ -294,7 +294,6 @@ module Oag
        market_requests = []
        case segment_count
          when 1
-           byebug
            one_segment_markets = DirectFlight.multi_keyed(brand.report_keys).pluck(:origin, :dest).uniq
            one_segment_markets.each do |origin, dest|
              market_requests = direct_market_routes(brand, origin, dest)
@@ -328,7 +327,6 @@ module Oag
          when 3
            market_requests = two_stop_routes(brand)
          else
-           byebug
            "Bad Case"
 
        end

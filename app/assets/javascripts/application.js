@@ -35,5 +35,8 @@
 //= require bootstrap-datepicker/js/bootstrap-datepicker
 //= require dates
 //= require bootstrap_init
+
+//= require active_admin
+
 jQuery.extend(window, Routes)
 

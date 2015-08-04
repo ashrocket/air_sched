@@ -8,12 +8,10 @@
 // $sidebar-width: 242px;
 
 // Active Admin's got SASS!
-@import "active_admin/mixins";
-@import "active_admin/base";
+
 
 @import 'prevars';
 @import 'bootstrap';
-
 
 @import 'jasny-bootstrap/dist/css/jasny-bootstrap';
 @import 'typeahead.js-bootstrap.css/typeahead.js-bootstrap.css';
@@ -23,6 +21,8 @@
 @import 'datatables-plugins/integration/bootstrap/3/dataTables.bootstrap';
 @import 'common';
 @import 'css_overrides';
+@import "active_admin/mixins";
+@import "active_admin/base";
 @import 'admin/data_key';
 
 
@@ -48,3 +48,40 @@ form fieldset.inputs {
 label {
   margin-right: 10px;
 }
+
+//@mixin reset-aa-button {
+//  background: none;
+//  border-radius: 0;
+//  border: 0;
+//  box-shadow: none;
+//  line-height: 1;
+//  padding: 0;
+//  text-shadow: none;
+//  vertical-align: middle;
+//  &:not(.disabled) {
+//    &:hover,
+//    &:active,
+//    &:focus {
+//      background: none;
+//      border: 0;
+//      box-shadow: none;
+//    }
+//  }
+//}
+//
+//.array-action--add,
+//.array-action--remove {
+//  @include reset-aa-button;
+//  font-size: rem(15);
+//}
+//
+//.array-action--add {
+//  color: green;
+//}
+//
+//.array-action--remove {
+//  color: red;
+//  &.can-undo {
+//    color: green;
+//  }
+//}

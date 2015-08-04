@@ -28,7 +28,15 @@ class ReportKey < ActiveRecord::Base
       matched_list = []
       all.each do |report_key|
         matches = pattern.match(report_key.file_pattern)
-        matched_list <<  {key: report_key, match: matches.captures.first.lstrip} if matches
+
+        if  matches
+          if matches.captures  and matches.captures.first
+            matched_list <<  {key: report_key, match: matches.captures.first.lstrip}
+          else
+           matched_list <<  {key: report_key, match: matches.to_s}
+          end
+        end
+
       end
       unless matched_list.empty?
         matched_list.sort_by! { |m| m[:match].length}

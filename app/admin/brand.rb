@@ -20,4 +20,17 @@ ActiveAdmin.register Brand, as: 'Brands' do
     end
   end
 
+  form do |f|
+      f.inputs do
+        f.input :brand_key
+        f.input :name
+        f.input :report_keys, as: :text
+        f.input :description
+        f.input :host_map, as: :text
+        f.input :active
+        f.input :default_currency
+      end
+      f.actions
+  end
+
 end

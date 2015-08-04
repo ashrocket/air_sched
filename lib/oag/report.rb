@@ -5,12 +5,16 @@ module Oag
 
 
     def build_brand_connections(brand)
-      filtered_cxrs = ['TZ','DD', 'XW','TR']
+      # filtered_cxrs = ['TZ','DD', 'XW','TR']
+      filtered_cxrs = []
+
       BrandConnection.keyed(brand.brand_key).destroy_all
 
       origins = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
                            .pluck(:origin_apt)
                            .sort.uniq
+
+
 
       routes = []
       brand_connections = []
@@ -290,6 +294,7 @@ module Oag
        market_requests = []
        case segment_count
          when 1
+           byebug
            one_segment_markets = DirectFlight.multi_keyed(brand.report_keys).pluck(:origin, :dest).uniq
            one_segment_markets.each do |origin, dest|
              market_requests = direct_market_routes(brand, origin, dest)

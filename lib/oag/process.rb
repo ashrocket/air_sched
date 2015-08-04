@@ -9,7 +9,7 @@ module Oag
 
       dests = Destination.keyed(report.report_key)
 
-      group_size = 200
+      group_size = 1000
       tot = dests.count
       dests.in_groups_of(group_size) do |dest_group|
 
@@ -116,7 +116,6 @@ module Oag
         direct_pairs.sort!
         direct_pairs_hash = direct_pairs.group_by{|pair| pair[0]}
 
-        pp direct_pairs_hash;
 
         origins.each do |o_apt|
           if cache.has_key? o_apt

@@ -17,6 +17,7 @@ gem 'time_diff'
 # Use SCSS for stylesheets
 gem 'js-routes'
 gem 'coffee-rails', '~> 4.0'
+gem 'font-awesome-rails'
 gem 'sprockets-rails', :require => 'sprockets/railtie'
 gem 'sass-rails', '~> 4.0'
 gem 'quiet_assets', :group => :development
@@ -70,8 +71,8 @@ gem "rails-settings-cached", "0.4.1"
 gem 'roo'
 
 
-# gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
-gem 'mastiff', path: '../mastiff'
+gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
+# gem 'mastiff', path: '../mastiff'
 
 
 group :development, :test do

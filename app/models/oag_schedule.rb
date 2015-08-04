@@ -27,9 +27,11 @@ class OagSchedule < ActiveRecord::Base
 
 
   scope :keyed,     lambda {|report_key| where("report_key = ?",  report_key)}
-  scope :branded,     lambda {|report_keys| where("report_key IN (?)",  report_keys)}
+  scope :branded,   lambda {|report_keys| where("report_key IN (?)",  report_keys)}
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}
-  scope :for_cxrs,   lambda {|carriers| where({:airline_code => carriers})}
+  scope :for_cxrs,  lambda {|carriers| carriers.empty? ? where.not(:airline_code => nil) :
+                              where(:airline_code =>  carriers)
+                            }
   #scope :except_cxrs lambda {|carriers| where.not(:conditions => {:airline_code => carriers})}
   scope :effective, lambda {|theDay| where('? BETWEEN eff_date and disc_date', theDay ) }
   scope :arriving,        lambda {|dest|   where(:dest_apt => dest)            }

@@ -5,7 +5,7 @@ module Oag
 
 
     def build_brand_connections(brand)
-      filtered_cxrs = ['TZ','DD', 'XW']
+      filtered_cxrs = ['TZ','DD', 'XW','TR']
       BrandConnection.keyed(brand.brand_key).destroy_all
 
       origins = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)

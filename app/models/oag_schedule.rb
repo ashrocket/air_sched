@@ -87,10 +87,14 @@ class OagSchedule < ActiveRecord::Base
     end
 
     def operating(dep_date)
-      where("dep_op_days ~* '.*?.*'", dep_date.cwday)
+      where.any(dep_op_days: dep_date.cwday)
+      # Use PostGres ext operator instead of Regexp
+      # where(dep_op_days "dep_op_days ~* '.*?.*'", )
     end
+
+
     def travelling_on(dep_date)
-      where('? BETWEEN eff_date and disc_date', dep_date ).operating(dep_date)
+      where.between(dep_date  '? BETWEEN eff_date and disc_date', dep_date ).operating(dep_date)
 
     end
 

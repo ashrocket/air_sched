@@ -20,9 +20,23 @@ Use the oag analyser tool to geenrate a schedule file for any report you wish to
 Brands are able to hold multiple report_keys.
 If you want to include more than 1 OAG schedule file in a Route File, simply add the required report_key to the brand.
 Currently the most reliable way to add report_keys is to do so the rails console, as the postgres array type has not been implemented in ActiveAdmin, and there is no view defined to edit Brands directly.
+**example**
+
+    ashr-mac:air_sched $rails c
+    2.1.2 :001 > b = Brand.keyed('TZ').first
+      Brand Load (1.2ms)  SELECT  "brands".* FROM "brands" WHERE "brands"."brand_key" = $1  ORDER BY "brands"."id" ASC LIMIT 1  [["brand_key", "TZ"]]
+     => #<Brand id: 1, brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW", "TZBRANDVA"], description: "Scoot Interline Network", host_map: {"TZ"=>"TZ", "TR"=>"TZ", "XW"=>"XW", "DD"=>"DD"}, active: true, slug: "tz", created_at: "2015-07-27 23:10:16", updated_at: "2015-08-05 03:49:48", default_currency: "AUD"> 
+    2.1.2 :002 > b.report_keys =  ["TZTRDDXW", "TZBRANDVA", "TZBRANDMI"]
+     => ["TZTRDDXW", "TZBRANDVA", "TZBRANDMI"] 
+    2.1.2 :003 > b.save
+       (0.3ms)  BEGIN
+      SQL (1.1ms)  UPDATE "brands" SET "report_keys" = $1, "updated_at" = $2 WHERE "brands"."id" = $3  [["report_keys", "{TZTRDDXW,TZBRANDVA,TZBRANDMI}"], ["updated_at", "2015-08-05 14:05:04.382883"], ["id", 1]]
+       (385.4ms)  COMMIT
+     => true 
+    2.1.2 :004 > 
 
 ----------
-**Brands**
+**Rails App**
 ---------------
 
 The Rails App that allows for basic schedule combination search, 

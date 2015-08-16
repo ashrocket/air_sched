@@ -49,6 +49,7 @@ namespace :reports do
   # end
   desc "Build Smart Connections"
    task :build_connections => :environment do |t, args|
+     ActiveRecord::Base.logger.level = Logger::INFO
      # b = Brand.create(brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW"], description: "Scoot Interline Network")
      b = Brand.first
      r = Oag::Report.new
@@ -58,22 +59,27 @@ namespace :reports do
 
 
   desc "Build Smart Market Routes"
-  task :build_market_smart_routes => :environment do |t, args|
+  task :build_market_smart_routes, [:seg_count_array, :brands] => :environment do |t, args|
+    ActiveRecord::Base.logger.level = Logger::INFO
+    args.with_defaults(:seg_count_array => [1,2,3], :brands => ['TZ'])
+
+    seg_counts =  (args[:seg_count_array].split ' ').map{|c| c.to_i}
+    brand_keys = args[:brands].split ' '
 
 
-    brand = Brand.first
-    r = Oag::Report.new
+    brand_keys.each do |brand_key|
 
+      brand = Brand.keyed(brand_key).first
+      r = Oag::Report.new
+      r.build_brand_market_smart_routes(brand, seg_counts)
 
-    r.build_brand_market_smart_routes(brand)
-
-
+    end
 
   end
 
   desc "Build Smart Market Route Maps"
    task :build_market_route_maps => :environment do |t, args|
-
+     ActiveRecord::Base.logger.level = Logger::INFO
 
      # b = Brand.create(brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW"], description: "Scoot Interline Network")
      brand = Brand.first

@@ -4,9 +4,10 @@ class BrandedMarketSegmentsRequest < ActiveRecord::Base
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
 
-  scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
-  scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
-  scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
+  scope :keyed,        lambda {|brand_key| where(brand_key: brand_key)}
+  scope :branded,      lambda {|brand|    where(brand_id:  brand.id)}
+  scope :market,       lambda {|o,d|       where(:origin =>  o, :dest => d)}
+  scope :with_segs,    lambda {|seg_count|       where(:segment_count => seg_count) }
 
 
   def branded_market_requests

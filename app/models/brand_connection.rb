@@ -15,8 +15,14 @@ class BrandConnection < ActiveRecord::Base
 
   # class method
 
-
+  def self.connecting_scheds(connection)
+    where(sched1_id: connection.sched1_id).to_a
+        .delete_if{|other| other.sched2_id == connection.sched1_id or other.dest == connection.origin}
+  end
   # instance methods
+  # connects_with (sched1_id, sched2_id, origin) Could Imporve =>
+  #  where(sched1_id: my_sched1_id).to_array
+  #   .delete_if{|sched| sched.sched2_id == my_sched1_id or sched.dest == my_sched1_origin}
   def connects_with
     BrandConnection.where(sched1_id: sched2_id).where.not(sched2_id: sched1_id).where.not(dest: origin)
   end

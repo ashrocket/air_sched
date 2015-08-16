@@ -1,4 +1,4 @@
-
+require 'benchmark'
 module Oag
   class Report
 
@@ -8,7 +8,7 @@ module Oag
       # filtered_cxrs = ['TZ','DD', 'XW','TR']
       filtered_cxrs = []
 
-      BrandConnection.keyed(brand.brand_key).destroy_all
+      BrandConnection.keyed(brand.brand_key).delete_all
 
       origins = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
                            .pluck(:origin_apt)
@@ -28,7 +28,7 @@ module Oag
 
 
         via_points.each_with_index do |via_code, via_index|
-            Rails.logger.info "Building connections  " +
+            Rails.logger.info "(#{brand.brand_key}) Building branded connections  " +
                   "for #{origin_code} #{index} of (#{origins.count}) through #{via_code}  " +
                   " #{via_index} of (#{via_points.count})  - #{brand.brand_key}"
 
@@ -145,11 +145,6 @@ module Oag
           carriers = cxr_host_list.map{|cxr_host| cxr_host[:cxr]}.sort
 
 
-          # if origin == 'DMK' and dest == 'SIN' and cxrs = ['TZ','XW']
-          # # (TZ:ScootHost/DMK-SIN-TZ,XW)
-          #   byebug
-          #   "STOP"
-          # end
 
           brr = BrandedRouteRequest.where( brand_id: brand.id, brand_key: brand.brand_key,
                            origin: origin,  dest: dest,  host: host, cxrs: carriers
@@ -227,18 +222,99 @@ module Oag
 
        three_segment_mkt_connects = Hash.new([])
 
-       existing_markets.each_with_index do |e_mkt, index|
+       bc_connections = {}
+       Benchmark.bm do |x|
+
+          # bc_set =  BrandConnection.keyed(brand.brand_key).to_a
+          bc_set = BrandConnection.keyed(brand.brand_key).select(:origin, :via, :dest, :id).group(:origin, :via, :dest, :id).group_by{|gi|  gi.attributes.except("id")}.each{|k,v_list|  v_list.map!{|v| v.id} }
+
+          first_leg_routes = bc_set.keys.map{|k| k[0] + k[1]}
+          next_leg_routes  = bc_set.keys.map{|k| k[1] + k[2]}
+
+
+          bc_set.keys.each_with_index do |bc_route_key|
+
+
+            bc_set[bc_route_key].each do |bc_id|
+
+
+            end
+
+
+
+          end
+
+
+          # market_connections =
+          grouped_bcs = bc_set.group_by{|bc| [bc.origin, bc.via, bc.dest]}
+
+            x.report("Build connected connections") {
+
+              route_key_count = grouped_bcs.keys.count
+              grouped_bcs.keys.each_with_index do |bc_key, bc_set_index|
+                route_key = bc_key.join('-')
+                Rails.logger.info "(#{brand.brand_key}) connecting #{bc_set_index} (#{route_key}) of (#{route_key_count}) connecting paths."
+
+                route_branded_connections = grouped_bcs[bc_key][bc_key]
+                valid_connection = false
+                connecting_route = []
+                route_branded_connections.each do | rbc|
+                  cbcs = BrandConnection.connecting_scheds(rbc)
+                  if cbcs.count > 0
+                     cbcs.
+                    valid_connection = true
+                    break
+                  end
+                end
+
+                cbcs = BrandConnection.connecting_scheds(bc)
+                bc_connections[bc.id] = cbcs
+                byebug
+              end
+            }
+
+
+        end
+
+
+       existing_markets.each_with_index do |e_mkt, emkt_index|
          e_origin, e_dest = e_mkt
 
-         Rails.logger.info "(#{brand.brand_key}) Building connections  #{e_origin} #{e_dest} for #{index} of (#{existing_markets.count}) one/two seg markets"
 
-         BrandConnection.keyed(brand.brand_key).market(e_origin, e_dest).each do |bc|
-         # bc_list.each do |bc|
+         byebug
+         bc_list = BrandConnection.keyed(brand.brand_key).market(e_origin, e_dest)
+         if bc_list.count == 0
+           Rails.logger.info "(#{brand.brand_key}) Building connections - Skip  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets, no connections exist"
+         else
+            Rails.logger.info "(#{brand.brand_key}) Building connections  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets"
+         end
+         # BrandConnection.keyed(brand.brand_key).market(e_origin, e_dest).each_with_index do |bc, index|
+           bc_list.each_with_index do |bc, bc_index|
+
+           Rails.logger.info " ==== (#{brand.brand_key}) Building 3 Seg connects from #{bc_index} of (#{bc_list.count}) "
+           # bc_list.each do |bc|
            origin = bc.origin
-           connecting_bcs = bc.connects_with.to_a
+
+
+           cbcs = []
+           connecting_bcs = []
+           Benchmark.bm do |x|
+             x.report("3 seg #{[e_origin, e_dest]}") { cbcs = BrandConnection.connecting_scheds(bc) }
+             x.report("Each 3 seg #{[e_origin, e_dest]}") { connecting_bcs = bc.connects_with.to_a }
+
+             if emkt_index.between? 6,7
+                       byebug
+            end
+
            destinations = connecting_bcs.pluck(:dest).sort.uniq
-           destinations.each do |dest|
+           destinations.each_with_index do |dest, index|
+
+             x.report("mapping from References"){
              mkt = "#{origin}-#{dest}"
+             Rails.logger.info " ==== (#{brand.brand_key}) Building 3 Segment mkt requests  for #{mkt} "
+             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{destinations.count}) "
+
+
              markets = markets | [[origin, dest]]
 
 
@@ -248,7 +324,11 @@ module Oag
 
              multi_connections = uniq_cb_list.map{|c2| MultiConnRef.new(conns: [c1,c2])}.uniq{|mc| mc.key}
              three_segment_mkt_connects[mkt] = multi_connections
+             }
            end
+
+           end
+
          end
 
        end
@@ -295,7 +375,11 @@ module Oag
        case segment_count
          when 1
            one_segment_markets = DirectFlight.multi_keyed(brand.report_keys).pluck(:origin, :dest).uniq
-           one_segment_markets.each do |origin, dest|
+           one_segment_markets.each_with_index do |origin, dest, index|
+             Rails.logger.info " ==== (#{brand.brand_key}) Building 1 Segment mkt requests  for #{origin} #{dest} "
+             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{one_segment_markets.count}) "
+
+
              market_requests = direct_market_routes(brand, origin, dest)
 
              unless  market_requests.blank?
@@ -340,20 +424,19 @@ module Oag
 
    end
 
-    def build_brand_market_smart_routes(brand)
-
-      BrandedMarketSegmentsRequest.branded(brand).destroy_all
-      BrandedRouteRequest.branded(brand).destroy_all
-      BrandedMarketRequest.branded(brand).destroy_all
+    def build_brand_market_smart_routes(brand, seg_counts)
 
 
-      build_brand_market_routes(brand, 1)
+      seg_counts.each do |seg_count|
+        BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).delete_all
+        # BrandedRouteRequest.branded(brand).destroy_all
+        # BrandedMarketRequest.branded(brand).destroy_all
 
-      build_brand_market_routes(brand, 2)
-
-      build_brand_market_routes(brand, 3)
 
 
+        build_brand_market_routes(brand, seg_count)
+
+      end
 
     end
 
@@ -420,8 +503,6 @@ module Oag
         }}
         market_maps.merge! market_map
         puts JSON.pretty_generate(market_map)
-        # byebug
-        # pp market_map
 
       end
       BrandedRouteMap.where(brand_id: brand.id, brand_key: brand.brand_key).destroy_all

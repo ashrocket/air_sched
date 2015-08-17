@@ -1,70 +1,47 @@
-# SQLite version 3.x
-#   gem install sqlite3
-#
-#   Ensure the SQLite 3 gem is defined in your Gemfile
-#   gem 'sqlite3'
-#development:
-#  adapter: mysql2
-#  encoding: utf8
-#  database: air_sched
-#  username: air_sched_admin
-#  password: airline1
-#  host: localhost
-#  port: 3306
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  host: <%= ENV['POSTGRES_PORT_5432_TCP_ADDR'] %>
+  port: <%= ENV['POSTGRES_PORT_5432_TCP_PORT'] || "5432" %>
+  username: <%= ENV['POSTGRES_ENV_USER'] %>
+  password: <%= ENV['POSTGRES_ENV_PASS'] %>
+
 development:
-  adapter: postgresql
-  encoding: unicode
-  host: localhost
-  database: air_sched
-  pool: 40
-  username: air_sched_admin
-  password: airline1
-  encoding: utf8
-  reconnect: true
-demo:
-  adapter: postgresql
-  encoding: unicode
-  database: <%= ENV['RDS_DB_NAME'] %>
-  username: <%= ENV['RDS_USERNAME'] %>
-  password: <%= ENV['RDS_PASSWORD'] %>
-  host: <%= ENV['RDS_HOSTNAME'] %>
-  port: <%= ENV['RDS_PORT'] %>
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
-test: &test
-#  adapter: mysql2
-#  encoding: utf8
-#  database: air_sched_test
-#  username: air_sched_admin
-#  password: airline1
-#  host: localhost
-#  port: 3306
-  adapter: postgresql
-  encoding: unicode
-  host: localhost
+  <<: *default
+  database: air_sched_development
+
+localdevelopment:
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] %> 
+  username: <%= ENV['POSTGRES_USERNAME'] %> 
+  password: <%= ENV['POSTGRES_PASSWORD'] %> 
+  host: <%= ENV['POSTGRES_HOST'] %>
+
+remotedevelopment:
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] %> 
+  username: <%= ENV['POSTGRES_USERNAME'] %> 
+  password: <%= ENV['POSTGRES_PASSWORD'] %> 
+  host: <%= ENV['POSTGRES_HOST'] %>
+
+remotestaging:
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] %> 
+  username: <%= ENV['POSTGRES_USERNAME'] %> 
+  password: <%= ENV['POSTGRES_PASSWORD'] %> 
+  host: <%= ENV['POSTGRES_HOST'] %>
+
+
+
+
+test:
+  <<: *default
   database: air_sched_test
-  pool: 40
-  username: air_sched_admin
-  password: airline1
-  encoding: utf8
-  reconnect: true
 
 production:
-#  adapter: mysql2
-#  encoding: utf8
-#  database: air_sched
-#  username: air_sched_admin
-#  password: airline1
-#  host: localhost
-#  port: 3306
-  adapter: postgresql
-  encoding: unicode
-  database: <%= ENV['RDS_DB_NAME'] %>
-  username: <%= ENV['RDS_USERNAME'] %>
-  password: <%= ENV['RDS_PASSWORD'] %>
-  host: <%= ENV['RDS_HOSTNAME'] %>
-  port: <%= ENV['RDS_PORT'] %>
-  reconnect: true
-cucumber:
-  <<: *test
+  <<: *default
+  database: <%= ENV['POSTGRES_DATABASE'] %> 
+  username: <%= ENV['POSTGRES_USERNAME'] %> 
+  password: <%= ENV['POSTGRES_PASSWORD'] %> 
+  host: <%= ENV['POSTGRES_HOST'] %>

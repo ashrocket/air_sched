@@ -63,6 +63,7 @@ spec/dummy/tmp/
 # Ignore application configuration
 /config/application.yml
 
+.env.web
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

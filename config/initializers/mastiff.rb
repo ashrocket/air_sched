@@ -37,8 +37,7 @@ Mastiff.configure do |config|
   config.process_attachment_worker  = ProcessAttachmentWorker
   # Class to store attachment
   config.attachment_uploader        =  MailAttachmentUploader
-
-  config.attachment_dir      = "data/attachments/pending"
+  # config.attachment_dir      = "data/attachments/pending"
   #config.process_dir      = "data/attachments/processed"
 
   # Mailbox Options

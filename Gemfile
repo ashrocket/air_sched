@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 4.1'
 # ORM related gems
+gem 'puma'
 gem 'pg', '~> 0.18.0.pre20140820094244'
 gem 'postgres_ext'
 gem 'arel-helpers'

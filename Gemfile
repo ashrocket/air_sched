@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'rails', '~> 4.2.3'
+gem 'rails', '4.2.1'
 gem 'puma', '2.10.2'
 # ORM related gems
 gem 'pg', '~> 0.18.0.pre20140820094244'

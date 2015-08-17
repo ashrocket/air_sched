@@ -36,6 +36,7 @@
     "commit": "368b997dad7c4f68569ffa29aee7833541453945"
   },
   "_source": "git://github.com/twitter/hogan.js.git",
-  "_target": "*",
-  "_originalSource": "hogan"
+  "_target": "3.0.2",
+  "_originalSource": "hogan",
+  "_direct": true
 }

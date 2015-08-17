@@ -8,7 +8,6 @@
   "description": "Ruby on Rails unobtrusive scripting adapter for jQuery",
   "main": "src/rails.js",
   "license": "MIT",
-  "version": "1.0.0",
   "dependencies": {
     "jquery": ">1.8.*"
   },
@@ -20,13 +19,14 @@
     "script",
     "test"
   ],
-  "_release": "1.0.0",
+  "version": "1.0.4",
+  "_release": "1.0.4",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.0",
-    "commit": "eb0e88537cd23208591c0426e8b06c1f0cfad39d"
+    "tag": "v1.0.4",
+    "commit": "7146dc96a71fda9b713f1f60fb414c699db0b3a7"
   },
   "_source": "git://github.com/rails/jquery-ujs.git",
-  "_target": "*",
+  "_target": "1.0.4",
   "_originalSource": "jquery-ujs"
 }

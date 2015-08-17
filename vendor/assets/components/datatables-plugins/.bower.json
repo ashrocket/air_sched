@@ -1,12 +1,15 @@
 {
   "name": "datatables-plugins",
   "homepage": "https://github.com/DataTables/Plugins",
-  "_release": "725b2a2115",
+  "version": "1.10.8",
+  "_release": "1.10.8",
   "_resolution": {
-    "type": "commit",
-    "commit": "725b2a2115b9e307231746e0c4108db7a1778b27"
+    "type": "version",
+    "tag": "1.10.8",
+    "commit": "461d704e70b1dd5e1b51766051fbb036517a2711"
   },
   "_source": "git://github.com/DataTables/Plugins.git",
-  "_target": "725b2a2115b9e307231746e0c4108db7a1778b27",
-  "_originalSource": "datatables-plugins"
+  "_target": "1.10.8",
+  "_originalSource": "datatables-plugins",
+  "_direct": true
 }

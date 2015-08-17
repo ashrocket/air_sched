@@ -1,5 +1,5 @@
 /* TableTools
- * 2009-2014 SpryMedia Ltd - datatables.net/license
+ * 2009-2015 SpryMedia Ltd - datatables.net/license
  */
 
 /*globals TableTools,ZeroClipboard_TableTools*/
@@ -722,7 +722,11 @@ TableTools.prototype = {
 		this.s.dt.aoDestroyCallback.push( {
 			"sName": "TableTools",
 			"fn": function () {
-				$(that.s.dt.nTBody).off( 'click.DTTT_Select', 'tr' );
+				$(that.s.dt.nTBody)
+					.off( 'click.DTTT_Select', that.s.custom.sRowSelector )
+					.off( 'mousedown.DTTT_Select', 'tr' )
+					.off( 'mouseup.DTTT_Select', 'tr' );
+
 				$(that.dom.container).empty();
 
 				// Remove the instance
@@ -861,6 +865,33 @@ TableTools.prototype = {
 		{
 			this._fnTextConfig( nButton, oConfig );
 			this._fnCollectionConfig( nButton, oConfig );
+		}
+
+		if ( this.s.dt.iTabIndex !== -1 ) {
+			$(nButton)
+				.attr( 'tabindex', this.s.dt.iTabIndex )
+				.attr( 'aria-controls', this.s.dt.sTableId )
+				.on( 'keyup.DTTT', function (e) {
+					// Trigger the click event on return key when focused.
+					// Note that for Flash buttons this has no effect since we
+					// can't programmatically trigger the Flash export
+					if ( e.keyCode === 13 ) {
+						e.stopPropagation();
+
+						$(this).trigger( 'click' );
+					}
+				} )
+				.on( 'mousedown.DTTT', function (e) {
+					// On mousedown we want to stop the focus occurring on the
+					// button, focus is used only for the keyboard navigation.
+					// But using preventDefault for the flash buttons stops the
+					// flash action. However, it is not the button that gets
+					// focused but the flash element for flash buttons, so this
+					// works
+					if ( ! oConfig.sAction.match(/flash/) ) {
+						e.preventDefault();
+					}
+				} );
 		}
 
 		return nButton;
@@ -1343,6 +1374,10 @@ TableTools.prototype = {
 
 			return out;
 		}
+		else if ( typeof src === 'number' )
+		{
+			out.push(this.s.dt.aoData[src]);
+		}
 		else
 		{
 			// A single aoData point
@@ -1516,6 +1551,13 @@ TableTools.prototype = {
 			that._fnCollectionHide( nButton, oConfig );
 		} );
 
+		if ( oConfig.fnSelect !== null )
+		{
+			TableTools._fnEventListen( this, 'select', function (n) {
+				oConfig.fnSelect.call( that, nButton, oConfig, n );
+			} );
+		}
+
 		this._fnFlashGlue( flash, nButton, oConfig.sToolTip );
 	},
 
@@ -1595,10 +1637,21 @@ TableTools.prototype = {
 		var aColumns = [];
 		var dt = this.s.dt;
 		var i, iLen;
+		var columns = dt.aoColumns;
+		var columnCount = columns.length;
 
-		if ( typeof mColumns == "object" )
+		if ( typeof mColumns == "function" )
 		{
-			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			var a = mColumns.call( this, dt );
+
+			for ( i=0, iLen=columnCount ; i<iLen ; i++ )
+			{
+				aColumns.push( $.inArray( i, a ) !== -1 ? true : false );
+			}
+		}
+		else if ( typeof mColumns == "object" )
+		{
+			for ( i=0, iLen=columnCount ; i<iLen ; i++ )
 			{
 				aColumns.push( false );
 			}
@@ -1610,28 +1663,28 @@ TableTools.prototype = {
 		}
 		else if ( mColumns == "visible" )
 		{
-			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			for ( i=0, iLen=columnCount ; i<iLen ; i++ )
 			{
-				aColumns.push( dt.aoColumns[i].bVisible ? true : false );
+				aColumns.push( columns[i].bVisible ? true : false );
 			}
 		}
 		else if ( mColumns == "hidden" )
 		{
-			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			for ( i=0, iLen=columnCount ; i<iLen ; i++ )
 			{
-				aColumns.push( dt.aoColumns[i].bVisible ? false : true );
+				aColumns.push( columns[i].bVisible ? false : true );
 			}
 		}
 		else if ( mColumns == "sortable" )
 		{
-			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			for ( i=0, iLen=columnCount ; i<iLen ; i++ )
 			{
-				aColumns.push( dt.aoColumns[i].bSortable ? true : false );
+				aColumns.push( columns[i].bSortable ? true : false );
 			}
 		}
 		else /* all */
 		{
-			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			for ( i=0, iLen=columnCount ; i<iLen ; i++ )
 			{
 				aColumns.push( true );
 			}
@@ -1704,24 +1757,36 @@ TableTools.prototype = {
 			aData.push( aRow.join(oConfig.sFieldSeperator) );
 		}
 
+		bSelectedOnly = true;
+
 		/*
 		 * Body
 		 */
-		var aSelected = this.fnGetSelected();
+		var aDataIndex;
+		var aSelected = this.fnGetSelectedIndexes();
 		bSelectedOnly = this.s.select.type !== "none" && bSelectedOnly && aSelected.length !== 0;
 
-		var api = $.fn.dataTable.Api;
-		var aDataIndex = api ?
-			new api( dt ).rows( oConfig.oSelectorOpts ).indexes().flatten().toArray() :
-			dt.oInstance
+		if ( bSelectedOnly ) {
+			// Use the selected indexes
+			aDataIndex = aSelected;
+		}
+		else if ( DataTable.Api ) {
+			// 1.10+ style
+			aDataIndex = new DataTable.Api( dt )
+				.rows( oConfig.oSelectorOpts )
+				.indexes()
+				.flatten()
+				.toArray();
+		}
+		else {
+			// 1.9- style
+			aDataIndex = dt.oInstance
 				.$('tr', oConfig.oSelectorOpts)
 				.map( function (id, row) {
-					// If "selected only", then ensure that the row is in the selected list
-					return bSelectedOnly && $.inArray( row, aSelected ) === -1 ?
-						null :
-						dt.oInstance.fnGetPosition( row );
+					return dt.oInstance.fnGetPosition( row );
 				} )
 				.get();
+		}
 
 		for ( j=0, jLen=aDataIndex.length ; j<jLen ; j++ )
 		{
@@ -2619,7 +2684,7 @@ TableTools.prototype.CLASS = "TableTools";
  *  @type	  String
  *  @default   See code
  */
-TableTools.version = "2.2.2";
+TableTools.version = "2.2.4";
 
 
 

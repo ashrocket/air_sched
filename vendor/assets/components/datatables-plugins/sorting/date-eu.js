@@ -3,9 +3,14 @@
  * additional  flexibility with support for spaces between the values and
  * either . or / notation for the separators.
  *
+ * Please note that this plug-in is **deprecated*. The
+ * [datetime](//datatables.net/blog/2014-12-18) plug-in provides enhanced
+ * functionality and flexibility.
+ *
  *  @name Date (dd . mm[ . YYYY]) 
  *  @summary Sort dates in the format `dd/mm/YY[YY]` (with optional spaces)
  *  @author [Robert Sedovšek](http://galjot.si/)
+ *  @deprecated
  *
  *  @example
  *    $('#example').dataTable( {
@@ -18,36 +23,31 @@
 jQuery.extend( jQuery.fn.dataTableExt.oSort, {
 	"date-eu-pre": function ( date ) {
 		date = date.replace(" ", "");
-		var eu_date, year;
 		
-		if (date == '') {
+		if ( ! date ) {
 			return 0;
 		}
 
-		if (date.indexOf('.') > 0) {
-			/*date a, format dd.mn.(yyyy) ; (year is optional)*/
-			eu_date = date.split('.');
-		} else {
-			/*date a, format dd/mn/(yyyy) ; (year is optional)*/
-			eu_date = date.split('/');
-		}
+		var year;
+		var eu_date = date.split(/[\.\-\/]/);
 
 		/*year (optional)*/
-		if (eu_date[2]) {
+		if ( eu_date[2] ) {
 			year = eu_date[2];
-		} else {
+		}
+		else {
 			year = 0;
 		}
 
 		/*month*/
 		var month = eu_date[1];
-		if (month.length == 1) {
+		if ( month.length == 1 ) {
 			month = 0+month;
 		}
 
 		/*day*/
 		var day = eu_date[0];
-		if (day.length == 1) {
+		if ( day.length == 1 ) {
 			day = 0+day;
 		}
 

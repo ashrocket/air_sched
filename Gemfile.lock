@@ -223,7 +223,6 @@ GEM
       activerecord (>= 4.0.0)
       arel (>= 4.0.1)
       pg_array_parser (~> 0.0.9)
-    puma (2.13.4)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rabl (0.11.6)
@@ -388,10 +387,8 @@ DEPENDENCIES
   parallel (~> 1.6.1)
   pg (~> 0.18.0.pre20140820094244)
   postgres_ext (~> 2.4.1)
-  puma (~> 2.13.4)
   quiet_assets (~> 1.1.0)
   rabl
-  rack (= 1.6.0)
   rack-cors (~> 0.4.0)
   rails (~> 4.2.3)
   rails-settings-cached (= 0.4.1)

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 gem 'rails', '~> 4.2.3'
 gem 'puma', '~> 2.13.4'
-gem 'rack', '~> 1.6'
+gem 'rack', '1.6.0'
 # ORM related gems
 gem 'pg', '~> 0.18.0.pre20140820094244'
 gem 'postgres_ext', '~> 2.4.1'

@@ -1,8 +1,9 @@
 jQuery ->
+#  $(".tooltip").tooltip()
+#  $("a[rel=tooltip]").tooltip()
+#  $(".alert").alert();
   $("a[rel=popover]").popover()
-  $(".tooltip").tooltip()
-  $("a[rel=tooltip]").tooltip()
-  $(".alert").alert();
+  $('[data-toggle="tooltip"]').tooltip()
   $('.btn').button();
 #  $('.nav-tabs li a').tab();
 #  $('.nav-tabs li.active a').tab('show');

@@ -51,7 +51,7 @@ jQuery ->
           i = 0
 
           while i < data.length
-            (hints = _.str.words(data[i].value, /\W/)).push data[i].code
+            (hints = _.words(data[i].value)).push data[i].code
             retval.push
               value: data[i].value
               tokens: hints

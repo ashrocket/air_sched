@@ -31,9 +31,9 @@ Rails.application.configure do
   #       :enable_starttls_auto => true
   #     }
 
-  config.action_controller.asset_host = '0.0.0.0:3000'
-  config.action_mailer.default_url_options = { :host => '0.0.0.0:3000' }
-  config.action_mailer.asset_host = '0.0.0.0:3000'
+  # config.action_controller.asset_host = '0.0.0.0:3000'
+  # config.action_mailer.default_url_options = { :host => '0.0.0.0:3000' }
+  # config.action_mailer.asset_host = '0.0.0.0:3000'
 
   ActionMailer::Base.smtp_settings = {
       :address              => "0.0.0.0",
@@ -65,8 +65,8 @@ Rails.application.configure do
   # Require all existing scheduled jobs
   Dir[Rails.root.join "app/workers/**/*.rb"].each { |f| require f }
 
-  config.application_url = 'http://0.0.0.0'
-  config.application_port = '3000'
+  # config.application_url = 'http://0.0.0.0'
+  # config.application_port = '3000'
 
 
   Mastiff.configure do |config|

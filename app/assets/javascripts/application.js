@@ -10,8 +10,7 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery/jquery
-//= require jquery-ujs/src/rails.js
+//= require jquery/dist/jquery
 //= require jquery-ui/jquery-ui
 //= require jquery-ui/ui/core
 //= require jquery-ui/ui/progressbar
@@ -27,13 +26,13 @@
 //= require jquery/jquery.dataTables.fileSize
 
 //= require hogan/web/1.0.0/hogan
-//= require lodash/dist/lodash.min
+//= require lodash/lodash.min
 //= require underscore.string/dist/underscore.string.min
 //= require typeahead.js/dist/typeahead
 //= require jquery-file-upload/js/jquery.fileupload
-
 //= require bootstrap-datepicker/js/bootstrap-datepicker
 //= require dates
+
 //= require bootstrap_init
 
 //= require active_admin

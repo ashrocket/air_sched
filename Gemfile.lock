@@ -391,8 +391,9 @@ DEPENDENCIES
   puma (~> 2.13.4)
   quiet_assets (~> 1.1.0)
   rabl
+  rack (~> 1.6.4)
   rack-cors (~> 0.4.0)
-  rails (~> 4.1)
+  rails (~> 4.2.3)
   rails-settings-cached (= 0.4.1)
   redis-objects (~> 0.9)
   roo (~> 2.1.1)

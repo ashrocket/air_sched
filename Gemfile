@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 4.1'
+gem 'rails', '~> 4.2.3'
+gem 'rack', '~> 1.6.4'
 # ORM related gems
 gem 'puma', '~> 2.13.4'
 gem 'pg', '~> 0.18.0.pre20140820094244'
@@ -59,8 +59,8 @@ gem 'active_admin_import', '~> 2.1.2'
 gem 'rails-settings-cached', '0.4.1'
 gem 'roo', '~> 2.1.1'
 
-# gem 'mastiff', path: '../mastiff'
 gem 'mastiff', '~> 0.1.0'
+# gem 'mastiff', path: '../mastiff'
 # gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
 
 

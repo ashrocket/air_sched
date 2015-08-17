@@ -61,11 +61,11 @@ production:
   adapter: postgresql
   encoding: unicode
   host: localhost
-  database: air_sched
-  pool: 40
-  username: air_sched_admin
-  password: airline1
-  encoding: utf8
+  database: <%= ENV['RDS_DB_NAME'] %>
+  username: <%= ENV['RDS_USERNAME'] %>
+  password: <%= ENV['RDS_PASSWORD'] %>
+  host: <%= ENV['RDS_HOSTNAME'] %>
+  port: <%= ENV['RDS_PORT'] %>
   reconnect: true
 cucumber:
   <<: *test

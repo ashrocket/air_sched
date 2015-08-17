@@ -99,4 +99,9 @@ Rails.application.configure do
   config.application_url = 'http://dev1.airblackbox.com/shannon'
   config.application_port = '80'
 
+
+  Mastiff.configure do |config|
+     config.attachment_dir    = "/tmp"
+   end
+
 end

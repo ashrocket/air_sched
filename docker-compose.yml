@@ -1,0 +1,9 @@
+web:
+  build: .
+  ports:  
+    - "80:80"
+  environment:
+    - AIR_SCHED_URL
+    - RAILS_ENV
+  env_file:
+    - '.env.web'

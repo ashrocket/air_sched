@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 gem 'rails', '~> 4.2.3'
+gem 'puma', '~> 2.13.4'
 gem 'rack', '~> 1.6.4'
 # ORM related gems
-gem 'puma', '~> 2.13.4'
 gem 'pg', '~> 0.18.0.pre20140820094244'
 gem 'postgres_ext', '~> 2.4.1'
 gem 'arel-helpers', '~> 2.1.0'

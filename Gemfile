@@ -19,7 +19,7 @@ gem 'js-routes', '~> 1.1.0'
 gem 'coffee-rails', '~> 4.0'
 gem 'font-awesome-rails', '~> 4.4.0.0'
 gem 'sprockets-rails', '~> 2.3.2', :require => 'sprockets/railtie'
-gem 'sass-rails', '~> 4.0'
+gem 'sass-rails', '~> 5.0'
 gem 'quiet_assets', '~> 1.1.0', :group => :development
 gem 'bootstrap-sass', '~> 3.3.5.1'
 gem 'uglifier', '>= 1.3.0'
@@ -44,7 +44,7 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 gem 'figaro', '~> 1.1.1'
 gem 'aws-sdk', '~> 2.1.14'
 gem 'redis-objects', '~> 0.9'
-gem 'sidekiq', '~> 2.17.'
+gem 'sidekiq', '~> 2.17'
 gem 'sidekiq-lock', '~> 0.2.0'
 gem 'sidekiq-failures', '~> 0.4.5'
 gem 'sidetiq', '0.5.0'
@@ -60,7 +60,8 @@ gem 'rails-settings-cached', '0.4.1'
 gem 'roo', '~> 2.1.1'
 
 # gem 'mastiff', path: '../mastiff'
-gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
+gem 'mastiff', '~> 0.1.0'
+# gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
 
 
 group :development, :test do

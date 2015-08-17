@@ -387,7 +387,7 @@ DEPENDENCIES
   js-routes (~> 1.1.0)
   mastiff (~> 0.1.0)
   parallel (~> 1.6.1)
-  pg (~> 0.18.0.pre20140820094244)
+  pg (~> 0.18.2)
   postgres_ext (~> 2.4.1)
   puma (= 2.10.2)
   quiet_assets (~> 1.1.0)

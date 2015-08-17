@@ -60,7 +60,6 @@ production:
 #  port: 3306
   adapter: postgresql
   encoding: unicode
-  host: localhost
   database: <%= ENV['RDS_DB_NAME'] %>
   username: <%= ENV['RDS_USERNAME'] %>
   password: <%= ENV['RDS_PASSWORD'] %>

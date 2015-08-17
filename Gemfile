@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.1'
 gem 'puma', '2.10.2'
 # ORM related gems
-gem 'pg', '~> 0.18.0.pre20140820094244'
+gem 'pg', '~> 0.18.2'
 gem 'postgres_ext', '~> 2.4.1'
 gem 'arel-helpers', '~> 2.1.0'
 

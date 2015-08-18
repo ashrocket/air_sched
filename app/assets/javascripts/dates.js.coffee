@@ -14,6 +14,8 @@ $ ->
 
     nowTemp = new Date()
     now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0)
+
+
     departDate = $(".depart-datepicker[data-behaviour~=datepicker]").datepicker(
       startDate: '+2d'
       altFormat: 'dd/mm/yyyy'
@@ -45,6 +47,9 @@ $ ->
       retDate.hide()
       return
     ).data("datepicker")
+
+
+
 
     return false
 

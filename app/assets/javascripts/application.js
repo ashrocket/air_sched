@@ -18,6 +18,8 @@
 //= require js-routes
 //= require bootstrap
 //= require jasny-bootstrap/dist/js/jasny-bootstrap
+//= require bootstrap-datepicker/dist/js/bootstrap-datepicker
+
 //= require datatables/media/js/jquery.dataTables
 //= require datatables-tabletools/js/dataTables.tableTools
 //= require datatables-plugins/pagination/jPaginator/dataTables.jPaginator
@@ -30,12 +32,10 @@
 //= require underscore.string/dist/underscore.string.min
 //= require typeahead.js/dist/typeahead
 //= require jquery-file-upload/js/jquery.fileupload
-//= require bootstrap-datepicker/js/bootstrap-datepicker
 //= require dates
 
 //= require bootstrap_init
 
-//= require active_admin
 
 jQuery.extend(window, Routes)
 

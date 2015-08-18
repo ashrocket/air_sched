@@ -24,9 +24,7 @@ gem 'bootstrap-sass', '~> 3.3.5.1'
 gem 'uglifier', '>= 1.3.0'
 gem 'haml-rails', '~> 0.9.0'
 
-# Use jquery as the JavaScript library
-# Using Bower, so only customized asset gems are required in here
-#gem 'bootstrap-datepicker-rails'
+
 
 #View based gems
 gem 'simple_form', '~> 3.1.0'

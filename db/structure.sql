@@ -527,7 +527,6 @@ CREATE TABLE brands (
     id integer NOT NULL,
     brand_key character varying NOT NULL,
     name character varying NOT NULL,
-    report_keys character varying[] DEFAULT '{}'::character varying[],
     description character varying,
     host_map json,
     active boolean,
@@ -1916,6 +1915,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140103000080');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000090');
 
+INSERT INTO schema_migrations (version) VALUES ('20140103000150');
+
 INSERT INTO schema_migrations (version) VALUES ('20140821200616');
 
 INSERT INTO schema_migrations (version) VALUES ('20140821200706');
@@ -1931,8 +1932,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141003133309');
 INSERT INTO schema_migrations (version) VALUES ('20141119191319');
 
 INSERT INTO schema_migrations (version) VALUES ('20141124142205');
-
-INSERT INTO schema_migrations (version) VALUES ('20150727000010');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000020');
 

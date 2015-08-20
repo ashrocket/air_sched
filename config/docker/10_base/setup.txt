@@ -1,0 +1,2 @@
+docker build -t ashrocket/air_sched_base .
+docker push ashrocket/air_sched_base

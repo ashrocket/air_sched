@@ -1,0 +1,7 @@
+docker login
+Username: ashrocket
+Password: 
+Email: ashley@raiteri.net
+
+docker build -t ashrocket/ruby .
+#docker push ashrocket/ruby

@@ -1,0 +1,2 @@
+docker build -t ashrocket/redis_ngnix_pgruby:2.2.2_9.4_3.0 .
+#docker push ashrocket/ngnix_pgruby

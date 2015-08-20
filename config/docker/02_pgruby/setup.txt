@@ -1,0 +1,2 @@
+docker build -t ashrocket/pgruby .
+#docker push ashrocket/pg_ruby

@@ -1,57 +1,40 @@
-FROM ubuntu:14.04
-MAINTAINER Ashley Raiteri "ashley@raiteri.net"
+FROM ruby:2.2.2
+RUN apt-get update -qq && apt-get install -y build-essential
 
-WORKDIR /tmp
+# for postgres
+RUN apt-get install -y libpq-dev
 
-# Install Rails App
-ADD Gemfile /tmp/Gemfile
-ADD Gemfile.lock /tmp/Gemfile.lock
-ADD vendor/gems /tmp/vendor/gems
+# for nokogiri
+RUN apt-get install -y libxml2-dev libxslt1-dev
 
-ENV RAILS_ENV remotestaging
-ENV SECRET_KEY_BASE your_secret_key
-RUN echo $GEM_HOME
+# for capybara-webkit
+RUN apt-get install -y libqt4-webkit libqt4-dev xvfb
+
+# for a JS runtime
+RUN apt-get install -y nodejs
+
+
+ENV APP_HOME /app
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
+
+
+ADD Gemfile* $APP_HOME/
+ENV BUNDLE_GEMFILE=$APP_HOME/Gemfile \
+BUNDLE_JOBS=2 \
+BUNDLE_PATH=/bundle
+
 RUN bundle install
-RUN bundle install --binstubs
 
-RUN mkdir /app
-WORKDIR /app
+ADD . $APP_HOME
 
-##########################
-#install redis locally
-##########################
-ENV REDIS_PORT_6379_TCP_ADDR localhost
 
-##########################
-#setup postgres locally
-##########################
-ENV POSTGRES_VERSION 9.3
-ENV POSTGRES_HOST localhost
-ENV POSTGRES_DATABASE docker
-ENV POSTGRES_USERNAME docker
-ENV POSTGRES_PASSWORD docker
-
-RUN mkdir -p /var/run/postgresql/$POSTGRES_VERSION-main.pg_stat_tmp
-RUN chown postgres /var/run/postgresql/$POSTGRES_VERSION-main.pg_stat_tmp
-RUN chgrp postgres /var/run/postgresql/$POSTGRES_VERSION-main.pg_stat_tmp
-
-USER postgres
-
-RUN /etc/init.d/postgresql start \
-    && psql --command "create user docker with password 'docker';" \
-    && psql --command "alter role docker superuser createrole createdb;" \
-    && psql --command "create database docker owner docker;"
-
+WORKDIR $APP_HOME
 USER root
 ##########################
 
-ADD . /app
-RUN mkdir -p /app/tmp/pids/
-#ENV AIR_SCHED_URL "http://0.0.0.0"
-#RUN RAILS_ENV=remotestaging bundle exec rake assets:precompile --trace
+RUN mkdir -p $APP_HOME/tmp/pids/
 
-ADD config/nginx-sites.conf /etc/nginx/sites-enabled/default
-
-CMD foreman start -f Procfile
+CMD bundle exec puma
 
 EXPOSE 80

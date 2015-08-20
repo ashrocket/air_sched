@@ -2,6 +2,8 @@ db:
   image: postgres:9.4.1
   ports:
     - "5432:5432"
+#  environment:
+#   DB_1_ENV_PGDATA
 
 web:
   build: .
@@ -9,7 +11,7 @@ web:
   ports:
     - "3000:3000"
   links:
-    - db
+    - db:postgres
   volumes:
     - .:/airsched
   # This tells the web container to mount the `bundle` images'
@@ -23,7 +25,6 @@ bundle:
   # project name. You may need to run `docker-compose build web`
   # before this works.
   image: airsched_web
-  command: echo I'm a little data container, short and stout...
+  command: echo "I'm a little data container, short and stout..."
   volumes:
     - /bundle
-

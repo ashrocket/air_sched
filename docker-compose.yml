@@ -4,27 +4,31 @@ db:
     - "5432:5432"
 #  environment:
 #   DB_1_ENV_PGDATA
-
 web:
   build: .
-  command: bin/rails server --port 3000 --binding 0.0.0.0
-  ports:
-    - "3000:3000"
+  command: bundle exec rails s
   links:
     - db:postgres
   volumes:
-    - .:/airsched
+    - .:/opt/air_sched
   # This tells the web container to mount the `bundle` images'
   # /bundle volume to the `web` containers /bundle path.
-  volumes_from:
-    - bundle
+#  volumes_from:
+#    - bundle
+  environment:
+    APP_HOME: /opt/air_sched
+    DB_ADAPTER: postgres
+    DB_HOST: database
+    DB_NAME: air_sched_development
+    DB_USER: docker
+    DB_PASS: docker
 
 # --- Add this to your fig.yml or docker-compose.yml file ---
-bundle:
-  # 'image' will vary depending on your docker-compose 
-  # project name. You may need to run `docker-compose build web`
-  # before this works.
-  image: airsched_web
-  command: echo "I'm a little data container, short and stout..."
-  volumes:
-    - /bundle
+#bundle:
+#  # 'image' will vary depending on your docker-compose 
+#  # project name. You may need to run `docker-compose build web`
+#  # before this works.
+#  image: airsched_web
+#  command: echo "I'm a little data container, short and stout..."
+#  volumes:
+#    - /bundle

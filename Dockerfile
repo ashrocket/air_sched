@@ -13,28 +13,22 @@ RUN apt-get install -y libqt4-webkit libqt4-dev xvfb
 # for a JS runtime
 RUN apt-get install -y nodejs
 
-
-ENV APP_HOME /app
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
+ENV APP_HOME /opt/air_sched
 
 
-ADD Gemfile* $APP_HOME/
-ENV BUNDLE_GEMFILE=$APP_HOME/Gemfile \
-BUNDLE_JOBS=2 \
-BUNDLE_PATH=/bundle
-
-RUN bundle install
+# Copy the Gemfile and Gemfile.lock into the image. 
+# Temporarily set the working directory to where they are. 
+WORKDIR /tmp 
+ADD ./Gemfile Gemfile
+ADD ./Gemfile.lock Gemfile.lock
+RUN bundle install 
 
 ADD . $APP_HOME
-
-
+# Set the final working dir to the Rails app's location.
+#RUN mkdir -p $APP_HOME/tmp/pids/
 WORKDIR $APP_HOME
-USER root
-##########################
 
-RUN mkdir -p $APP_HOME/tmp/pids/
 
-CMD bundle exec puma
+CMD bash
 
 EXPOSE 80

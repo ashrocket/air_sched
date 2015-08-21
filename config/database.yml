@@ -2,7 +2,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: 5
-  host: airsched_db_1
+  host: <%= ENV['POSTGRES_PORT_5432_TCP_ADDR'] || 'localhost' %> 
   port: <%= ENV['POSTGRES_PORT_5432_TCP_PORT'] || "5432" %>
   username: <%= ENV['POSTGRES_ENV_USER'] ||  "postgres" %>
   password: <%= ENV['POSTGRES_ENV_PASS'] || "" %>

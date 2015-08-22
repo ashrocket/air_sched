@@ -10,8 +10,7 @@ Rails.application.configure do
   config.eager_load = false
 
   # Show full error reports and disable caching.
-  #config.consider_all_requests_local       = true
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
   config.action_mailer.raise_delivery_errors = true
@@ -20,7 +19,7 @@ Rails.application.configure do
   #config.action_mailer.delivery_method = :letter_opener
   #config.action_mailer.delivery_method = :sendmail
   config.action_mailer.delivery_method = :smtp
-  
+
   # config.action_mailer.default_url_options = { :host => "localhost:3000" }
   # ActionMailer::Base.smtp_settings = {
   #       :address              => "smtp.gmail.com",
@@ -74,5 +73,7 @@ Rails.application.configure do
     config.attachment_dir    = "/tmp"
   end
 
+  config.consider_all_requests_local  = false # true - treats all requests as production (for testing
+  config.exceptions_app = ->(env) { ErrorsController.action(:show).call(env) }
 
 end

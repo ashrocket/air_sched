@@ -11,33 +11,16 @@ development:
   <<: *default
   database: air_sched_development
 
-localdevelopment:
-  <<: *default
-  database: <%= ENV['POSTGRES_DATABASE'] %> 
-  username: <%= ENV['POSTGRES_USERNAME'] %> 
-  password: <%= ENV['POSTGRES_PASSWORD'] %> 
-  host: <%= ENV['POSTGRES_HOST'] %>
-
-remotedevelopment:
-  <<: *default
-  database: <%= ENV['POSTGRES_DATABASE'] %> 
-  username: <%= ENV['POSTGRES_USERNAME'] %> 
-  password: <%= ENV['POSTGRES_PASSWORD'] %> 
-  host: <%= ENV['POSTGRES_HOST'] %>
-
-remotestaging:
-  <<: *default
-  database: <%= ENV['POSTGRES_DATABASE'] %> 
-  username: <%= ENV['POSTGRES_USERNAME'] %> 
-  password: <%= ENV['POSTGRES_PASSWORD'] %> 
-  host: <%= ENV['POSTGRES_HOST'] %>
-
-
-
 
 test:
   <<: *default
   database: air_sched_test
+
+
+localstaging:
+  <<: *default
+  database: air_sched_development
+
 
 production:
   <<: *default

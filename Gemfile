@@ -63,12 +63,14 @@ gem 'roo', '~> 2.1.1'
 
 # gem 'mastiff', path: '../mastiff'
 # gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
+gem 'byebug'
+gem 'exception_handler'
 
 
 group :development, :test do
     gem 'better_errors'
     gem 'binding_of_caller'
-    gem 'byebug'
+#    gem 'byebug'
 #     gem 'rspec',  '~> 3.0.0.beta2'
 #     gem 'rspec-rails',  '~> 3.0.0.beta2'
 #

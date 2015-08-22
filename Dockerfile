@@ -13,6 +13,9 @@ RUN apt-get install -y libqt4-webkit libqt4-dev xvfb
 # for a JS runtime
 RUN apt-get install -y nodejs
 
+# for postgres gem pg_dump needed by rake db:structure:dump
+RUN apt-get install -y postgresql-client-9.4
+
 ENV APP_HOME /opt/air_sched
 
 
@@ -29,6 +32,8 @@ ADD . $APP_HOME
 WORKDIR $APP_HOME
 
 
-CMD bash
 
-EXPOSE 80
+#CMD bundle exec rake db:setup
+
+#EXPOSE 80
+#EXPOSE 3000

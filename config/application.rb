@@ -45,5 +45,8 @@ module AirSched
      end
     end
 
+    config.exceptions_app = self.routes
+
+
   end
 end

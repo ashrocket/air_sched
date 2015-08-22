@@ -8,6 +8,8 @@ class SearchController < ApplicationController
   def index
     req = params.except(:controller, :action, :format)
     @search_request  = validate_form req
+
+
   end
 
   def search

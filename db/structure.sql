@@ -37,12 +37,12 @@ SET default_with_oids = false;
 
 CREATE TABLE active_admin_comments (
     id integer NOT NULL,
-    namespace character varying(255),
+    namespace character varying,
     body text,
-    resource_id character varying(255) NOT NULL,
-    resource_type character varying(255) NOT NULL,
+    resource_id character varying NOT NULL,
+    resource_type character varying NOT NULL,
     author_id integer,
-    author_type character varying(255),
+    author_type character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -68,58 +68,23 @@ ALTER SEQUENCE active_admin_comments_id_seq OWNED BY active_admin_comments.id;
 
 
 --
--- Name: activeadmin_settings_pictures; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE activeadmin_settings_pictures (
-    id bigint NOT NULL,
-    data text,
-    data_file_size text,
-    data_content_type text,
-    width bigint,
-    height bigint,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
-);
-
-
---
--- Name: activeadmin_settings_pictures_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE activeadmin_settings_pictures_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: activeadmin_settings_pictures_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE activeadmin_settings_pictures_id_seq OWNED BY activeadmin_settings_pictures.id;
-
-
---
 -- Name: admin_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE admin_users (
-    id bigint NOT NULL,
-    email text DEFAULT ''::text NOT NULL,
-    encrypted_password text DEFAULT ''::text NOT NULL,
-    reset_password_token text,
-    reset_password_sent_at timestamp with time zone,
-    remember_created_at timestamp with time zone,
-    sign_in_count bigint DEFAULT (0)::bigint NOT NULL,
-    current_sign_in_at timestamp with time zone,
-    last_sign_in_at timestamp with time zone,
-    current_sign_in_ip text,
-    last_sign_in_ip text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    id integer NOT NULL,
+    email character varying DEFAULT ''::character varying NOT NULL,
+    encrypted_password character varying DEFAULT ''::character varying NOT NULL,
+    reset_password_token character varying,
+    reset_password_sent_at timestamp without time zone,
+    remember_created_at timestamp without time zone,
+    sign_in_count integer DEFAULT 0 NOT NULL,
+    current_sign_in_at timestamp without time zone,
+    last_sign_in_at timestamp without time zone,
+    current_sign_in_ip character varying,
+    last_sign_in_ip character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -182,11 +147,11 @@ ALTER SEQUENCE airline_hosts_id_seq OWNED BY airline_hosts.id;
 --
 
 CREATE TABLE airlines (
-    id bigint NOT NULL,
-    code text,
-    name text,
-    country text,
-    slug text
+    id integer NOT NULL,
+    code character varying,
+    name character varying,
+    country character varying,
+    slug character varying
 );
 
 
@@ -251,13 +216,13 @@ ALTER SEQUENCE airport_currencies_id_seq OWNED BY airport_currencies.id;
 --
 
 CREATE TABLE airports (
-    id bigint NOT NULL,
-    code text,
-    name text,
-    city text,
-    slug text,
+    id integer NOT NULL,
+    code character varying,
+    name character varying,
+    city character varying,
     lat numeric(10,6),
-    long numeric(10,6)
+    long numeric(10,6),
+    slug character varying
 );
 
 
@@ -285,11 +250,11 @@ ALTER SEQUENCE airports_id_seq OWNED BY airports.id;
 --
 
 CREATE TABLE app_switches (
-    id bigint NOT NULL,
-    name text,
+    id integer NOT NULL,
+    name character varying,
     enabled boolean,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -397,6 +362,7 @@ ALTER SEQUENCE branded_market_requests_id_seq OWNED BY branded_market_requests.i
 
 CREATE TABLE branded_market_route_requests (
     id integer NOT NULL,
+    "order" integer,
     branded_route_request_id integer,
     branded_market_request_id integer
 );
@@ -529,13 +495,14 @@ CREATE TABLE brands (
     id integer NOT NULL,
     brand_key character varying NOT NULL,
     name character varying NOT NULL,
+    report_keys character varying[] DEFAULT '{}'::character varying[],
     description character varying,
+    default_currency character varying,
     host_map json,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    default_currency character varying(256)
+    updated_at timestamp without time zone
 );
 
 
@@ -563,14 +530,14 @@ ALTER SEQUENCE brands_id_seq OWNED BY brands.id;
 --
 
 CREATE TABLE carriers (
-    id bigint NOT NULL,
-    code text,
-    name text,
-    country text,
+    id integer NOT NULL,
+    code character varying,
+    name character varying,
+    country character varying,
     active boolean,
-    slug text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    slug character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -631,12 +598,12 @@ ALTER SEQUENCE city_pairs_id_seq OWNED BY city_pairs.id;
 --
 
 CREATE TABLE cnx_pairs (
-    id bigint NOT NULL,
-    report_key text,
-    origin text,
-    origin_name text,
-    dest text,
-    dest_name text
+    id integer NOT NULL,
+    report_key character varying(12),
+    origin character varying(4),
+    origin_name character varying,
+    dest character varying(4),
+    dest_name character varying
 );
 
 
@@ -674,7 +641,9 @@ CREATE TABLE destinations (
     cxrs2 character varying[] DEFAULT '{}'::character varying[],
     dest character varying,
     dest_code character varying,
-    eff_days character varying[] DEFAULT '{}'::character varying[]
+    eff_days character varying[] DEFAULT '{}'::character varying[],
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -703,10 +672,10 @@ ALTER SEQUENCE destinations_id_seq OWNED BY destinations.id;
 
 CREATE TABLE direct_flights (
     id integer NOT NULL,
-    report_key character varying(255),
-    origin character varying(255),
-    dest character varying(255),
-    carriers character varying(255)[] DEFAULT '{}'::character varying[]
+    report_key character varying,
+    origin character varying,
+    dest character varying,
+    carriers character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -803,12 +772,12 @@ ALTER SEQUENCE export_smart_route_reports_id_seq OWNED BY export_smart_route_rep
 --
 
 CREATE TABLE friendly_id_slugs (
-    id bigint NOT NULL,
-    slug text NOT NULL,
-    sluggable_id bigint NOT NULL,
-    sluggable_type text,
-    scope text,
-    created_at timestamp with time zone
+    id integer NOT NULL,
+    slug character varying NOT NULL,
+    sluggable_id integer NOT NULL,
+    sluggable_type character varying(50),
+    scope character varying,
+    created_at timestamp without time zone
 );
 
 
@@ -836,14 +805,14 @@ ALTER SEQUENCE friendly_id_slugs_id_seq OWNED BY friendly_id_slugs.id;
 --
 
 CREATE TABLE hubs (
-    id bigint NOT NULL,
-    code text,
-    name text,
-    city text,
+    id integer NOT NULL,
+    code character varying,
+    name character varying,
+    city character varying,
     active boolean,
-    slug text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    slug character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -874,8 +843,8 @@ CREATE TABLE interline_cxr_rules (
     id integer NOT NULL,
     report_key_id integer,
     patterns text[] DEFAULT '{(?!)}'::text[],
-    match_on character varying(255) DEFAULT 'id'::character varying,
-    rule_kind character varying(255) DEFAULT 'allow'::character varying NOT NULL,
+    match_on character varying DEFAULT 'id'::character varying,
+    rule_kind character varying DEFAULT 'allow'::character varying NOT NULL,
     active boolean DEFAULT true,
     sequence integer DEFAULT 0,
     description text,
@@ -911,7 +880,7 @@ CREATE TABLE oag_reports (
     id integer NOT NULL,
     msg_id character varying,
     report_key character varying,
-    load_status text,
+    load_status json,
     report_status character varying DEFAULT 'uninitialized'::character varying,
     attachment_status character varying DEFAULT 'unstored'::character varying,
     received timestamp without time zone,
@@ -1042,12 +1011,12 @@ ALTER SEQUENCE possible_flights_id_seq OWNED BY possible_flights.id;
 
 CREATE TABLE report_keys (
     id integer NOT NULL,
-    report_key character varying(255) NOT NULL,
-    name character varying(255) NOT NULL,
-    file_pattern character varying(255) DEFAULT '(?!)'::character varying NOT NULL,
-    city character varying(255),
+    report_key character varying NOT NULL,
+    name character varying NOT NULL,
+    file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
+    city character varying,
     active boolean,
-    slug character varying(255),
+    slug character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1077,7 +1046,7 @@ ALTER SEQUENCE report_keys_id_seq OWNED BY report_keys.id;
 --
 
 CREATE TABLE schema_migrations (
-    version text NOT NULL
+    version character varying NOT NULL
 );
 
 
@@ -1086,14 +1055,14 @@ CREATE TABLE schema_migrations (
 --
 
 CREATE TABLE settings (
-    id bigint NOT NULL,
-    var text NOT NULL,
+    id integer NOT NULL,
+    var character varying NOT NULL,
     value text,
-    thing_id bigint,
-    thing_type text,
+    thing_id integer,
+    thing_type character varying(30),
     tip text,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -1117,37 +1086,10 @@ ALTER SEQUENCE settings_id_seq OWNED BY settings.id;
 
 
 --
--- Name: tztrddxw; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW tztrddxw AS
- SELECT destinations.id,
-    destinations.report_key,
-    destinations.origin,
-    destinations.origin_code,
-    destinations.cxrs1,
-    destinations.hub_name,
-    destinations.hub_code,
-    destinations.cxrs2,
-    destinations.dest,
-    destinations.dest_code,
-    destinations.eff_days
-   FROM destinations
-  WHERE ((destinations.report_key)::text = 'TZTRDDXW'::text);
-
-
---
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY active_admin_comments ALTER COLUMN id SET DEFAULT nextval('active_admin_comments_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY activeadmin_settings_pictures ALTER COLUMN id SET DEFAULT nextval('activeadmin_settings_pictures_id_seq'::regclass);
 
 
 --
@@ -1352,14 +1294,6 @@ ALTER TABLE ONLY settings ALTER COLUMN id SET DEFAULT nextval('settings_id_seq':
 
 ALTER TABLE ONLY active_admin_comments
     ADD CONSTRAINT active_admin_comments_pkey PRIMARY KEY (id);
-
-
---
--- Name: activeadmin_settings_pictures_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY activeadmin_settings_pictures
-    ADD CONSTRAINT activeadmin_settings_pictures_pkey PRIMARY KEY (id);
 
 
 --
@@ -1587,6 +1521,13 @@ ALTER TABLE ONLY settings
 
 
 --
+-- Name: cnx_pairs_o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX cnx_pairs_o_and_d ON cnx_pairs USING btree (report_key, origin, dest, origin_name, dest_name);
+
+
+--
 -- Name: direct_flights_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1605,125 +1546,6 @@ CREATE INDEX direct_flights_o ON direct_flights USING btree (origin);
 --
 
 CREATE INDEX direct_flights_o_and_d ON direct_flights USING btree (origin, dest);
-
-
---
--- Name: idx_23405_index_admin_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23405_index_admin_users_on_email ON admin_users USING btree (email);
-
-
---
--- Name: idx_23405_index_admin_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23405_index_admin_users_on_reset_password_token ON admin_users USING btree (reset_password_token);
-
-
---
--- Name: idx_23417_index_airlines_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23417_index_airlines_on_code ON airlines USING btree (code);
-
-
---
--- Name: idx_23417_index_airlines_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23417_index_airlines_on_slug ON airlines USING btree (slug);
-
-
---
--- Name: idx_23426_index_airports_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23426_index_airports_on_code ON airports USING btree (code);
-
-
---
--- Name: idx_23426_index_airports_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23426_index_airports_on_slug ON airports USING btree (slug);
-
-
---
--- Name: idx_23444_index_carriers_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23444_index_carriers_on_code ON carriers USING btree (code);
-
-
---
--- Name: idx_23444_index_carriers_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23444_index_carriers_on_slug ON carriers USING btree (slug);
-
-
---
--- Name: idx_23453_cnx_pairs_o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23453_cnx_pairs_o_and_d ON cnx_pairs USING btree (report_key, origin, dest, origin_name, dest_name);
-
-
---
--- Name: idx_23489_index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23489_index_friendly_id_slugs_on_slug_and_sluggable_type ON friendly_id_slugs USING btree (slug, sluggable_type);
-
-
---
--- Name: idx_23489_index_friendly_id_slugs_on_slug_and_sluggable_type_an; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23489_index_friendly_id_slugs_on_slug_and_sluggable_type_an ON friendly_id_slugs USING btree (slug, sluggable_type, scope);
-
-
---
--- Name: idx_23489_index_friendly_id_slugs_on_sluggable_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23489_index_friendly_id_slugs_on_sluggable_id ON friendly_id_slugs USING btree (sluggable_id);
-
-
---
--- Name: idx_23489_index_friendly_id_slugs_on_sluggable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX idx_23489_index_friendly_id_slugs_on_sluggable_type ON friendly_id_slugs USING btree (sluggable_type);
-
-
---
--- Name: idx_23498_index_hubs_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23498_index_hubs_on_code ON hubs USING btree (code);
-
-
---
--- Name: idx_23498_index_hubs_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23498_index_hubs_on_slug ON hubs USING btree (slug);
-
-
---
--- Name: idx_23537_unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23537_unique_schema_migrations ON schema_migrations USING btree (version);
-
-
---
--- Name: idx_23545_index_settings_on_thing_type_and_thing_id_and_var; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_23545_index_settings_on_thing_type_and_thing_id_and_var ON settings USING btree (thing_type, thing_id, var);
 
 
 --
@@ -1748,6 +1570,20 @@ CREATE INDEX index_active_admin_comments_on_resource_type_and_resource_id ON act
 
 
 --
+-- Name: index_admin_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_admin_users_on_email ON admin_users USING btree (email);
+
+
+--
+-- Name: index_admin_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_admin_users_on_reset_password_token ON admin_users USING btree (reset_password_token);
+
+
+--
 -- Name: index_airline_hosts_on_host_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1759,6 +1595,34 @@ CREATE UNIQUE INDEX index_airline_hosts_on_host_key ON airline_hosts USING btree
 --
 
 CREATE UNIQUE INDEX index_airline_hosts_on_slug ON airline_hosts USING btree (slug);
+
+
+--
+-- Name: index_airlines_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airlines_on_code ON airlines USING btree (code);
+
+
+--
+-- Name: index_airlines_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airlines_on_slug ON airlines USING btree (slug);
+
+
+--
+-- Name: index_airports_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airports_on_code ON airports USING btree (code);
+
+
+--
+-- Name: index_airports_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airports_on_slug ON airports USING btree (slug);
 
 
 --
@@ -1783,10 +1647,66 @@ CREATE UNIQUE INDEX index_brands_on_slug ON brands USING btree (slug);
 
 
 --
+-- Name: index_carriers_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_carriers_on_code ON carriers USING btree (code);
+
+
+--
+-- Name: index_carriers_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_carriers_on_slug ON carriers USING btree (slug);
+
+
+--
 -- Name: index_city_pairs_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_city_pairs_on_hub_and_orig_and_dest ON city_pairs USING btree (hub, orig, dest);
+
+
+--
+-- Name: index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type ON friendly_id_slugs USING btree (slug, sluggable_type);
+
+
+--
+-- Name: index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope ON friendly_id_slugs USING btree (slug, sluggable_type, scope);
+
+
+--
+-- Name: index_friendly_id_slugs_on_sluggable_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_friendly_id_slugs_on_sluggable_id ON friendly_id_slugs USING btree (sluggable_id);
+
+
+--
+-- Name: index_friendly_id_slugs_on_sluggable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_friendly_id_slugs_on_sluggable_type ON friendly_id_slugs USING btree (sluggable_type);
+
+
+--
+-- Name: index_hubs_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_hubs_on_code ON hubs USING btree (code);
+
+
+--
+-- Name: index_hubs_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_hubs_on_slug ON hubs USING btree (slug);
 
 
 --
@@ -1839,6 +1759,13 @@ CREATE UNIQUE INDEX index_report_keys_on_slug ON report_keys USING btree (slug);
 
 
 --
+-- Name: index_settings_on_thing_type_and_thing_id_and_var; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_settings_on_thing_type_and_thing_id_and_var ON settings USING btree (thing_type, thing_id, var);
+
+
+--
 -- Name: oag_comp_mkt; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1885,6 +1812,13 @@ CREATE INDEX oag_flight_id_time ON oag_schedules USING btree (dep_time_local, fl
 --
 
 CREATE INDEX oag_origins ON oag_schedules USING btree (report_key, eff_date, disc_date, origin_apt, dep_time_local);
+
+
+--
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --

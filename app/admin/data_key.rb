@@ -11,3 +11,4 @@ ActiveAdmin.register_page 'Active Data Key' do
 
 
 end
+# app_control/current_data_key

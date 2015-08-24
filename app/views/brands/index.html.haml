@@ -1,0 +1,41 @@
+- page_title
+
+.page-header
+  = link_to new_brand_path, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-plus
+    New Brand
+  %h2 Listing Brands
+
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Brand key
+        %th Name
+        %th Report keys
+        %th Description
+        %th Default currency
+        %th Host map
+        %th Active
+        %th Slug
+        %th
+        %th
+        %th
+
+    %tbody
+      - @brands.each do |brand|
+        %tr
+          %td= brand.brand_key
+          %td= brand.name
+          %td
+            %ul#sorted_report_keys.list-group
+              - brand.report_keys.each do |rk|
+                %li.list-group-item= rk.name
+          %td= brand.description
+          %td= brand.default_currency
+          %td= brand.host_map
+          %td= brand.active
+          %td= brand.slug
+          %td= link_to 'Show', brand
+          %td= link_to 'Edit', edit_brand_path(brand)
+          %td= link_to 'Destroy', brand, data: { confirm: 'Are you sure?' }, method: :delete

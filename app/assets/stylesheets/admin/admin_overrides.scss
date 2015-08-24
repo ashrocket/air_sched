@@ -1,0 +1,68 @@
+
+  a.btn {
+    @extend .btn;
+  }
+  a.btn-primary {
+    @extend .btn-primary;
+  }
+  a.btn-default {
+    @extend .btn-default;
+  }
+
+
+  form {
+
+    .inputs, .actions {
+      ol {
+        padding-left: 0;
+        list-style: none;
+      }
+    }
+
+    .inputs {
+      li {
+        @extend .form-group;
+
+        input, select, textarea {
+          @extend .form-control;
+        }
+      }
+    }
+
+    .actions {
+      li {
+        display: inline-block;
+
+        input, a {
+          @extend .btn;
+          @extend .btn-default;
+        }
+        input[type="submit"] {
+          @extend .btn-primary;
+        }
+      }
+    }
+
+    label.label {
+      /* The label class has a different meaning in bootstrap */
+      display: inline-block;
+      font-weight: bold;
+
+      padding: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
+      text-align: inherit;
+      white-space: inherit;
+      vertical-align: inherit;
+      border-radius: inherit;
+    }
+    input[type=submit].btn, input[type=button].btn, button[type=submit].btn, button.btn {
+      @extend .btn;
+    }
+    input[type=submit].btn-primary, input[type=button].btn-primary, button[type=submit].btn-primary, button.btn-primary {
+      @extend .btn-primary;
+
+    }
+  }
+

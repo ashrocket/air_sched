@@ -5,7 +5,7 @@ gem 'puma', '2.10.2'
 gem 'pg', '~> 0.18.2'
 gem 'postgres_ext', '~> 2.4.1'
 gem 'arel-helpers', '~> 2.1.0'
-
+gem 'acts_as_singleton'
 
 gem 'friendly_id', '~> 5.0.0'
 # gem 'activerecord-import', '~> 0.10.0'
@@ -25,6 +25,7 @@ gem 'haml-rails', '~> 0.9.0'
 gem 'bootstrap-sass', '~> 3.3.5.1'
 # gem 'font-awesome-rails', '~> 4.4.0.0'
 
+gem 'bootstrap-generators', '~> 3.3.4'
 
 
 #View based gems
@@ -44,7 +45,8 @@ gem 'rabl'
 #
 # gem 'parallel', '~> 1.6.1'
 gem 'devise', '~> 3.5.2'
-gem 'activeadmin', '~> 1.0.0.pre1'
+gem 'activeadmin', github: 'activeadmin'
+#gem 'activeadmin', '~> 1.0.0.pre1'
 gem 'active_admin_import', '~> 2.1.2'
 #
 gem 'rails-settings-cached', '0.4.1'
@@ -65,11 +67,13 @@ gem 'roo', '~> 2.1.1'
 # gem 'mastiff', :git => 'https://github.com/ashrocket/mastiff.git'
 gem 'byebug'
 gem 'exception_handler'
+gem 'seed_dump'
 
 
 group :development, :test do
     gem 'better_errors'
     gem 'binding_of_caller'
+
 #    gem 'byebug'
 #     gem 'rspec',  '~> 3.0.0.beta2'
 #     gem 'rspec-rails',  '~> 3.0.0.beta2'

@@ -65,7 +65,7 @@ class PossibleFlights
 
 	def destinations_from(origin)
 		airport_code = origin.code
-	    cnx_pairs = CnxPair.keyed(ABBConfig.data_key).from_airport(airport_code)
+	    cnx_pairs = CnxPair.keyed(ReportKey.current_key).from_airport(airport_code)
 	    destinations = cnx_pairs.map{|pair| pair.slice(:dest, :dest_name).merge(:dest_airport_id =>  Airport.friendly.find(pair.dest.downcase).id)}
 	    destinations.each{|h| h.store('value',h.delete('dest_name'))}
 	end
@@ -97,7 +97,7 @@ class PossibleFlights
 		@params["depart"] = "#{date}"
 		@params["ret_date"] = "#{rdate}" if rdate
 
-		@params[:data_key] = ABBConfig.data_key unless @params[:data_key]
+		@params[:data_key] = ReportKey.current_key unless @params[:data_key]
 		search_request = SearchRequest.new(@params)
 		
 		search_results = OagSchedule.search_interlines search_request

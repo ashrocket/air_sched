@@ -1,0 +1,29 @@
+= simple_form_for @app_control, html: { class: 'form-horizontal' },
+   wrapper: :horizontal_form,
+   wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
+                       radio_buttons: :horizontal_radio_and_checkboxes,
+                       file: :horizontal_file_input,
+                       boolean: :horizontal_boolean }  do |f|
+  -if @app_control.errors.any?
+    .alert.alert-danger.alert-dismissable{role: 'alert'}
+      %button.close{type: 'button', data: {dismiss: 'alert'} }
+        %span{aria: {hidden: 'true'} } &times;
+        %span.sr-only Close
+      %h4= "#{pluralize(@app_control.errors.count, 'error')} prohibited this setting from being saved:"
+
+      %ul
+        - @app_control.errors.full_messages.each do |msg|
+          %li= msg
+
+
+
+  .form-inputs
+    = f.association :report_key, include_blank: false
+
+  .form-actions.col-sm-offset-3.col-sm-9
+    = f.submit class: 'btn btn-primary'
+
+
+-#<%= f.input :location,:collection => @locations,:label_method => :location_name,:value_method => :id,:label => "Location" ,:include_blank => false %>
+
+

@@ -1,0 +1,39 @@
+.row
+  = simple_form_for @brand, html: { class: 'form-horizontal' },
+      wrapper: :horizontal_form,
+      wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
+                         radio_buttons: :horizontal_radio_and_checkboxes,
+                         file: :horizontal_file_input,
+                         boolean: :horizontal_boolean }  do |f|
+
+    - if @brand.errors.any?
+      .alert.alert-danger.alert-dismissable{role: 'alert'}
+        %button.close{type: 'button', data: {dismiss: 'alert'} }
+          %span{aria: {hidden: 'true'} } &times;
+          %span.sr-only Close
+        %h4= "#{pluralize(@brand.errors.count, 'error')} prohibited this Brand from being saved:"
+
+        %ul
+          - @brand.errors.full_messages.each do |msg|
+            %li= msg
+
+
+
+
+    .form-inputs
+      = f.input :brand_key
+      = f.input :name
+      = f.association :report_keys, as: :check_boxes
+      -#TODO:  Change the association checkboxes to use Jquey List Boxes
+      -#with Add Left or Remove Right
+      = f.input :description
+      = f.input :default_currency
+      -#= f.input :host_map
+      = f.input :active
+      = f.input :slug
+
+    %br
+    .form-actions.col-sm-offset-1
+      = f.button :submit
+.row
+  %br

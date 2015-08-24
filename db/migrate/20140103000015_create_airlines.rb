@@ -3,7 +3,7 @@ class CreateAirlines < ActiveRecord::Migration
     create_table :airlines do |t|
       t.string :code
       t.string :name
-      t.string :country
+      t.string :country_name
       t.string :slug
 
 

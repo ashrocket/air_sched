@@ -13,4 +13,13 @@ class AirlinesController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
+    def set_airline
+      @airline = Airline.friendly.find(params[:id])
+    end
+
+    # Only allow a trusted parameter "white list" through.
+    def airline_params
+      params.require(:host).permit(:name, :code, :country_name, hosts_ids: [])
+    end
+    # Use callbacks to share common setup or constraints between actions.
 end

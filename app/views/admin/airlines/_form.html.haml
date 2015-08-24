@@ -1,0 +1,32 @@
+= simple_form_for [:admin,@airline], html: { class: 'form-horizontal' },
+   wrapper: :horizontal_form,
+   wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
+                       radio_buttons: :horizontal_radio_and_checkboxes,
+                       file: :horizontal_file_input,
+                       boolean: :horizontal_boolean }  do |f|
+  -if @airline.errors.any?
+    .alert.alert-danger.alert-dismissable{role: 'alert'}
+      %button.close{type: 'button', data: {dismiss: 'alert'} }
+        %span{aria: {hidden: 'true'} } &times;
+        %span.sr-only Close
+      %h4= "#{pluralize(@airline.errors.count, 'error')} prohibited this benefit_limit from being saved:"
+
+      %ul
+        - @airline.errors.full_messages.each do |msg|
+          %li= msg
+
+
+
+  .form-inputs
+    = f.input :code
+    = f.input :name
+    = f.input :country_name, as: :string
+    = f.association :hosts, include_hidden: false, include_blank: false, as: :check_boxes
+    = f.input :slug
+
+  .form-actions.col-sm-offset-3.col-sm-8
+    = f.submit class: 'btn btn-primary'
+
+
+
+

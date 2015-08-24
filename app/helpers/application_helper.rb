@@ -16,7 +16,21 @@ module ApplicationHelper
   def title(page_title)
     content_for :title, page_title.to_s
   end
-
+  def page_title
+    action_string = 'Explore'
+    case controller.action_name
+      when 'new'
+        action_string = 'Create'
+      when 'edit'
+        action_string = 'Update'
+      when 'index'
+        action_string = 'List'
+      when 'show'
+        action_string = 'Explore'
+    end
+    action_string
+    content_for(:title, "Airhelp Stat Model, #{action_string}  #{controller_name.classify.underscore.humanize.titleize}")
+  end
 
   def deep_link(flt, connection, ret_flt = nil, ret_connection = nil)
         host = "http://dev1.airblackbox.com/ibe3/voyages/search"
@@ -31,4 +45,6 @@ module ApplicationHelper
         return "#{host}?#{qs.to_param('voyage_search')}"
 
   end
+
+
 end

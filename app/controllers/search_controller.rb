@@ -6,9 +6,13 @@ class SearchController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
+
     req = params.except(:controller, :action, :format)
     @search_request  = validate_form req
 
+    # unless Destination.origins.count > 0
+    #   raise("No Valid Schedules for #{ReportKey.current_key}")
+    # end
 
   end
 

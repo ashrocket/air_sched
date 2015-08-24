@@ -1,7 +1,7 @@
 !!!
 %html
   %head
-    %title= #{content_for?(:title) ? yield(:title) : "Raize"}#{csrf_meta_tags} Schedman
+    %title= #{content_for?(:title) ? yield(:title) : "Air Scheduler"}#{csrf_meta_tags} Schedman
     = csrf_meta_tags
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,4 +35,5 @@
   -#      = yield
   -#  = render partial: "layouts/shannon/footer"
   %body{class: "#{controller_name} #{action_name}" }
-    = yield
+    .container
+      = yield

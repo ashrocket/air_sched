@@ -3,7 +3,6 @@ class CreateBrands < ActiveRecord::Migration
     create_table :brands do |t|
       t.string :brand_key,  null: false
       t.string :name,  null: false
-      t.string :report_keys, array: true, default: []
       t.string :description
       t.string :default_currency
       t.json :host_map

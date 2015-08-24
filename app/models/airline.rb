@@ -4,7 +4,11 @@ class Airline < ActiveRecord::Base
   # :name
   # :country
   extend FriendlyId
-  friendly_id :code, use: :slugged
+  friendly_id :code, use: [:slugged, :finders]
+
+
+  has_many :airlines_hosts
+  has_many :hosts, through: :airlines_hosts
 
 
   class << self
@@ -36,7 +40,7 @@ class Airline < ActiveRecord::Base
       unless rows.blank?
         Airline.delete_all
         rows.each do |airline|
-          Airline.create code: airline["IATA"], name: airline["Airline Name"].strip, country: airline["Country Name"].strip
+          Airline.create code: airline["IATA"], name: airline["Airline Name"].strip, country_name: airline["Country Name"].strip
         end
 
       end
@@ -46,7 +50,7 @@ class Airline < ActiveRecord::Base
       unless rows.blank?
         rows.each do |airline|
           cxr = Airline.find_or_create_by(code: airline["IATA"])
-          cxr.update name: airline["Airline Name"].strip, country: airline["Country Name"].strip
+          cxr.update name: airline["Airline Name"].strip, country_name: airline["Country Name"].strip
           cxr.save
         end
       end
@@ -89,7 +93,9 @@ class Airline < ActiveRecord::Base
   def disp_airline
      "#{self.name} (#{self.code})"
   end
-
+  def to_label
+     "#{self.code} - #{self.name}"
+  end
 
 
 

@@ -1,0 +1,34 @@
+.row
+  %br
+.row
+  %br
+.row
+  .col-sm-8
+
+    - if @status.to_s == "404"
+      Sorry, this page is missing!
+    - else
+      .error
+        / Alert
+        = image_tag 'exception_handler/alert.png', width: "150",
+         alt: "Error!", title: "Sorry, A Server Error Occurred", class: "alert"
+        / Message
+        .message
+          %strong= details[:name]
+          .h3.text-primary
+            %span= details[:message]
+        / Contact
+        .contact
+          - ExceptionHandler.config.social.each do |item, address|
+            = link_to image_tag("exception_handler/contact/#{item}.png",
+             title: item.to_s.titleize), address, target: :blank
+
+.row
+  .col-sm-2.col-sm-offset-2
+    .h1.text-primary
+      %a{href:"#{root_url}"}<
+        %i.fa.fa-home
+  .col-sm-2.col-sm-offset-1
+    .h1.text-primary
+      %a{href:"#{admin_dashboard_url}"}<
+        %i.fa.fa-gear

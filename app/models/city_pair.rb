@@ -4,7 +4,7 @@ class CityPair < ActiveRecord::Base
 
   def self.search(params)
   	city_pair = CityPair.where(
-      hub: "#{ABBConfig.data_key}", 
+      hub: "#{ReportKey.current_key}",
       orig: "#{params['id']}", 
       dest: "#{params['orig']}"
     ).first

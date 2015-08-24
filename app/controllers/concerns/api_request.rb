@@ -4,7 +4,7 @@ module ApiRequest
   def validate_form params
     Rails.logger.info params
     unless params[:data_key]
-           params[:data_key] =  ABBConfig.data_key
+           params[:data_key] =  ReportKey.current_key
     end
     @req = SearchRequest.new(params)
     Rails.logger.info @req
@@ -13,7 +13,7 @@ module ApiRequest
   def validate_json params
      Rails.logger.info params
      unless params[:data_key]
-           params[:data_key] =  ABBConfig.data_key
+           params[:data_key] =  ReportKey.current_key
      end
      @req = SearchRequest.new(params)
      Rails.logger.info @req

@@ -1,0 +1,24 @@
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Name
+        %th Code
+        %th Airlines
+        %th
+        %th
+        %th
+
+    %tbody
+      - @hosts.each do |host|
+        %tr
+          %td= host.name
+          %td= host.code
+          %td
+            %ul#sorted_airlines.list-group
+              - host.airlines.each do |al|
+                %li.list-group-item= "#{al.code} - #{al.name}"
+
+          %td= link_to 'Show', [:admin,host]
+          %td= link_to 'Edit', edit_admin_host_path(host)
+          %td= link_to 'Destroy', [:admin,host], data: { confirm: 'Are you sure?' }, method: :delete

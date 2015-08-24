@@ -40,7 +40,7 @@ class DirectFlight < ActiveRecord::Base
        end
     end
     def origins
-      cached_origins ABBConfig.data_key
+      cached_origins ReportKey.current_key
     end
 
 
@@ -51,7 +51,7 @@ class DirectFlight < ActiveRecord::Base
        end
      end
     def dest_airports origin_code
-      cached_dest_airports ABBConfig.data_key, origin_code
+      cached_dest_airports ReportKey.current_key, origin_code
     end
 
     def cached_pair data_key, o,d

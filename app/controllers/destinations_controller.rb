@@ -5,7 +5,7 @@ class DestinationsController < ApplicationController
 
   # GET /destinations
   def index
-    @destinations = Destination.keyed(ABBConfig.data_key)
+    @destinations = Destination.keyed(ReportKey.current_key)
   end
 
   # GET /destinations/1
@@ -16,7 +16,7 @@ class DestinationsController < ApplicationController
   end
 
   def hubs
-    data_key = ABBConfig.data_key
+    data_key = ReportKey.current_key
     is_int = Integer(params[:origin]) rescue nil
     if is_int
       origin_apt = Airport.find(params[:origin])

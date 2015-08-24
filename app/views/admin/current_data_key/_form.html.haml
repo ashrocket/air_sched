@@ -1,0 +1,25 @@
+-#TODO: Make this a remote form and use the JS fucntions to signal success
+- @app_control = app_control unless @app_control
+= simple_form_for [:admin, @app_control], as: :app_control,     |
+  :url => admin_current_data_key_set_url, remote: false,         |
+  html: { method: :put, id: :set_current_data_key_form,         |
+  class: 'form-inline' }   do |f|                               |
+
+  - if @app_control.errors.any?
+    .alert.alert-danger.alert-dismissable{role: 'alert'}
+      %button.close{type: 'button', data: {dismiss: 'alert'} }
+        %span{aria: {hidden: 'true'} } &times;
+        %span.sr-only Close
+      %h4= "#{pluralize(@app_control.errors.count, 'error')} prohibited this setting from being saved:"
+
+      %ul
+        - @app_control.errors.full_messages.each do |msg|
+          %li= msg
+
+  .form-inputs.col-sm-offset-1.col-sm-9
+    = f.association :report_key, include_blank: false, label: 'Current Data Key'
+
+
+-#<%= f.input :location,:collection => @locations,:label_method => :location_name,:value_method => :id,:label => "Location" ,:include_blank => false %>
+
+

@@ -76,6 +76,11 @@ module Oag
         report.carriers = OagSchedule.carriers_details_for_report(report)
 
         # TODO Refresh Global Airline Table
+        # Set Carrier to Active
+        # Refactor Airline Carrier relationship to be a has_one with an active flag
+        # The Airlines Table will likey need to include duplicates and be loaded
+        # seperately from OAG as the list of airlines
+        #
 
         report.report_status = 'airlines_refreshed'
         report.save

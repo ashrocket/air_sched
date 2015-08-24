@@ -156,6 +156,36 @@ CREATE TABLE airlines (
 
 
 --
+-- Name: airlines_hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE airlines_hosts (
+    id integer NOT NULL,
+    airline_id integer,
+    host_id integer
+);
+
+
+--
+-- Name: airlines_hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE airlines_hosts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: airlines_hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE airlines_hosts_id_seq OWNED BY airlines_hosts.id;
+
+
+--
 -- Name: airlines_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -246,6 +276,35 @@ ALTER SEQUENCE airports_id_seq OWNED BY airports.id;
 
 
 --
+-- Name: app_controls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE app_controls (
+    id integer NOT NULL,
+    report_key_id integer
+);
+
+
+--
+-- Name: app_controls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE app_controls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: app_controls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE app_controls_id_seq OWNED BY app_controls.id;
+
+
+--
 -- Name: app_switches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -322,6 +381,36 @@ CREATE SEQUENCE brand_connections_id_seq
 --
 
 ALTER SEQUENCE brand_connections_id_seq OWNED BY brand_connections.id;
+
+
+--
+-- Name: brand_report_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE brand_report_keys (
+    id integer NOT NULL,
+    brand_id integer,
+    report_key_id integer
+);
+
+
+--
+-- Name: brand_report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE brand_report_keys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: brand_report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE brand_report_keys_id_seq OWNED BY brand_report_keys.id;
 
 
 --
@@ -801,6 +890,38 @@ ALTER SEQUENCE friendly_id_slugs_id_seq OWNED BY friendly_id_slugs.id;
 
 
 --
+-- Name: hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE hosts (
+    id integer NOT NULL,
+    name character varying,
+    code character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE hosts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE hosts_id_seq OWNED BY hosts.id;
+
+
+--
 -- Name: hubs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1018,7 +1139,8 @@ CREATE TABLE report_keys (
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    current character varying DEFAULT false NOT NULL
 );
 
 
@@ -1117,6 +1239,13 @@ ALTER TABLE ONLY airlines ALTER COLUMN id SET DEFAULT nextval('airlines_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY airlines_hosts ALTER COLUMN id SET DEFAULT nextval('airlines_hosts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY airport_currencies ALTER COLUMN id SET DEFAULT nextval('airport_currencies_id_seq'::regclass);
 
 
@@ -1131,6 +1260,13 @@ ALTER TABLE ONLY airports ALTER COLUMN id SET DEFAULT nextval('airports_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY app_controls ALTER COLUMN id SET DEFAULT nextval('app_controls_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY app_switches ALTER COLUMN id SET DEFAULT nextval('app_switches_id_seq'::regclass);
 
 
@@ -1139,6 +1275,13 @@ ALTER TABLE ONLY app_switches ALTER COLUMN id SET DEFAULT nextval('app_switches_
 --
 
 ALTER TABLE ONLY brand_connections ALTER COLUMN id SET DEFAULT nextval('brand_connections_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY brand_report_keys ALTER COLUMN id SET DEFAULT nextval('brand_report_keys_id_seq'::regclass);
 
 
 --
@@ -1243,6 +1386,13 @@ ALTER TABLE ONLY friendly_id_slugs ALTER COLUMN id SET DEFAULT nextval('friendly
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY hosts ALTER COLUMN id SET DEFAULT nextval('hosts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY hubs ALTER COLUMN id SET DEFAULT nextval('hubs_id_seq'::regclass);
 
 
@@ -1313,6 +1463,14 @@ ALTER TABLE ONLY airline_hosts
 
 
 --
+-- Name: airlines_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY airlines_hosts
+    ADD CONSTRAINT airlines_hosts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: airlines_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1337,6 +1495,14 @@ ALTER TABLE ONLY airports
 
 
 --
+-- Name: app_controls_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY app_controls
+    ADD CONSTRAINT app_controls_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: app_switches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1350,6 +1516,14 @@ ALTER TABLE ONLY app_switches
 
 ALTER TABLE ONLY brand_connections
     ADD CONSTRAINT brand_connections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: brand_report_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY brand_report_keys
+    ADD CONSTRAINT brand_report_keys_pkey PRIMARY KEY (id);
 
 
 --
@@ -1462,6 +1636,14 @@ ALTER TABLE ONLY export_smart_route_reports
 
 ALTER TABLE ONLY friendly_id_slugs
     ADD CONSTRAINT friendly_id_slugs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY hosts
+    ADD CONSTRAINT hosts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1598,6 +1780,20 @@ CREATE UNIQUE INDEX index_airline_hosts_on_slug ON airline_hosts USING btree (sl
 
 
 --
+-- Name: index_airlines_hosts_on_airline_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_airlines_hosts_on_airline_id ON airlines_hosts USING btree (airline_id);
+
+
+--
+-- Name: index_airlines_hosts_on_host_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_airlines_hosts_on_host_id ON airlines_hosts USING btree (host_id);
+
+
+--
 -- Name: index_airlines_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1623,6 +1819,27 @@ CREATE UNIQUE INDEX index_airports_on_code ON airports USING btree (code);
 --
 
 CREATE UNIQUE INDEX index_airports_on_slug ON airports USING btree (slug);
+
+
+--
+-- Name: index_app_controls_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_app_controls_on_report_key_id ON app_controls USING btree (report_key_id);
+
+
+--
+-- Name: index_brand_report_keys_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_brand_report_keys_on_brand_id ON brand_report_keys USING btree (brand_id);
+
+
+--
+-- Name: index_brand_report_keys_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_brand_report_keys_on_report_key_id ON brand_report_keys USING btree (report_key_id);
 
 
 --
@@ -1822,6 +2039,38 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
+-- Name: fk_rails_3be8df1480; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY brand_report_keys
+    ADD CONSTRAINT fk_rails_3be8df1480 FOREIGN KEY (brand_id) REFERENCES brands(id);
+
+
+--
+-- Name: fk_rails_538425cf32; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY brand_report_keys
+    ADD CONSTRAINT fk_rails_538425cf32 FOREIGN KEY (report_key_id) REFERENCES report_keys(id);
+
+
+--
+-- Name: fk_rails_a68c11e0aa; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY airlines_hosts
+    ADD CONSTRAINT fk_rails_a68c11e0aa FOREIGN KEY (airline_id) REFERENCES airlines(id);
+
+
+--
+-- Name: fk_rails_a8b0cd38f8; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY airlines_hosts
+    ADD CONSTRAINT fk_rails_a8b0cd38f8 FOREIGN KEY (host_id) REFERENCES hosts(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1841,17 +2090,25 @@ INSERT INTO schema_migrations (version) VALUES ('20140103000025');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000030');
 
+INSERT INTO schema_migrations (version) VALUES ('20140103000035');
+
 INSERT INTO schema_migrations (version) VALUES ('20140103000050');
 
-INSERT INTO schema_migrations (version) VALUES ('20140103000060');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000070');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000080');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000090');
-
 INSERT INTO schema_migrations (version) VALUES ('20140103000150');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000175');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000200');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000250');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000260');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000270');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000280');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000300');
 
 INSERT INTO schema_migrations (version) VALUES ('20140821200616');
 

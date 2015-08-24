@@ -1,2 +1,2 @@
 object @airline
-attributes :code, :name, :country
+attributes :code, :name, :country_name

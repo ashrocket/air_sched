@@ -1,0 +1,13 @@
+%dl.dl-horizontal
+  %dt Name:
+  %dd= @host.name
+  %dt Code:
+  %dd= @host.code
+  %br
+  %br
+  %dt Airlines:
+  %dd
+    %ul#sorted_airlines.list-group
+      - @host.airlines.each do |al|
+        %li.list-group-item= "#{al.code} - #{al.name}"
+

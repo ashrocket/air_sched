@@ -31,7 +31,7 @@ class Destination < ActiveRecord::Base
      end
    end
   def origins
-    (cached_origins ABBConfig.data_key)
+    (cached_origins ReportKey.current_key)
   end
   def cached_dest_airports  data_key, origin_code
      Rails.cache.fetch("destination_dest_#{mode}_#{mode_key}_#{origin_code}", :expires_in => 1.hour) do
@@ -40,7 +40,7 @@ class Destination < ActiveRecord::Base
      end
    end
   def dest_airports origin_code
-    (cached_dest_airports ABBConfig.data_key, origin_code)
+    (cached_dest_airports ReportKey.current_key, origin_code)
   end
 
 

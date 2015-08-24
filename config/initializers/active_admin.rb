@@ -200,7 +200,7 @@ ActiveAdmin.setup do |config|
   #       menu.add label: "My Great Website", url: "http://www.mygreatwebsite.com", html_options: { target: :blank }
   #     end
   #   end
-  config.namespace :admin do |admin|
+  config.namespace :active_admin do |admin|
  
        # This block will edit the default menu
        admin.build_menu do |menu|
@@ -251,6 +251,8 @@ ActiveAdmin.setup do |config|
   # You can enable or disable them for all resources here.
   #
   # config.filters = true
+  config.before_filter :set_admin_locale
+
   config.clear_stylesheets!
   config.register_stylesheet 'admin/active_admin.css'
 

@@ -6,6 +6,7 @@ class CreateReportKeys < ActiveRecord::Migration
       t.string :file_pattern,  null: false, default: '(?!)'
       t.string :city
       t.boolean :active
+      t.boolean :current
       t.string :slug
 
 

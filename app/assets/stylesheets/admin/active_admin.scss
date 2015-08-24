@@ -10,25 +10,14 @@
 // Active Admin's got SASS!
 
 
-@import 'prevars';
-@import 'bootstrap';
-
-@import 'prevars';
-@import "bootstrap";
-@import 'jasny-bootstrap/dist/css/jasny-bootstrap';
-@import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.standalone';
-@import 'datatables/media/css/jquery.dataTables';
-@import 'datatables-plugins/integration/bootstrap/3/dataTables.bootstrap';
-@import 'typeahead.js-bootstrap-css/typeaheadjs';
-@import 'common';
-@import 'css_overrides';
-
-
-@import 'common';
-@import 'css_overrides';
 @import "active_admin/mixins";
 @import "active_admin/base";
-@import 'admin/data_key';
+
+@import 'core';
+@import 'shannon/style';
+@import 'admin/admin_overrides';
+
+
 
 
 // Overriding any non-variable SASS must be done after the fact.

@@ -5,10 +5,10 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-ABBConfig.data_key = 'SIN'
-config = ABBConfig.where(:var => 'data_key').first
-config.tip = "Key that determins which data set will be used"
-config.save
+ac = AppControl.first_or_create!
+
+rk = ReportKey.where(name: 'Null Report', report_key: 'NONE').first_or_create
+ReportKey.set_current(rk)
 
 ABBConfig.mct = 60
 config = ABBConfig.where(:var => 'mct').first

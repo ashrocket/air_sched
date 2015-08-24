@@ -1,0 +1,9 @@
+%p#notice= notice
+
+%p
+  %b Report key:
+  = @app_control.report_key
+
+= link_to 'Edit', edit_app_control_path(@app_control)
+\|
+= link_to 'Back', app_controls_path

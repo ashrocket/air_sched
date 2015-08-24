@@ -20,7 +20,7 @@
   .row
     .col-sm-12
       Search for Destinations
-      = "connecting trips for #{ReportKey.find_by_report_key(ABBConfig.data_key).name}"
+      = "connecting trips for #{ReportKey.current_report.name}"
   .row
     %br
 

@@ -1,0 +1,30 @@
+- page_title
+.page-header
+  = link_to brands_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_brand_path(@brand), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Brand
+
+%dl.dl-horizontal
+  %dt Brand key:
+  %dd= @brand.brand_key
+  %dt Name:
+  %dd= @brand.name
+  %dt Report keys:
+  %dd
+    %ul#sorted_report_keys.list-group
+      - @brand.report_keys.each do |rk|
+        %li.list-group-item.col-sm-4= rk.name
+  %dt Description:
+  %dd= @brand.description
+  %dt Default currency:
+  %dd= @brand.default_currency
+  %dt Host map:
+  %dd= @brand.host_map
+  %dt Active:
+  %dd= @brand.active
+  %dt Slug:
+  %dd= @brand.slug

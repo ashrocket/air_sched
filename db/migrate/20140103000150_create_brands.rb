@@ -5,7 +5,6 @@ class CreateBrands < ActiveRecord::Migration
       t.string :name,  null: false
       t.string :description
       t.string :default_currency
-      t.json :host_map
 
       t.boolean :active
       t.string :slug

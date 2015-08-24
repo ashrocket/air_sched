@@ -5,11 +5,17 @@
   %dd= @airline.name
   %dt Country:
   %dd= @airline.country_name
+  %br
+  %br
+
   %dt Airline Hosts:
   %dd
     %ul#sorted_hosts.list-group
       - @airline.hosts.each do |h|
-        %li.list-group-item.col-sm-4= "#{h.code} - #{h.name}"
+        %li.list-group-item.col-sm-4
+          = link_to("#{h.code} - #{h.name}", [:admin,h])
+  %br
+  %br
   %dt Slug:
   %dd= @airline.slug
   -#%dt Hosts:

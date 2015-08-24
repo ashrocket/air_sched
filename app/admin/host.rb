@@ -8,15 +8,20 @@ ActiveAdmin.register Host do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :code, :name, airline_ids: []
+  permit_params :brand_id, :code, :name, airline_ids: []
 
   index do
+    column :brand
     column :code
     column :name
     column :airlines  do |host|
       content_tag :ul, class: 'list-group' do
         host.airlines.collect{ |al|
-          content_tag(:li, "#{al.code} - #{al.name}", class: 'list-group-item')
+          content_tag :li, class: 'list-group-item' do
+            content_tag :a do
+              link_to("#{al.code} - #{al.name}", [:admin,al])
+            end
+          end
         }.join.html_safe
       end
     end

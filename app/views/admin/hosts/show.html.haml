@@ -1,4 +1,6 @@
 %dl.dl-horizontal
+  %dt Brand:
+  %dd= @host.brand.name
   %dt Name:
   %dd= @host.name
   %dt Code:
@@ -9,5 +11,6 @@
   %dd
     %ul#sorted_airlines.list-group
       - @host.airlines.each do |al|
-        %li.list-group-item= "#{al.code} - #{al.name}"
+        %li.list-group-item
+          = link_to("#{al.code} - #{al.name}", [:admin,al])
 

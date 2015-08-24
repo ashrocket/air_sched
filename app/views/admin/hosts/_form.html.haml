@@ -18,6 +18,7 @@
 
 
   .form-inputs
+    = f.association :brand
     = f.input :name
     = f.input :code
     = f.association :airlines, include_hidden: false, include_blank: false, input_html: { size: 10}

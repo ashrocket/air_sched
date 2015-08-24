@@ -15,7 +15,7 @@
         %th Report keys
         %th Description
         %th Default currency
-        %th Host map
+        %th Hosts
         %th Active
         %th Slug
         %th
@@ -30,12 +30,17 @@
           %td
             %ul#sorted_report_keys.list-group
               - brand.report_keys.each do |rk|
-                %li.list-group-item= rk.name
+                %li.list-group-item.col-sm-4
+                  = link_to(rk.name, edit_admin_data_key_path(rk))
           %td= brand.description
           %td= brand.default_currency
-          %td= brand.host_map
+          %td
+            %ul#sorted_hosts.list-group
+              - brand.hosts.each do |h|
+                %li.list-group-item.col-sm-4
+                  = link_to(h.name, [:admin,h])
           %td= brand.active
           %td= brand.slug
-          %td= link_to 'Show', brand
-          %td= link_to 'Edit', edit_brand_path(brand)
-          %td= link_to 'Destroy', brand, data: { confirm: 'Are you sure?' }, method: :delete
+          -#%td= link_to 'Show', [:admin,brand]
+          -#%td= link_to 'Edit', edit_admin_brand_path(brand)
+          -#%td= link_to 'Destroy', [:admin,brand], data: { confirm: 'Are you sure?' }, method: :delete

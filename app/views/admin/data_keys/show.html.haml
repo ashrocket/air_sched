@@ -1,0 +1,32 @@
+%p#notice= notice
+%p#alert= alert
+
+%dl.dl-horizontal
+  %dt Report key:
+  %dd= @report_key.report_key
+  %dt File pattern:
+  %br
+  %dd= @report_key.file_pattern
+  %br
+  %dt Name:
+  %dd= @report_key.name
+  %dt City:
+  %dd= @report_key.city
+  %br
+  %dt Brands:
+  %dd
+    %ul#sorted_brand.list-group
+      - @report_key.brands.each do |br|
+        %li.list-group-item.col-sm-4
+          = link_to(br.name, admin_brand_path(br))
+  %br
+  %dt Slug:
+  %dd= @report_key.slug
+  %br
+  %dt Active:
+  %dd
+    = @report_key.active? ? content_tag(:span, 'Yes',class:'status_tag yes') : content_tag(:span, 'No',class:'status_tag no')
+  %br
+  %dt Current:
+  %dd
+    = @report_key.current ? content_tag(:span, 'Yes',class:'status_tag yes') : content_tag(:span, 'No',class:'status_tag no')

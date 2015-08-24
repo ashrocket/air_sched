@@ -1,9 +1,11 @@
 %p#notice= notice
+%p#alert= alert
+%dl.dl-horizontal
+  %dt Current Report key:
+  %dd
+    %ul.list-inline
+      %li= link_to @app_control.report_key.report_key, admin_data_key_path(@app_control.report_key)
+      %li= @app_control.report_key.name
+      %li= @app_control.report_key.file_pattern
 
-%p
-  %b Report key:
-  = @app_control.report_key
-
-= link_to 'Edit', edit_app_control_path(@app_control)
-\|
-= link_to 'Back', app_controls_path
+  %br

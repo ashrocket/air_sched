@@ -40,7 +40,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
          content_tag :ul, class: 'list-group' do
            brand.report_keys.collect{ |rk|
              content_tag(:li, class: 'list-group-item') do
-                link_to(rk.name, edit_admin_data_key_path(rk))
+                link_to(rk.name, admin_data_key_path(rk))
              end
            }.join.html_safe
          end

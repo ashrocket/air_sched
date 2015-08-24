@@ -1,29 +1,35 @@
-= simple_form_for [:admin,@app_control], html: { class: 'form-horizontal' },
+= simple_form_for @report_key, url: admin_data_keys_path(@report_key), html: { class: 'form-horizontal' },
    wrapper: :horizontal_form,
    wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
                        radio_buttons: :horizontal_radio_and_checkboxes,
                        file: :horizontal_file_input,
                        boolean: :horizontal_boolean }  do |f|
-  -if @app_control.errors.any?
+  -if @report_key.errors.any?
     .alert.alert-danger.alert-dismissable{role: 'alert'}
       %button.close{type: 'button', data: {dismiss: 'alert'} }
         %span{aria: {hidden: 'true'} } &times;
         %span.sr-only Close
-      %h4= "#{pluralize(@app_control.errors.count, 'error')} prohibited this setting from being saved:"
+      %h4= "#{pluralize(@report_key.errors.count, 'error')} prohibited this benefit_limit from being saved:"
 
       %ul
-        - @app_control.errors.full_messages.each do |msg|
+        - @report_key.errors.full_messages.each do |msg|
           %li= msg
 
 
 
   .form-inputs
-    = f.association :report_key, include_hidden: false, include_blank: false
+    = f.input :report_key
+    = f.input :file_pattern
+    = f.input :name
+    = f.input :city
+    = f.association :brands, as: :check_boxes
+    %br
+    = f.input :active
+    = f.input :current
 
-  .form-actions.col-sm-offset-3.col-sm-8
+  .form-actions.col-sm-offset-3.col-sm-9
     = f.submit class: 'btn btn-primary'
 
 
--#<%= f.input :location,:collection => @locations,:label_method => :location_name,:value_method => :id,:label => "Location" ,:include_blank => false %>
 
 

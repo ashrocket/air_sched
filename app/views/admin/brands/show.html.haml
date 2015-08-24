@@ -1,3 +1,6 @@
+%p#notice= notice
+%p#alert= alert
+
 %dl.dl-horizontal
   %dt Brand key:
   %dd= @brand.brand_key
@@ -9,7 +12,7 @@
     %ul#sorted_report_keys.list-group
       - @brand.report_keys.each do |rk|
         %li.list-group-item.col-sm-4
-          = link_to(rk.name, edit_admin_data_key_path(rk))
+          = link_to(rk.name, admin_data_key_path(rk))
   %br
   %dt Description:
   %dd= @brand.description
@@ -25,6 +28,8 @@
 
   %br
   %dt Active:
-  %dd= @brand.active
+  %dd
+    = @brand.active? ? content_tag(:span, 'Yes',class:'status_tag yes') : content_tag(:span, 'No',class:'status_tag no')
+  %br
   %dt Slug:
   %dd= @brand.slug

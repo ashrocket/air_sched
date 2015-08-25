@@ -61,9 +61,9 @@ class ScheduleImportWorker
             when /direct_flights_refreshed/
 
               Sidekiq::Logging.logger.info "Import Worker refreshing destinations   #{report_id}: #{report.report_key}"
-              report.load_status['destinations_map_status'] = 'refreshing'
+              report.load_status[:destinations_map_status] = 'refreshing'
               processor.refresh_destinations(report)
-              report.load_status['destinations_map_status'] = 'refreshed'
+              report.load_status[:destinations_map_status] = 'refreshed'
               FilterDestinationsWorker.perform_async(report_id)
               report.save
             when /destinations_refreshed/

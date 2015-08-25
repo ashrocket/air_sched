@@ -9,7 +9,7 @@
       %button.close{type: 'button', data: {dismiss: 'alert'} }
         %span{aria: {hidden: 'true'} } &times;
         %span.sr-only Close
-      %h4= "#{pluralize(@<%= singular_table_name %>.errors.count, 'error')} prohibited this benefit_limit from being saved:"
+      %h4= "#{pluralize(@<%= singular_table_name %>.errors.count, 'error')} prohibited this <%= singular_table_name.humanize %> from being saved:"
 
       %ul
         - @<%= singular_table_name %>.errors.full_messages.each do |msg|

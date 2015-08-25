@@ -33,7 +33,6 @@
 
       = f.association :hosts, as: :check_boxes, label_method: lambda {|host| "#{host.name} (Brand:#{host.brand.brand_key})"}
       = f.input :active
-      = f.input :slug
 
     %br
     .form-actions.col-sm-offset-1

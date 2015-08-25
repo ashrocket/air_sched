@@ -28,7 +28,7 @@ class ProcessInboxWorker
           #      if report.report_status.eql?('uninitialized')
           #        report.attachment_path   = att_path
           #        report.attachment_status = File.exist?(att_path) ? 'stored' : 'unstored'
-          #        report.load_status       = { email_status: 'cached', attachment_status: ''}
+          #        report.load_status.merge!( email_status: 'cached', attachment_status: '')
           #        report.received          = msg.header[:date]
           #        report.save
           #

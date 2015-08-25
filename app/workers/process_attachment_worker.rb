@@ -20,9 +20,13 @@ class ProcessAttachmentWorker
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
     begin
+      msg = Mastiff::Email::Message.get(message_id)
+      report = OagReport.where(msg_id: message_id).first
+      report.load_status[:autoload] = true
+      report.save
+
       if AppSwitch.on?('autoload')
-        msg = Mastiff::Email::Message.get(message_id)
-        report = OagReport.where(msg_id: message_id).first
+
         if report and report.report_status.eql? 'uninitialized'
           report.process_attachment
           processor = Oag::Process.new
@@ -33,7 +37,7 @@ class ProcessAttachmentWorker
           unless key.is_a? ReportKey
             processor.finalize(report, 'rejected')
             report.report_status ='rejected'
-            report.load_status['attachment_status'] = 'undefined or invalid report key'
+            report.load_status[:attachment_status] = 'undefined or invalid report key'
             report.attachment_status = 'undefined or invalid report key'
             report.save
 
@@ -53,8 +57,13 @@ class ProcessAttachmentWorker
           report.report_status = 'uninitialized'
           ProcessAttachmentWorker.delay_for(3.minute).perform_async(message_id)
         end
+      else
+        Sidekiq::Logging.logger.info 'Process Attachment Worker, autoload is FALSE'
+
+        report.load_status[:autoload] = false
+        report.save
       end
-      ensure
+    ensure
         lock.release!
       end
     else

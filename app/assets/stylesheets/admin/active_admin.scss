@@ -42,6 +42,12 @@ form fieldset.inputs {
 label {
   margin-right: 10px;
 }
+.load_status_col {
+  width: 150px;
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}
 
 //@mixin reset-aa-button {
 //  background: none;

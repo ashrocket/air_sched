@@ -9,7 +9,7 @@ class SyncMailWorker
   sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
   sidekiq_options lock: { timeout: 120000, name: 'lock-mail-worker' }
 
-  recurrence { minutely(5) }
+  recurrence { minutely(1) }
   # recurrence { secondly(6) }
 
   def perform

@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'redis'
 
 Mastiff.configure do |config|
@@ -37,6 +38,9 @@ Mastiff.configure do |config|
   config.process_attachment_worker  = ProcessAttachmentWorker
   # Class to store attachment
   config.attachment_uploader        =  MailAttachmentUploader
+
+  #  You REALLY should use an Explicit Directory Here so you can find attachments
+  # when imports fail
   # config.attachment_dir      = "data/attachments/pending"
   #config.process_dir      = "data/attachments/processed"
 
@@ -45,6 +49,16 @@ Mastiff.configure do |config|
                                                          rejected: 'rejected',
                                                          processing: 'processing'})
   ul = config.attachment_uploader.new
+
+  if ul.store_dir.eql? '/tmp'
+    tmp_path =  File.dirname(Tempfile.new('foo'))
+    if FileUtils.mkpath(File.join(tmp_path ,'mastiff'))
+      Mastiff.attachment_dir  = File.join(tmp_path ,'mastiff')
+    else
+      Mastiff.attachment_dir = ''
+    end
+    ul = config.attachment_uploader.new
+  end
   File.directory?(ul.store_dir) or
       abort "Gem requires local storage path for mail attachments - #{ul.store_dir} does not exist!\n" +
           "to generate path, execute\n" +

@@ -1,6 +1,6 @@
-ActiveAdmin.register OagReport, :as => 'OAG Imports' do
-  menu :parent => 'Reports'
-  actions :all, :except => [:new]
+ActiveAdmin.register OagReport  do
+  menu label: 'Oag Imports', :parent => 'Reports'
+  # actions :all, :except => [:new]
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
@@ -14,29 +14,41 @@ ActiveAdmin.register OagReport, :as => 'OAG Imports' do
   #  permitted << :other if resource.something?
   #  permitted
   # end
+  controller do
+     def show
+       @oag_report = OagReport.find(params[:id])
+        render :show,  layout: 'active_admin'
+     end
+   end
+
+
   index do
-          column 'Mail Id' do |report|
-            report.msg_id
-          end
-          column 'Report Key', :sortable => :report_key do |report|
-            report.report_key
-          end
-          column 'Finished', :sortable => :complete  do |report|
-            report.complete
-          end
-          column 'Status', :sortable => :report_status do |report|
-            report.report_status
-          end
-          column 'Modified', :sortable => :updated_at do |report|
-            report.updated_at
-          end
-          column 'Message Date', :sortable => :received do |report|
-            report.received
-          end
-          # column 'Detail Status', :sortable => :load_status do |report|
-          #   report.load_status
-          # end
+
+      selectable_column
+      column 'Mail Id' do |report|
+        report.msg_id
+      end
+      column 'Report Key', :sortable => :report_key do |report|
+        report.report_key
+      end
+      column 'Finished', :sortable => :complete  do |report|
+        report.complete
+      end
+      column 'Status', :sortable => :report_status do |report|
+        report.report_status
+      end
+      column 'Modified', :sortable => :updated_at do |report|
+        report.updated_at
+      end
+      # column 'Message Date', :sortable => :received do |report|
+      #   report.received
+      # end
+      column  'Detail Status', class: 'load_status_col', :sortable => :load_status do |report|
+        report.load_status
+      end
 
     actions
-   end
+  end
+
+
 end

@@ -216,13 +216,13 @@ module Oag
         File.delete report.attachment_path if File.exist?(report.attachment_path)
         File.delete report.report_path if File.exist?(report.report_path)
         Mastiff::Email.finalize([report.msg_id], status)
-        report.load_status['attachment_status'] = status
+        report.load_status[:attachment_status] = status
         report.report_status                    = 'finished'
         report.complete = true
         report.save
     end
     def large_import(report)
-      line_count = %x{wc -l < "#{report.load_status['report_path']}"}.to_i
+      line_count = %x{wc -l < "#{report.load_status[:report_path]}"}.to_i
       line_count > 10000
     end
     def import_oag_file report

@@ -1,0 +1,6 @@
+%dl.dl-horizontal
+  %dt Name:
+  %dd= @app_switch.name
+  %dt Enable:
+  %dd
+    = @app_switch.enabled? ? content_tag(:span, 'Yes',class:'status_tag yes') : content_tag(:span, 'No',class:'status_tag no')

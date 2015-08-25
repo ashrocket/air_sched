@@ -1,4 +1,4 @@
-class Admin::AppSwitchesController < ApplicationController
+class AppSwitchesController < ApplicationController
   before_action :set_admin_app_switch, only: [:show, :edit, :update, :destroy]
 
   # GET /admin/app_switches

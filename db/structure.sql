@@ -108,41 +108,6 @@ ALTER SEQUENCE admin_users_id_seq OWNED BY admin_users.id;
 
 
 --
--- Name: airline_hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE airline_hosts (
-    id integer NOT NULL,
-    host_key character varying NOT NULL,
-    name character varying NOT NULL,
-    description character varying,
-    active boolean,
-    slug character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: airline_hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE airline_hosts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: airline_hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE airline_hosts_id_seq OWNED BY airline_hosts.id;
-
-
---
 -- Name: airlines; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -150,7 +115,7 @@ CREATE TABLE airlines (
     id integer NOT NULL,
     code character varying,
     name character varying,
-    country character varying,
+    country_name character varying,
     slug character varying
 );
 
@@ -351,11 +316,11 @@ CREATE TABLE brand_connections (
     sched2_id integer,
     sched1_cxr character varying,
     sched2_cxr character varying,
-    sched1_eff_dates json,
-    sched1_operating json,
-    sched2_eff_dates json,
-    sched2_operating json,
-    ct_minutes json,
+    sched1_eff_dates json DEFAULT '{}'::json,
+    sched1_operating json DEFAULT '[]'::json,
+    sched2_eff_dates json DEFAULT '{}'::json,
+    sched2_operating json DEFAULT '[]'::json,
+    ct_minutes json DEFAULT '[]'::json,
     eff date,
     disc date,
     operating_window integer[] DEFAULT '{}'::integer[],
@@ -518,7 +483,7 @@ CREATE TABLE branded_route_maps (
     id integer NOT NULL,
     brand_id integer,
     brand_key character varying NOT NULL,
-    route_map json
+    route_map json DEFAULT '{}'::json
 );
 
 
@@ -587,7 +552,6 @@ CREATE TABLE brands (
     report_keys character varying[] DEFAULT '{}'::character varying[],
     description character varying,
     default_currency character varying,
-    host_map json,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
@@ -730,7 +694,7 @@ CREATE TABLE destinations (
     cxrs2 character varying[] DEFAULT '{}'::character varying[],
     dest character varying,
     dest_code character varying,
-    eff_days character varying[] DEFAULT '{}'::character varying[],
+    eff_days json DEFAULT '[]'::json,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -898,7 +862,8 @@ CREATE TABLE hosts (
     name character varying,
     code character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    brand_id integer
 );
 
 
@@ -1001,7 +966,7 @@ CREATE TABLE oag_reports (
     id integer NOT NULL,
     msg_id character varying,
     report_key character varying,
-    load_status json,
+    load_status json DEFAULT '{}'::json,
     report_status character varying DEFAULT 'uninitialized'::character varying,
     attachment_status character varying DEFAULT 'unstored'::character varying,
     received timestamp without time zone,
@@ -1140,7 +1105,7 @@ CREATE TABLE report_keys (
     slug character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    current character varying DEFAULT false NOT NULL
+    current boolean DEFAULT false
 );
 
 
@@ -1219,13 +1184,6 @@ ALTER TABLE ONLY active_admin_comments ALTER COLUMN id SET DEFAULT nextval('acti
 --
 
 ALTER TABLE ONLY admin_users ALTER COLUMN id SET DEFAULT nextval('admin_users_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY airline_hosts ALTER COLUMN id SET DEFAULT nextval('airline_hosts_id_seq'::regclass);
 
 
 --
@@ -1452,14 +1410,6 @@ ALTER TABLE ONLY active_admin_comments
 
 ALTER TABLE ONLY admin_users
     ADD CONSTRAINT admin_users_pkey PRIMARY KEY (id);
-
-
---
--- Name: airline_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY airline_hosts
-    ADD CONSTRAINT airline_hosts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1766,20 +1716,6 @@ CREATE UNIQUE INDEX index_admin_users_on_reset_password_token ON admin_users USI
 
 
 --
--- Name: index_airline_hosts_on_host_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_airline_hosts_on_host_key ON airline_hosts USING btree (host_key);
-
-
---
--- Name: index_airline_hosts_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_airline_hosts_on_slug ON airline_hosts USING btree (slug);
-
-
---
 -- Name: index_airlines_hosts_on_airline_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2080,7 +2016,13 @@ INSERT INTO schema_migrations (version) VALUES ('20140101000000');
 
 INSERT INTO schema_migrations (version) VALUES ('20140102002000');
 
+INSERT INTO schema_migrations (version) VALUES ('20140102002100');
+
+INSERT INTO schema_migrations (version) VALUES ('20140102002200');
+
 INSERT INTO schema_migrations (version) VALUES ('20140103000010');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000012');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000015');
 
@@ -2100,33 +2042,27 @@ INSERT INTO schema_migrations (version) VALUES ('20140103000175');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000200');
 
-INSERT INTO schema_migrations (version) VALUES ('20140103000250');
+INSERT INTO schema_migrations (version) VALUES ('20140103000220');
 
-INSERT INTO schema_migrations (version) VALUES ('20140103000260');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000270');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000280');
+INSERT INTO schema_migrations (version) VALUES ('20140103000230');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000300');
 
-INSERT INTO schema_migrations (version) VALUES ('20140821200616');
+INSERT INTO schema_migrations (version) VALUES ('20140103000500');
 
-INSERT INTO schema_migrations (version) VALUES ('20140821200706');
+INSERT INTO schema_migrations (version) VALUES ('20140103000520');
 
-INSERT INTO schema_migrations (version) VALUES ('20140821204002');
+INSERT INTO schema_migrations (version) VALUES ('20140103000530');
 
-INSERT INTO schema_migrations (version) VALUES ('20140929190724');
+INSERT INTO schema_migrations (version) VALUES ('20140103000550');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000580');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103001000');
 
 INSERT INTO schema_migrations (version) VALUES ('20140940100000');
 
-INSERT INTO schema_migrations (version) VALUES ('20141003133309');
-
-INSERT INTO schema_migrations (version) VALUES ('20141119191319');
-
-INSERT INTO schema_migrations (version) VALUES ('20141124142205');
-
-INSERT INTO schema_migrations (version) VALUES ('20150727000020');
+INSERT INTO schema_migrations (version) VALUES ('20150727000000');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000030');
 
@@ -2137,8 +2073,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000160');
 INSERT INTO schema_migrations (version) VALUES ('20150727000180');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000200');
-
-INSERT INTO schema_migrations (version) VALUES ('20150727000400');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000500');
 

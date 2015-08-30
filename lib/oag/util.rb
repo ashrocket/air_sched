@@ -24,7 +24,7 @@ module Oag
     end
 
 
-  def release_concurrent_postgres_db_connection
+  def release_forked_process_postgres_db_connection
       begin
         defined?(ActiveRecord::Base) and
                 ActiveRecord::Base.connection.disconnect!
@@ -36,7 +36,7 @@ module Oag
 
     # As per https://github.com/grosser/parallel  Active Record Connection
     # https://devcenter.heroku.com/articles/forked-pg-connections
-    def refresh_concurrent_postgres_db_connection
+    def refresh_forked_process_postgres_db_connection
       begin
         begin
         ActiveRecord::Base.connection.reconnect!

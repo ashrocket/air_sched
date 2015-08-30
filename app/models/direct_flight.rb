@@ -1,4 +1,6 @@
 class DirectFlight < ActiveRecord::Base
+  include ArelHelpers::ArelTable
+
   # :cxx
   # :hub
   # :origin
@@ -16,15 +18,18 @@ class DirectFlight < ActiveRecord::Base
     #  where("hub = ?",  apt)
     #end
 
-
-
-    def keyed report_key
-      where("report_key = ?",  report_key)
+    def keyed report_keys
+      if report_keys.is_a? String
+        where(DirectFlight[:report_key].eql?(report_keys))
+      elsif report_keys.respond_to?(:first) and report_keys.first.is_a? String
+        where(DirectFlight[:report_key].in(report_keys))
+      elsif report_keys.respond_to?(:first) and report_keys.first.is_a? ReportKey
+        where(DirectFlight[:report_key].in(ReportKey.strings(report_keys)))
+      else
+        DirectFlight.none
+      end
     end
 
-    def multi_keyed report_keys
-      where("report_key IN (?)",  report_keys)
-    end
 
     def pair o,d
       where(origin: o, dest: d)

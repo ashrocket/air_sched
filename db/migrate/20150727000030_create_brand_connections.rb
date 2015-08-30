@@ -10,11 +10,11 @@ class CreateBrandConnections < ActiveRecord::Migration
       t.references :sched2
       t.string :sched1_cxr
       t.string :sched2_cxr
-      t.json :sched1_eff_dates
-      t.json :sched1_operating
-      t.json :sched2_eff_dates
-      t.json :sched2_operating
-      t.json :ct_minutes
+      t.json :sched1_eff_dates, default: {}
+      t.json :sched1_operating, default: []
+      t.json :sched2_eff_dates, default: {}
+      t.json :sched2_operating, default: []
+      t.json :ct_minutes, default: []
       t.date :eff
       t.date :disc
       t.integer :operating_window, array:true , default: []

@@ -1,5 +1,8 @@
 require 'roo'
 class Airline < ActiveRecord::Base
+  include ArelHelpers::ArelTable
+
+
   # :code
   # :name
   # :country
@@ -7,7 +10,7 @@ class Airline < ActiveRecord::Base
   friendly_id :code, use: [:slugged, :finders]
 
 
-  has_many :airlines_hosts
+  has_many :airlines_hosts, dependent: :destroy
   has_many :hosts, through: :airlines_hosts
 
 

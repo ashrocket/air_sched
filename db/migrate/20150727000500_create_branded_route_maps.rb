@@ -3,7 +3,7 @@ class CreateBrandedRouteMaps < ActiveRecord::Migration
     create_table :branded_route_maps do |t|
       t.references :brand
       t.string :brand_key,  null: false
-      t.json :route_map
+      t.json :route_map, default: {}
 
     end
 

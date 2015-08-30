@@ -48,13 +48,19 @@ namespace :reports do
   #
   # end
   desc "Build Smart Connections"
-   task :build_connections => :environment do |t, args|
+   task :build_connections, [:brands] => :environment do |t, args|
      ActiveRecord::Base.logger.level = Logger::INFO
-     # b = Brand.create(brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW"], description: "Scoot Interline Network")
-     b = Brand.first
-     r = Oag::Report.new
-     r.build_brand_connections(b)
+     args.with_defaults(:brands => ['TZ'])
+     brand_keys = args[:brands].split ' '
+     brand_keys.each do |brand_key|
+       brands = Brand.where(brand_key: brand_key)
+       if brands.count > 0
+         b = brands.first
+         r = Oag::Report.new
 
+         r.build_brand_connections(b)
+       end
+     end
    end
 
 
@@ -65,7 +71,6 @@ namespace :reports do
 
     seg_counts =  (args[:seg_count_array].split ' ').map{|c| c.to_i}
     brand_keys = args[:brands].split ' '
-
 
     brand_keys.each do |brand_key|
 

@@ -12,6 +12,7 @@ require 'extras.rb'
 #end
 class OagSchedule < ActiveRecord::Base
 
+  include ArelHelpers::ArelTable
 
 
   #attr_accessible :hub, :cxr
@@ -24,10 +25,11 @@ class OagSchedule < ActiveRecord::Base
   #attr_accessible :dep_op_days, :arr_op_days
   #attr_accessible :stops, :mkt, :mkt_cxrs
 
+  # oag_schedules = Arel::Table.new(:oag_schedules)
 
+  scope :keyed,     lambda {|report_key| where(OagSchedule[:report_key].eql?(report_key))}
+  scope :branded,     lambda {|brand| where(OagSchedule[:report_key].in(brand.report_key_strings)) }
 
-  scope :keyed,     lambda {|report_key| where("report_key = ?",  report_key)}
-  scope :branded,   lambda {|report_keys| where("report_key IN (?)",  report_keys)}
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}
   scope :for_cxrs,  lambda {|carriers| carriers.empty? ? where.not(:airline_code => nil) :
                               where(:airline_code =>  carriers)

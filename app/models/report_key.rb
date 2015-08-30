@@ -42,6 +42,14 @@ class ReportKey < ActiveRecord::Base
       report_key.save
     end
 
+    def strings(report_keys)
+      if  report_keys and report_keys.count > 1 and report_keys.first.is_a?(ReportKey)
+          report_keys.map{|r| r.report_key}
+      else
+          [""]
+      end
+    end
+
     def match_key(pattern)
       key = nil
       matched_list = []

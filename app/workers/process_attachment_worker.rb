@@ -22,12 +22,13 @@ class ProcessAttachmentWorker
     begin
       msg = Mastiff::Email::Message.get(message_id)
       report = OagReport.where(msg_id: message_id).first
-      report.load_status[:autoload] = true
-      report.save
 
       if AppSwitch.on?('autoload')
 
         if report and report.report_status.eql? 'uninitialized'
+          report.load_status['autoload'] = true
+          report.save
+
           report.process_attachment
           processor = Oag::Process.new
 
@@ -37,7 +38,7 @@ class ProcessAttachmentWorker
           unless key.is_a? ReportKey
             processor.finalize(report, 'rejected')
             report.report_status ='rejected'
-            report.load_status[:attachment_status] = 'undefined or invalid report key'
+            report.load_status['attachment_status'] = 'undefined or invalid report key'
             report.attachment_status = 'undefined or invalid report key'
             report.save
 
@@ -52,16 +53,22 @@ class ProcessAttachmentWorker
           end
         # Attachment might be stuck
         elsif report and
-              !report.report_status.eql? 'uninitialized' and
+              !report.report_status.eql? 'uninitialized' and report.attachment_status != 'stored' and
               (Time.now - report.updated_at) < 1800
           report.report_status = 'uninitialized'
           ProcessAttachmentWorker.delay_for(3.minute).perform_async(message_id)
         end
       else
         Sidekiq::Logging.logger.info 'Process Attachment Worker, autoload is FALSE'
+        if report
+          report.load_status['autoload'] = false
+          report.save
+        else
+          Sidekiq::Logging.logger.info "Process Attachment Worker, " +
+                       "Report #{message_id} does not exist yet, delaying for 2 minutes"
+          ProcessAttachmentWorker.delay_for(2.minute).perform_async(message_id)
+        end
 
-        report.load_status[:autoload] = false
-        report.save
       end
     ensure
         lock.release!

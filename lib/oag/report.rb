@@ -2,15 +2,21 @@ require 'benchmark'
 module Oag
   class Report
 
-
+    def log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
+        Rails.logger.info "(#{brand.brand_key}) Building branded connections  " +
+                        "for #{origin_code} #{index + 1} of (#{origins.count}) through #{via_code}  " +
+                        " #{via_index + 1} of (#{via_points.count})  - #{brand.brand_key}"
+    end
 
     def build_brand_connections(brand)
+
+
       # filtered_cxrs = ['TZ','DD', 'XW','TR']
       filtered_cxrs = []
 
-      BrandConnection.keyed(brand.brand_key).delete_all
+      BrandConnection.branded(brand).delete_all
 
-      origins = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
+      origins = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
                            .pluck(:origin_apt)
                            .sort.uniq
 
@@ -22,32 +28,32 @@ module Oag
       origins.each_with_index do |origin_code, index|
 
         via_points =
-            OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
+            OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
                 .departing(origin_code)
                 .pluck(:dest_apt).sort.uniq
 
 
-        via_points.each_with_index do |via_code, via_index|
-            Rails.logger.info "(#{brand.brand_key}) Building branded connections  " +
-                  "for #{origin_code} #{index} of (#{origins.count}) through #{via_code}  " +
-                  " #{via_index} of (#{via_points.count})  - #{brand.brand_key}"
+        # via_points.each_with_index do |via_code, via_index|
+        routes_for_origin = Parallel.map_with_index(via_points, in_threads:4) do |via_code, via_index|
 
-           leg1_scheds = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
+
+           log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
+
+           leg1_scheds = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
                                     .departing(origin_code)
                                     .arriving(via_code)
 
-           leg2_scheds = OagSchedule.branded(brand.report_keys).for_cxrs(filtered_cxrs)
+           leg2_scheds = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
                                     .departing(via_code)
                                     .reject{|sched| sched.dest_apt == origin_code}
 
+           possible_routes = []
 
             leg1_scheds.each do |sched1|
-              possible_routes = []
               leg2_scheds.each do |sched2|
                 window    = sched1.effective_window(sched2)
                 op_window = sched1.connection_days_of_week(sched2,2)
                 if not window.blank? and not op_window.blank?
-
                   possible_routes <<  BrandConnection.new(brand_id: brand.id, brand_key: brand.brand_key,
                             origin: origin_code, via: via_code, dest: sched2.dest_apt,
                             sched1_cxr: sched1.airline_code, sched2_cxr: sched2.airline_code,
@@ -63,12 +69,14 @@ module Oag
 
                 end
               end
-              # possible_routes.uniq!{|route| [route.dest, route.eff_window, route.operating_window]  }
-              routes = routes + possible_routes
             end
+           # possible_routes.uniq!{|route| [route.dest, route.eff_window, route.operating_window]  }
+           possible_routes
 
-
-           end
+        end
+        routes = routes + routes_for_origin.compact.flatten(1)
+      end
+      routes = routes.compact.flatten
 
 
           # routes.map!{|route|  {
@@ -108,9 +116,7 @@ module Oag
            #                                                 segments: 2,
            #                                                 route_map: routes)
 
-        end
-
-      group_size = 5000
+      group_size = 2000
       tot = routes.count
       routes.in_groups_of(group_size) do |connection_group|
 
@@ -135,10 +141,12 @@ module Oag
      #  No Stops
 
       direct_route_requests = []
-      direct_flight_markets = DirectFlight.pair(origin ,dest).multi_keyed(brand.report_keys).compact
+      direct_flight_markets = DirectFlight.pair(origin ,dest).keyed(brand.report_keys)
+                                  # .compact
 
       direct_flight_markets.each do |df|
-        direct_host_templates = df.carriers.map{|cxr| {cxr: cxr, host: brand.host_map[cxr]}}.uniq
+        byebug
+        direct_host_templates = df.carriers.map{|cxr| {cxr: cxr, host: brand.hosts.by_cxr(cxr)}}.uniq
         dht_by_host = direct_host_templates.group_by{|ht| ht[:host]}
         dht_by_host.each do |host, cxr_host_list |
 
@@ -174,6 +182,7 @@ module Oag
       routes_requests = routes.map{|c| c.to_route_requests}
 
       grouped_rrs = routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
+      byebug
       grouped_rrs.each do |keys, group|
            brr0 =
            BrandedRouteRequest.where(
@@ -211,7 +220,7 @@ module Oag
        #  1 Stops
        markets = []
 
-       one_seg_markets = DirectFlight.multi_keyed(brand.report_keys).pluck(:origin, :dest).uniq
+       one_seg_markets = DirectFlight.keyed(brand.report_key_strings).pluck(:origin, :dest).uniq
        two_seg_markets = BrandConnection.keyed(brand.brand_key).pluck(:origin, :dest).sort.uniq
 
        Rails.logger.info "(#{brand.brand_key}) There are  #{one_seg_markets.count} one segment markets"
@@ -374,8 +383,10 @@ module Oag
        market_requests = []
        case segment_count
          when 1
-           one_segment_markets = DirectFlight.multi_keyed(brand.report_keys).pluck(:origin, :dest).uniq
-           one_segment_markets.each_with_index do |origin, dest, index|
+           byebug
+           one_segment_markets = DirectFlight.keyed(brand.report_key_strings).pluck(:origin, :dest).uniq
+           one_segment_markets.each_with_index do |pair, index|
+             origin, dest = pair
              Rails.logger.info " ==== (#{brand.brand_key}) Building 1 Segment mkt requests  for #{origin} #{dest} "
              Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{one_segment_markets.count}) "
 

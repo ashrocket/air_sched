@@ -3,54 +3,70 @@ require 'mastiff'
 
 module Oag
   class Process
+    
+    attr_accessor :logger  
 
+
+    def process_logger
+      @logger ||= Rails.logger
+    end
+    
 
     def filter_destinations(report)
-
       dests = Destination.keyed(report.report_key)
 
-      group_size = 1000
+      group_size = 300
       tot = dests.count
       dests.in_groups_of(group_size) do |dest_group|
 
-        dest_group.compact.each do  |dest|
 
-        leg1_scheds = OagSchedule.keyed(report.report_key).departing(dest.origin_code).arriving(dest.hub_code)
-        leg2_scheds  = OagSchedule.keyed(report.report_key).departing(dest.hub_code).arriving(dest.dest_code)
+        # dest_group.compact.each do  |dest|
+        process_logger.info "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key}"
 
-             overlapping_scheds = []
+        Parallel.each_with_index(dest_group, in_threads:4) do |dest, index|
+          # Oag::Util.refresh_forked_process_postgres_db_connection
+          if dest
 
-             leg1_scheds.each do |sched1|
-               leg2_scheds.each do |sched2|
-                  if sched1.effective_overlaps? sched2
-                    overlapping_scheds << {scheds: [sched1, sched2], window: sched1.effective_window(sched2) }
-                  end
+            leg1_scheds = OagSchedule.keyed(report.report_key).departing(dest.origin_code).arriving(dest.hub_code)
+            leg2_scheds  = OagSchedule.keyed(report.report_key).departing(dest.hub_code).arriving(dest.dest_code)
+
+               overlapping_scheds = []
+
+               leg1_scheds.each do |sched1|
+                 leg2_scheds.each do |sched2|
+                    if sched1.effective_overlaps? sched2
+                      overlapping_scheds << {scheds: [sched1, sched2], window: sched1.effective_window(sched2) }
+                    end
+
+                 end
 
                end
-
-             end
-             connected_schedules = []
-             overlapping_scheds.each do  |sched_set|
-               connected_departure_days = sched_set[:scheds][0].connection_days_of_week(sched_set[:scheds][1],2)
-               if not connected_departure_days.empty?
-                 sched_set[:cnx_dep_days] = connected_departure_days
-                 connected_schedules << sched_set
+               connected_schedules = []
+               overlapping_scheds.each do  |sched_set|
+                 connected_departure_days = sched_set[:scheds][0].connection_days_of_week(sched_set[:scheds][1],2)
+                 if not connected_departure_days.empty?
+                   sched_set[:cnx_dep_days] = connected_departure_days
+                   connected_schedules << sched_set
+                 end
                end
-             end
+               process_logger.debug "Filtering:  #{connected_schedules.count} connected_schedules for #{dest.origin_code}" +
+                                       "#{dest.hub_code} #{dest.dest_code} #{report.report_key}"
 
-             eff_days = connected_schedules.map{ |cs|  [ cs[:window][:eff].to_date,
-                                                               cs[:window][:disc].to_date,
-                                                               cs[:cnx_dep_days]].to_json
-                                                      }
-             dest.eff_days = eff_days
-             dest.save
+               eff_days = connected_schedules.map{ |cs|  [ cs[:window][:eff].to_date,
+                                                                 cs[:window][:disc].to_date,
+                                                                 cs[:cnx_dep_days]].to_json
+                                                        }
+               eff_days.uniq!
+               dest.eff_days = eff_days || []
+               dest.save
+          end #If Dest, protection against leftover nil values in parallel.
+        end # End parallel
+        # Oag::Util.refresh_forked_process_postgres_db_connection
 
-        end
-        Rails.logger.info "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key}"
         tot = tot - dest_group.compact.count
       end
 
-      report.load_status[:destinations_map_status] = 'eff_days_filtered'
+      report.load_status['destinations_map_status'] = 'eff_days_filtered'
       report.save
 
     end
@@ -107,7 +123,7 @@ module Oag
 
     def refresh_destinations report
 
-      report.load_status[:destinations_map_status] = 'initialized'
+      report.load_status['destinations_map_status'] = 'initialized'
 
         Destination.keyed(report.report_key).delete_all
 
@@ -154,7 +170,7 @@ module Oag
 
         tot = cnx.count
         cnx.in_groups_of(1000) do |cnx_group|
-          Rails.logger.info "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key}"
+          process_logger.info "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
@@ -162,7 +178,7 @@ module Oag
            d_name = Airport.cached_name(row[2])
            connections << Destination.new(report_key: report.report_key, origin: o_name, origin_code: row[0],
                                           hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2],
-                                          cxrs1: row[3], cxrs2: row[4], eff_days: row[5]
+                                          cxrs1: row[3], cxrs2: row[4]
            )
           end
 
@@ -175,7 +191,7 @@ module Oag
           Destination.import connections
           connections = []
         end
-      report.load_status[:destinations_map_status] = 'refreshed'
+      report.load_status['destinations_map_status'] = 'refreshed'
       report.report_status = 'destinations_refreshed'
       report.save
     end
@@ -195,7 +211,7 @@ module Oag
           tot = pairs.count
           group_size = 1000
           pairs.in_groups_of(group_size) do |pair_group|
-            Rails.logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
+            process_logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
             tot -= group_size
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
@@ -211,18 +227,18 @@ module Oag
     end
     #TODO provide the option to store the processed files in the processed folder
     def finalize report, status
-        Rails.logger.info "Finalizing #{report.attachment_path} import"
+        process_logger.info "Finalizing #{report.attachment_path} import"
 
         File.delete report.attachment_path if File.exist?(report.attachment_path)
         File.delete report.report_path if File.exist?(report.report_path)
         Mastiff::Email.finalize([report.msg_id], status)
-        report.load_status[:attachment_status] = status
+        report.load_status['attachment_status'] = status
         report.report_status                    = 'finished'
         report.complete = true
         report.save
     end
     def large_import(report)
-      line_count = %x{wc -l < "#{report.load_status[:report_path]}"}.to_i
+      line_count = %x{wc -l < "#{report.load_status['report_path']}"}.to_i
       line_count > 10000
     end
     def import_oag_file report
@@ -232,8 +248,8 @@ module Oag
           report.report_status = 'schedules_loaded'
           report.save
         rescue Exception => ex
-               Rails.logger.info ex.message
-               Rails.logger.info report.inspect
+               process_logger.info ex.message
+               process_logger.info report.inspect
         end
 
 
@@ -244,8 +260,8 @@ module Oag
           importer.parse_and_load_large_report report
 
         rescue Exception => ex
-               Rails.logger.info ex.message
-               Rails.logger.info report.inspect
+               process_logger.info ex.message
+               process_logger.info report.inspect
         end
     end
 

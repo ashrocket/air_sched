@@ -24,9 +24,7 @@ ActiveAdmin.register Destination do
     column :cxrs2
     column :dest
     column :dest_code
-    column :eff_days do |dest|
-      JSON.parse(dest.eff_days.first)
-    end
+    column :eff_days
   end
 
 end

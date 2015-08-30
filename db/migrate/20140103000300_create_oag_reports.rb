@@ -3,7 +3,7 @@ class CreateOagReports < ActiveRecord::Migration
     create_table :oag_reports do |t|
       t.string   :msg_id
       t.string   :report_key
-      t.json     :load_status
+      t.json     :load_status, default: {}
       t.string   :report_status, default: 'uninitialized'
       t.string   :attachment_status, default: 'unstored'
       t.datetime :received

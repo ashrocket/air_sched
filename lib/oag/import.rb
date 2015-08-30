@@ -120,11 +120,11 @@ module Oag
     orig_airports = schedules.collect{ |n| n[:origin_apt] }
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status[:expired_schedules_count] = 0 unless report.load_status.has_key?('expired_schedules_count')
-    report.load_status[:schedules_count]         = 0 unless report.load_status.has_key?('schedules_count')
-    report.load_status[:expired_schedules_count] +=  expired.count
+    report.load_status['expired_schedules_count'] = 0 unless report.load_status.has_key?('expired_schedules_count')
+    report.load_status['schedules_count']         = 0 unless report.load_status.has_key?('schedules_count')
+    report.load_status['expired_schedules_count'] +=  expired.count
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status[:schedules_count] +=  schedules.count
+    report.load_status['schedules_count'] +=  schedules.count
     schedule_records = []
     loaded = 0
     group_size = 500
@@ -158,11 +158,11 @@ module Oag
 
     Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key}"
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status[:expired_schedules_count] = expired.count
+    report.load_status['expired_schedules_count'] = expired.count
 
     Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{report.report_key}."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status[:schedules_count] = schedules.count
+    report.load_status['schedules_count'] = schedules.count
 
     schedule_records = []
     loaded = 0
@@ -188,7 +188,7 @@ module Oag
     schedule_records = []
   end
   Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key} ---"
-  report.load_status[:report_status] = 'imported'
+  report.load_status['report_status'] = 'imported'
   report.save
 
   end
@@ -208,7 +208,7 @@ module Oag
      Rails.logger.error ex.message
     end
     tstart = Time.now
-    report.load_status[:processing_time] = Time.now - tstart
+    report.load_status['processing_time'] = Time.now - tstart
     data
   end
 
@@ -220,22 +220,22 @@ module Oag
     blocks = (block_mod.eql? 0 ) ? block_count : block_count + 1
 
 
-    report.load_status[:report_line_ptr] = 2 unless report.load_status.has_key? 'report_line_ptr'
+    report.load_status['report_line_ptr'] = 2 unless report.load_status.has_key? 'report_line_ptr'
     CSV::Converters[:oag_converters]  = body_converters
     options = {:headers => true, :header_converters => :symbol, :converters => [:oag_converters]}
 
-    # Oag::Util.release_concurrent_postgres_db_connection
+    # Oag::Util.release_forked_process_postgres_db_connection
 
     schedule_rows = Parallel.map_with_index([0,1,2], in_processes:3) do |batch_number|
-      Oag::Util.refresh_concurrent_postgres_db_connection
+      Oag::Util.refresh_forked_process_postgres_db_connection
 
 
-      starting_row = (batch_number * block_size) + report.load_status[:report_line_ptr]
+      starting_row = (batch_number * block_size) + report.load_status['report_line_ptr']
       end_row      = block_size + starting_row
       csv_row_num  = 2
       csv_rows     = []
       begin
-        CSV.foreach(report.load_status[:report_path], options) do |row|
+        CSV.foreach(report.load_status['report_path'], options) do |row|
           begin
             if csv_row_num.eql?  end_row
                break
@@ -243,7 +243,7 @@ module Oag
             if csv_row_num >= starting_row
               if csv_row_num.eql? starting_row
                 Rails.logger.info "Parsing Block # #{starting_row/block_size} of #{blocks} blocks containing #{block_size} rows."
-                Rails.logger.info "Scanning line numbers #{csv_row_num}-#{end_row} of #{line_count} #{report.load_status[:report_path]}"
+                Rails.logger.info "Scanning line numbers #{csv_row_num}-#{end_row} of #{line_count} #{report.load_status['report_path']}"
               end
               csv_rows << row
             end
@@ -258,11 +258,11 @@ module Oag
       csv_rows
     end
 
-    Oag::Util.refresh_concurrent_postgres_db_connection
+    Oag::Util.refresh_forked_process_postgres_db_connection
 
     schedule_rows.flatten!
-    report.load_status[:report_line_ptr] = report.load_status[:report_line_ptr] + schedule_rows.count
-    Rails.logger.info "Scanned #{schedule_rows.count} rows of #{report.load_status[:report_path]}"
+    report.load_status['report_line_ptr'] = report.load_status['report_line_ptr'] + schedule_rows.count
+    Rails.logger.info "Scanned #{schedule_rows.count} rows of #{report.load_status['report_path']}"
     schedule_rows
 
   end
@@ -294,10 +294,9 @@ module Oag
     # end
     schedules.flatten!
     process_schedule_chunk(report, schedules)
-    byebug
-    if report.load_status[:report_line_ptr].to_i >= report.attachment_lines
+    if report.load_status['report_line_ptr'].to_i >= report.attachment_lines
       report.report_status = 'schedules_loaded'
-      Rails.logger.info "There were  #{report.load_status[:expired_schedules_count]} expired schedules in the file  for #{report.report_key}."
+      Rails.logger.info "There were  #{report.load_status['expired_schedules_count']} expired schedules in the file  for #{report.report_key}."
 
     end
 

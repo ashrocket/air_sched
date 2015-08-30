@@ -21,14 +21,14 @@ class FilterDestinationsWorker
         report = OagReport.find_by(id: report_id)
         Sidekiq::Logging.logger.info "Filter Destinations Worker Lock acquired, processing #{report_id}: #{report.report_key}"
 
-        byebug
-        if report and report.load_status and report.load_status[:destinations_map_status] == 'refreshed'
+        if report and report.load_status and report.load_status['destinations_map_status'] == 'refreshed'
           processor = Oag::Process.new
+          processor.logger = Sidekiq::Logging.logger
 
           Sidekiq::Logging.logger.info "Filter Destinations Worker filtering destinations   #{report_id}: #{report.report_key}"
-          report.load_status[:destinations_map_status] = 'filtering_eff_days'
+          report.load_status['destinations_map_status'] = 'filtering_eff_days'
           processor.filter_destinations(report)
-          report.load_status[:destinations_map_status] == 'filtered_eff_days'
+          report.load_status['destinations_map_status'] == 'filtered_eff_days'
           report.save
 
         end

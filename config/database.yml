@@ -1,7 +1,7 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  pool: 5
+  pool: <%= ENV["DB_POOL"] || ENV['MAX_THREADS'] || 10 %>
   host: <%= ENV['POSTGRES_PORT_5432_TCP_ADDR'] || 'localhost' %> 
   port: <%= ENV['POSTGRES_PORT_5432_TCP_PORT'] || "5432" %>
   username: <%= ENV['POSTGRES_ENV_USER'] ||  "postgres" %>

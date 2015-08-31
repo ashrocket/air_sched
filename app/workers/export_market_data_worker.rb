@@ -17,7 +17,7 @@ def perform()
    if lock.acquire!
      begin
        @export_report = ExportMarketDataReport.create(status: 'started')
-       exporter = Oag::MarketDataExporter.new({})
+       exporter = Oag::MarketDataExporter.new
        url = exporter.export_to_s3
        @export_report.status = 'exported'
        @export_report.location = url.to_s

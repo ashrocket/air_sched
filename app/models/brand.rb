@@ -24,10 +24,10 @@ class Brand < ActiveRecord::Base
 
 
   def report_key_strings
-    if  report_keys and report_keys.count > 1 and report_keys.first.is_a?(ReportKey)
+    if  report_keys and report_keys.respond_to?(:first) and report_keys.first.is_a?(ReportKey)
         report_keys.map{|r| r.report_key}
     else
-      [""]
+      ['']
     end
 
   end

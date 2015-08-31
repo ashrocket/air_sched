@@ -2,6 +2,9 @@ require 'benchmark'
 module Oag
   class Report
 
+
+
+
     def log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
         Rails.logger.info "(#{brand.brand_key}) Building branded connections  " +
                         "for #{origin_code} #{index + 1} of (#{origins.count}) through #{via_code}  " +
@@ -10,12 +13,11 @@ module Oag
 
     def build_brand_connections(brand)
 
-
-      # filtered_cxrs = ['TZ','DD', 'XW','TR']
+      Rails.logger.info "Building Branded Connections for Schedules from Brand #{brand.brand_key} #{brand.name}"
       filtered_cxrs = []
 
       BrandConnection.branded(brand).delete_all
-
+      byebug
       origins = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
                            .pluck(:origin_apt)
                            .sort.uniq

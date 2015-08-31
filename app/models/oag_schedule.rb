@@ -28,7 +28,8 @@ class OagSchedule < ActiveRecord::Base
   # oag_schedules = Arel::Table.new(:oag_schedules)
 
   scope :keyed,     lambda {|report_key| where(OagSchedule[:report_key].eql?(report_key))}
-  scope :branded,     lambda {|brand| where(OagSchedule[:report_key].in(brand.report_key_strings)) }
+
+  # scope :branded,     lambda {|brand| where(OagSchedule[:report_key].in(brand.report_key_strings)) }
 
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}
   scope :for_cxrs,  lambda {|carriers| carriers.empty? ? where.not(:airline_code => nil) :
@@ -41,6 +42,11 @@ class OagSchedule < ActiveRecord::Base
   scope :market,          lambda {|o,d|    where(:origin_apt =>  o, :dest_apt => d)}
   scope :connecting,          lambda {|o,d|    where(:origin_apt =>  o, :dest_apt => d)}
 
+  def self.branded(brand)
+    byebug
+    where(OagSchedule[:report_key].in(brand.report_key_strings))
+
+  end
 
 
 

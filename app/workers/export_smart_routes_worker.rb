@@ -19,7 +19,9 @@ class ExportSmartRoutesWorker
   recurrence { daily(1) }
 
 
-  def perform(brand_key)
+  def perform(brand_key = nil)
+    brand_key = AppControl.brand.brand_key unless brand_key and brand_key.is_a? String
+
     Sidekiq::Logging.logger.info "Smart Routes Worker #{brand_key}"
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!

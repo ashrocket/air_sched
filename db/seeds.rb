@@ -5,10 +5,7 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-ac = AppControl.first_or_create!
-
-rk = ReportKey.where(name: 'Null Report', report_key: 'NONE').first_or_create
-ReportKey.set_current(rk)
+AppControl.first_time_setup
 
 ABBConfig.mct = 60
 config = ABBConfig.where(:var => 'mct').first

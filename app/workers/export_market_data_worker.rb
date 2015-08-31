@@ -16,8 +16,8 @@ def perform()
    Rails.logger = Sidekiq::Logging.logger
    if lock.acquire!
      begin
-       @export_report = MarketDataExport.create(status: 'started')
-       exporter = MarketDataExporter.new({})
+       @export_report = ExportMarketDataReport.create(status: 'started')
+       exporter = Oag::MarketDataExporter.new({})
        url = exporter.export_to_s3
        @export_report.status = 'exported'
        @export_report.location = url.to_s

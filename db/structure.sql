@@ -13,16 +13,14 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -246,7 +244,8 @@ ALTER SEQUENCE airports_id_seq OWNED BY airports.id;
 
 CREATE TABLE app_controls (
     id integer NOT NULL,
-    report_key_id integer
+    report_key_id integer,
+    brand_id integer
 );
 
 
@@ -789,13 +788,10 @@ ALTER SEQUENCE export_market_data_reports_id_seq OWNED BY export_market_data_rep
 
 CREATE TABLE export_smart_route_reports (
     id integer NOT NULL,
-    brand_key character varying,
+    brand_id integer,
     status character varying,
-    origin character varying,
-    dest character varying,
-    number_of_segments character varying,
-    brand_routes text,
     location character varying,
+    details json DEFAULT '{}'::json,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1755,6 +1751,13 @@ CREATE UNIQUE INDEX index_airports_on_code ON airports USING btree (code);
 --
 
 CREATE UNIQUE INDEX index_airports_on_slug ON airports USING btree (slug);
+
+
+--
+-- Name: index_app_controls_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_app_controls_on_brand_id ON app_controls USING btree (brand_id);
 
 
 --

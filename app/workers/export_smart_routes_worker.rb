@@ -25,7 +25,17 @@ class ExportSmartRoutesWorker
     if lock.acquire!
       begin
         Sidekiq::Logging.logger.info "Smart Routes Worker pretending to Export #{brand_key}"
+        brands = Brand.all
+        brands.each do |brand|
+          @export_report = ExportSmartRouteReport.create(brand: brand, status: 'started')
+          exporter = Oag::SmartRoutesExporter.new
+          url = exporter.export_to_s3(brand)
+          @export_report.status = 'exported'
+          @export_report.location = url.to_s
 
+          @export_report.save
+
+        end
 
 
       ensure

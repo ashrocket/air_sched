@@ -50,7 +50,7 @@ namespace :reports do
   desc "Build Smart Connections"
    task :build_connections, [:brands] => :environment do |t, args|
      ActiveRecord::Base.logger.level = Logger::INFO
-     args.with_defaults(:brands => ['TZ'])
+     args.with_defaults(:brands => [AppControl.singleton.brand.brand_key])
      brand_keys = args[:brands].split ' '
      brand_keys.each do |brand_key|
        brands = Brand.where(brand_key: brand_key)
@@ -67,14 +67,14 @@ namespace :reports do
   desc "Build Smart Market Routes"
   task :build_market_smart_routes, [:seg_count_array, :brands] => :environment do |t, args|
     ActiveRecord::Base.logger.level = Logger::INFO
-    args.with_defaults(:seg_count_array => [1,2,3], :brands => ['TZ'])
+    args.with_defaults(:seg_count_array => '1 2 3', :brands => [AppControl.singleton.brand.brand_key])
 
     seg_counts =  (args[:seg_count_array].split ' ').map{|c| c.to_i}
     brand_keys = args[:brands].split ' '
 
     brand_keys.each do |brand_key|
 
-      brand = Brand.keyed(brand_key).first
+      brand = Brand.keyed(brand_key)
       r = Oag::Report.new
       r.build_brand_market_smart_routes(brand, seg_counts)
 
@@ -83,23 +83,56 @@ namespace :reports do
   end
 
   desc "Build Smart Market Route Maps"
-   task :build_market_route_maps => :environment do |t, args|
+   task :build_market_route_maps, [:brands,:seg_count_array] => :environment do |t, args|
      ActiveRecord::Base.logger.level = Logger::INFO
 
-     # b = Brand.create(brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW"], description: "Scoot Interline Network")
-     brand = Brand.first
-     r = Oag::Report.new
+     args.with_defaults(:seg_count_array => '1 2 3', :brands => [AppControl.singleton.brand.brand_key])
+
+     seg_counts =  (args[:seg_count_array].split ' ').map{|c| c.to_i}
+     brand_keys = args[:brands].split ' '
+
+     brand_keys.each do |brand_key|
+        brand = Brand.keyed(brand_key)
+        r = Oag::Report.new
+        r.build_brand_route_maps(brand, seg_counts)
+     end
+   end
+
+  desc "Export Smart Market Route Maps to file"
+     task :export_market_route_maps, [:brands] => :environment do |t, args|
+       ActiveRecord::Base.logger.level = Logger::INFO
+
+       args.with_defaults(:brands => [AppControl.singleton.brand.brand_key])
 
 
-     # origin = 'TPE'
-     # dest   = 'SYD'
-     # r.build_brand_market_routes(b, origin, dest)
+       brand_keys = args[:brands].split ' '
 
-     r.build_brand_route_maps(brand)
+       brand_keys.each do |brand_key|
+          brand = Brand.keyed(brand_key)
+          r = Oag::Report.new
+          r.export_brand_route_maps(brand)
+       end
+  end
 
-     # bc = BrandConnection.first
-     # bc.to_market_request
+  desc "Export Smart Market Route Maps to file"
+      task :export_remote_market_route_maps, [:brands] => :environment do |t, args|
+        ActiveRecord::Base.logger.level = Logger::INFO
 
+        args.with_defaults(:brands => [AppControl.singleton.brand.brand_key])
+
+
+        brand_keys = args[:brands].split ' '
+
+        brand_keys.each do |brand_key|
+         brand = Brand.keyed(brand_key)
+         @export_report = ExportSmartRouteReport.create(brand: brand, status: 'started')
+         exporter = Oag::SmartRoutesExporter.new
+         url = exporter.export_to_s3(brand)
+         @export_report.status = 'exported'
+         @export_report.location = url.to_s
+
+         @export_report.save
+        end
    end
 
 end    

@@ -145,23 +145,22 @@ module Oag
                                   # .compact
 
       direct_flight_markets.each do |df|
-        byebug
-        direct_host_templates = df.carriers.map{|cxr| {cxr: cxr, host: brand.hosts.by_cxr(cxr)}}.uniq
-        dht_by_host = direct_host_templates.group_by{|ht| ht[:host]}
-        dht_by_host.each do |host, cxr_host_list |
+        hosts = brand.hosts_for(df.carriers).uniq
+        # direct_host_templates = df.carriers.map{|cxr| {cxr: cxr, hosts: brand.hosts_for(df.carriers)}}.uniq
+        # dht_by_host = direct_host_templates.group_by{|ht| ht[:host]}
 
-          carriers = cxr_host_list.map{|cxr_host| cxr_host[:cxr]}.sort
-
-
-
+        # dht_by_host.each do |host, cxr_host_list |
+        hosts.each do |host|
+          carriers = host.carrier_codes & df.carriers
           brr = BrandedRouteRequest.where( brand_id: brand.id, brand_key: brand.brand_key,
-                           origin: origin,  dest: dest,  host: host, cxrs: carriers
+                           origin: origin,  dest: dest,  host: host.code, cxrs: carriers
                            ).first_or_create!
           bmr = BrandedMarketRequest.joins(:branded_route_requests)
                     .where(BrandedRouteRequest[:id].in [brr.id])
                     .where(brand_key: brand.brand_key, brand_id: brand.id,
                            origin: origin, dest: dest).first_or_create!
 
+          # What is this doing?  Are we keeping the values uniq?  If so this may not be the way to do it.
           bmr.branded_route_requests << brr if  bmr.branded_route_requests.blank?
 
           direct_route_requests << bmr
@@ -182,7 +181,7 @@ module Oag
       routes_requests = routes.map{|c| c.to_route_requests}
 
       grouped_rrs = routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
-      byebug
+
       grouped_rrs.each do |keys, group|
            brr0 =
            BrandedRouteRequest.where(
@@ -278,7 +277,6 @@ module Oag
 
                 cbcs = BrandConnection.connecting_scheds(bc)
                 bc_connections[bc.id] = cbcs
-                byebug
               end
             }
 
@@ -290,7 +288,6 @@ module Oag
          e_origin, e_dest = e_mkt
 
 
-         byebug
          bc_list = BrandConnection.keyed(brand.brand_key).market(e_origin, e_dest)
          if bc_list.count == 0
            Rails.logger.info "(#{brand.brand_key}) Building connections - Skip  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets, no connections exist"
@@ -308,33 +305,32 @@ module Oag
            cbcs = []
            connecting_bcs = []
            Benchmark.bm do |x|
-             x.report("3 seg #{[e_origin, e_dest]}") { cbcs = BrandConnection.connecting_scheds(bc) }
-             x.report("Each 3 seg #{[e_origin, e_dest]}") { connecting_bcs = bc.connects_with.to_a }
+              x.report("3 seg #{[e_origin, e_dest]}") { cbcs = BrandConnection.connecting_scheds(bc) }
+              x.report("Each 3 seg #{[e_origin, e_dest]}") { connecting_bcs = bc.connects_with.to_a }
+              # if emkt_index.between? 6,7
+              #           byebug
+              # end
 
-             if emkt_index.between? 6,7
-                       byebug
-            end
+              destinations = connecting_bcs.pluck(:dest).sort.uniq
+              destinations.each_with_index do |dest, index|
 
-           destinations = connecting_bcs.pluck(:dest).sort.uniq
-           destinations.each_with_index do |dest, index|
-
-             x.report("mapping from References"){
-             mkt = "#{origin}-#{dest}"
-             Rails.logger.info " ==== (#{brand.brand_key}) Building 3 Segment mkt requests  for #{mkt} "
-             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{destinations.count}) "
-
-
-             markets = markets | [[origin, dest]]
+               x.report("mapping from References"){
+               mkt = "#{origin}-#{dest}"
+               Rails.logger.info " ==== (#{brand.brand_key}) Building 3 Segment mkt requests  for #{mkt} "
+               Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{destinations.count}) "
 
 
-             c1 = ConnRef.new(id: bc.id, key: bc.key)
-             cb_list = connecting_bcs.select{|cbc| cbc.dest == dest}
-             uniq_cb_list = cb_list.map{|other| ConnRef.new(id: other.id, key: other.key)}.uniq{|cr| cr.key}
+               markets = markets | [[origin, dest]]
 
-             multi_connections = uniq_cb_list.map{|c2| MultiConnRef.new(conns: [c1,c2])}.uniq{|mc| mc.key}
-             three_segment_mkt_connects[mkt] = multi_connections
-             }
-           end
+
+               c1 = ConnRef.new(id: bc.id, key: bc.key)
+               cb_list = connecting_bcs.select{|cbc| cbc.dest == dest}
+               uniq_cb_list = cb_list.map{|other| ConnRef.new(id: other.id, key: other.key)}.uniq{|cr| cr.key}
+
+               multi_connections = uniq_cb_list.map{|c2| MultiConnRef.new(conns: [c1,c2])}.uniq{|mc| mc.key}
+               three_segment_mkt_connects[mkt] = multi_connections
+               }
+              end
 
            end
 
@@ -383,7 +379,6 @@ module Oag
        market_requests = []
        case segment_count
          when 1
-           byebug
            one_segment_markets = DirectFlight.keyed(brand.report_key_strings).pluck(:origin, :dest).uniq
            one_segment_markets.each_with_index do |pair, index|
              origin, dest = pair
@@ -452,9 +447,9 @@ module Oag
     end
 
 
-    def market_route_map(brand, origin, dest)
+    def market_route_map(brand, origin, dest, seg_counts)
           requests = []
-          [*1..3].each do |seg_count|
+          seg_counts.each do |seg_count|
                 bmr =   BrandedMarketSegmentsRequest.branded(brand)
                         .market(origin, dest)
                         .where(segment_count: seg_count).first
@@ -465,23 +460,23 @@ module Oag
           end
 
           requests.uniq
-
     end
 
 
-    def build_brand_route_maps(brand)
+    def build_brand_route_maps(brand, seg_counts)
       
 
       markets = BrandedMarketSegmentsRequest.branded(brand).pluck(:origin, :dest).sort.uniq
 
       market_maps = {}
 
+      byebug
       markets.each do |mkt|
         origin, dest = mkt
         mkt_key = "#{origin}-#{dest}"
 
-        mkt_requests        = market_route_map(brand, origin, dest)
-        reverse_mkt_request = market_route_map(brand, dest, origin)
+        mkt_requests        = market_route_map(brand, origin, dest, seg_counts)
+        reverse_mkt_request = market_route_map(brand, dest, origin, seg_counts)
         return_mkt_request = mkt_requests.product reverse_mkt_request
 
         one_way = []
@@ -520,13 +515,22 @@ module Oag
       BrandedRouteMap.create(brand_id: brand.id, brand_key: brand.brand_key,
                         route_map: market_maps)
 
-      File.open("#{brand.brand_key.downcase}_route_map.json", 'w') {|f| f.write(
-          JSON.pretty_generate(market_maps)
-      )
-      }
+
 
     end
-    
+
+    def brand_route_map_document(brand)
+      brm = BrandedRouteMap.branded(brand)
+      JSON.pretty_generate(brm.route_map)
+    end
+
+    def export_brand_route_maps(brand)
+      File.open("#{brand.brand_key.downcase}_route_map.json", 'w') {|f| f.write(
+              brand_route_map_document(brand)
+            )
+      }
+    end
+
 
   #End Class
   end

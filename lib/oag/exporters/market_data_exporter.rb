@@ -66,7 +66,7 @@ class MarketDataExporter
     ENV['s3_region'] or raise 'AWS bucket path'
   end
   def bucket_name
-     ENV['bucket_name'] or raise 'AWS bucket path'
+     ENV['market_bucket_name'] or raise 'AWS bucket path'
   end
 
 end

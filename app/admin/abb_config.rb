@@ -1,5 +1,5 @@
 ActiveAdmin.register ABBConfig, as: 'App Setting' do
-  menu priority: 2,  :parent => 'Config'
+  menu priority: 2,  :parent => 'Settings'
 
   permit_params :var, :value, :thing_id, :thing_type, :tip
 

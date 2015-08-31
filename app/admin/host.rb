@@ -10,6 +10,15 @@ ActiveAdmin.register Host do
   #
   permit_params :brand_id, :code, :name, airline_ids: []
 
+  # action_item :clone, only: :show do
+  #   link_to 'Clone', clone_admin_host_path(host) if (host and host.id)
+  # end
+  # action :clone, only: :index do
+  #   byebug
+  #   link_to 'Clone', clone_admin_host_path(host) if (host and host.id)
+  # end
+
+
   index do
     column :brand
     column :code
@@ -26,7 +35,21 @@ ActiveAdmin.register Host do
       end
     end
 
-    actions
+    actions do |host|
+        link_to "Clone", clone_admin_host_path(host), class: "member_link"
+    end
+  end
+
+
+
+  member_action :clone, method: [:get] do
+      @o_host = Host.find(params[:id])
+      @host = @o_host.dup
+      @o_host.airlines.each do |airline|
+        @host.airlines << airline
+      end
+
+      render :edit
   end
 
   controller do
@@ -38,6 +61,7 @@ ActiveAdmin.register Host do
       @host = Host.find(params[:id])
       render :edit,  layout: 'active_admin'
     end
+
     def show
        @host = Host.find(params[:id])
        render :show,  layout: 'active_admin'

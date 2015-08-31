@@ -1,5 +1,5 @@
 .row
-  = simple_form_for @brand, html: { class: 'form-horizontal' },
+  = simple_form_for [:admin,@brand], html: { class: 'form-horizontal' },
       wrapper: :horizontal_form,
       wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
                          radio_buttons: :horizontal_radio_and_checkboxes,
@@ -23,7 +23,7 @@
     .form-inputs
       = f.input :brand_key
       = f.input :name
-      = f.association :report_keys, as: :check_boxes
+      = f.association :report_keys, as: :check_boxes, include_hidden: false
       -#TODO:  Change the association checkboxes to use Jquey List Boxes
       -#with Add Left or Remove Right
       = f.input :description

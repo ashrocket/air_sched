@@ -1,11 +1,11 @@
 ActiveAdmin.register Brand, as: 'Brands' do
-  menu priority: 3,  :parent => 'Config'
+  menu priority: 2,  :parent => 'Config'
 
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :report_keys, :name,  :description, :active, host_ids: []
+  permit_params :brand_key, :report_keys, :name,  :description, :default_currency, :active, report_key_ids: [], host_ids: []
   #
   # or
   #
@@ -78,9 +78,14 @@ ActiveAdmin.register Brand, as: 'Brands' do
       end
 
       # def update
-      #   @host = Host.find(params[:id])
-      #   @host.update(permitted_params[:host])
+      #   @brand = Brand.friendly.find(params[:id])
+      #   @brand.update(permitted_params[:brand])
       # end
+
+     #  def create
+     #       byebug
+     #       @brand = Brand.create(permitted_params[:brand])
+     # end
   end
 
 end

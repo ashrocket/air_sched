@@ -1,5 +1,5 @@
 ActiveAdmin.register DirectFlight, :as => "Directs" do
-  menu :parent => "Connections"
+  menu :parent => "Data"
 
   
   # See permitted parameters documentation:

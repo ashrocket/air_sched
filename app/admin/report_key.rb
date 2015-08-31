@@ -1,5 +1,5 @@
 ActiveAdmin.register ReportKey, as: 'Data Keys' do
-  menu priority: 1,  :parent => 'Config'
+  menu priority: 3,  :parent => 'Config'
 
 
   # See permitted parameters documentation:

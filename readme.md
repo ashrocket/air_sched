@@ -23,7 +23,7 @@ Currently the most reliable way to add report_keys is to do so the rails console
 **example**
 
     ashr-mac:air_sched $rails c
-    2.1.2 :001 > b = Brand.keyed('TZ').first
+    2.1.2 :001 > b = Brand.keyed('TZ')
       Brand Load (1.2ms)  SELECT  "brands".* FROM "brands" WHERE "brands"."brand_key" = $1  ORDER BY "brands"."id" ASC LIMIT 1  [["brand_key", "TZ"]]
      => #<Brand id: 1, brand_key: "TZ", name: "Scoot", report_keys: ["TZTRDDXW", "TZBRANDVA"], description: "Scoot Interline Network", host_map: {"TZ"=>"TZ", "TR"=>"TZ", "XW"=>"XW", "DD"=>"DD"}, active: true, slug: "tz", created_at: "2015-07-27 23:10:16", updated_at: "2015-08-05 03:49:48", default_currency: "AUD"> 
     2.1.2 :002 > b.report_keys =  ["TZTRDDXW", "TZBRANDVA", "TZBRANDMI"]
@@ -172,8 +172,31 @@ mastiff gem requires mailbox credentials to be supplied either in Environment va
     MASTIFF_PASSWORD: account password
     MASTIFF_MAILHOST: mailhost address
 
+----------
 
+Application.yml
+-----------------
 
+Add configuration values here, as shown below.
 
+     #
+     #
+     #stripe_api_key: sk_test_2J0l093xOyW72XUYJHE4Dv2r
+     # stripe_publishable_key: pk_test_ro9jV5SNwGb1yYlQfzG17LHK
+     #
+     #  You can specify by environment
+     # production:
+     #   stripe_api_key: sk_live_EeHnL644i6zo4Iyq4v1KdV9H
+     #   stripe_publishable_key: pk_live_9lcthxpSIHbGwmdO941O1XVU
+     # 
+    market_bucket_name: airblackbox-markets
+    routes_bucket_name: airblackbox-routes
+    s3_region: us-east-1
+    abb_aws_access_key_id: SECRETKEYID
+    abb_aws_secret_access_key: SECRETKEY
+    MASTIFF_EMAIL_ADDRESS: email@email.com
+    MASTIFF_PORT: '993'
+    MASTIFF_PASSWORD: EMAILPASSWORD
+    MASTIFF_MAILHOST: subhost.mail.mailhost.com
 
 

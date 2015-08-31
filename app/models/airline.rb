@@ -13,6 +13,7 @@ class Airline < ActiveRecord::Base
   has_many :airlines_hosts, dependent: :destroy
   has_many :hosts, through: :airlines_hosts
 
+  scope :by_codes,     lambda {|codes| where(Airline[:code].in codes)}
 
   class << self
     def by_code code

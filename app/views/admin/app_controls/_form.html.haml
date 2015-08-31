@@ -1,4 +1,4 @@
-= simple_form_for [:admin,@app_control], html: { class: 'form-horizontal' },
+= simple_form_for [:admin, @app_control], html: { class: 'form-horizontal' },
    wrapper: :horizontal_form,
    wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
                        radio_buttons: :horizontal_radio_and_checkboxes,
@@ -19,6 +19,7 @@
 
   .form-inputs
     = f.association :report_key, include_hidden: false, include_blank: false
+    = f.association :brand, include_hidden: false, include_blank: false
 
   .form-actions.col-sm-offset-3.col-sm-8
     = f.submit class: 'btn btn-primary'

@@ -2,6 +2,9 @@ class OagReport < ActiveRecord::Base
   # http://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Serialization/ClassMethods.html
   # serialize :load_status, JSON
 
+  scope :keyed, lambda {|report_key| where(report_key: report_key)}
+  scope :latest, -> { order(updated_at: :desc).first}
+  scope :complete,  -> { where(complete: true) }
   scope :incomplete,  -> { where(complete: false) }
 
   def report_path

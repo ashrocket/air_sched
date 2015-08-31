@@ -200,15 +200,21 @@ ActiveAdmin.setup do |config|
   #       menu.add label: "My Great Website", url: "http://www.mygreatwebsite.com", html_options: { target: :blank }
   #     end
   #   end
-  config.namespace :active_admin do |admin|
+  # config.namespace :admin do |admin|
+  #   admin.build_menu do |menu|
+  #     menu.add label: 'Blog', priority: 0
+  #   end
+  # end
+
+  config.namespace :admin do |admin|
  
        # This block will edit the default menu
        admin.build_menu do |menu|
          menu.add :label => 'Config', :priority => 1
-         menu.add :label => 'Reports', :priority => 2
-         menu.add :label => 'Connections', :priority => 3
-         menu.add :label => 'Schedules', :priority => 4
-         menu.add :label => 'Codes', :priority => 5
+         menu.add :label => 'Settings', :priority => 2
+         menu.add :label => 'Codes', :priority => 3
+         menu.add :label => 'Data', :priority => 4
+         menu.add :label => 'Reports', :priority => 5
        end
  
   end

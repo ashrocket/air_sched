@@ -1,5 +1,5 @@
 ActiveAdmin.register_page 'Current Data Key' do
-  menu priority: 0,  :parent => 'Config'
+  menu priority: 2,  :parent => 'Config'
 
   page_action :edit, method: :get do
   end

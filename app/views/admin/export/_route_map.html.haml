@@ -1,0 +1,11 @@
+.row
+  %br
+.row
+  .col-sm-3.col-sm-offset-1
+    .h5{:style => 'margin: 0px;'}
+      Smart Market Report
+  .col-sm-3
+    = simple_form_for :active_admin, url:   generate_admin_market_data_exports_path do |form|
+      = form.submit 'Export'
+
+

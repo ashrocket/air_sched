@@ -6,12 +6,11 @@ class Host < ActiveRecord::Base
   has_many :airlines_hosts, dependent: :destroy
   has_many :airlines, through: :airlines_hosts
 
-  # Class Methods
-  class << self
-    def by_carriers(cxrs)
-      includes(:airlines).where(Airline[:code]).in(cxrs)
-    end
+  scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
 
+
+  def carrier_codes
+    airlines.map{|a| a.code}
   end
 
 end

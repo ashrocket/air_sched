@@ -1,6 +1,18 @@
 %p#notice= notice
 %p#alert= alert
 %dl.dl-horizontal
+  %dt Current Brand:
+  %dd
+    %ul.list-inline
+      %li{style: "vertical-align: center"}= link_to @app_control.brand.name, admin_brand_path(@app_control.brand)
+      %li{style: "vertical-align: center"}= @app_control.brand.brand_key
+      %li{style: "vertical-align: top"}
+        %ul#sorted_report_keys.list-group
+          - @app_control.brand.report_keys.each do |rk|
+            %li.list-group-item
+              = link_to(rk.name, admin_data_key_path(rk))
+
+  %br
   %dt Current Report key:
   %dd
     %ul.list-inline

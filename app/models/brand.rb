@@ -1,13 +1,13 @@
 class Brand < ActiveRecord::Base
   extend FriendlyId
-  friendly_id :brand_key, use: :slugged
+  friendly_id :code, use: [:slugged, :finders]
 
   has_many :brand_report_keys, dependent: :destroy
   has_many :report_keys,  -> { order(report_key: :asc) }, through: :brand_report_keys
 
-  has_many :hosts
+  has_many :hosts, -> { order(name: :asc) }
 
-  scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
+  scope :keyed,     lambda {|brand_key| find_by(brand_key: brand_key)}
 
   # Class Methods
   class << self
@@ -19,7 +19,7 @@ class Brand < ActiveRecord::Base
   # Instance Methods
   #
   def hosts_for(cxrs)
-      hosts.by_carriers(cxrs)
+    hosts.includes(:airlines).where(Airline[:code].in(cxrs)).references(:airlines)
   end
 
 
@@ -29,6 +29,12 @@ class Brand < ActiveRecord::Base
     else
       [""]
     end
+
+  end
+
+  def build_connections
+    oag_reports = report_keys.map{ |rk| OagReport.keyed(rk.report_key).latest}
+
 
   end
 

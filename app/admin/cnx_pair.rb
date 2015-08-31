@@ -1,5 +1,5 @@
 ActiveAdmin.register CnxPair, :as => "Pairs" do
-  menu :parent => "Connections"
+  menu :parent => "Data"
 
   # See permitted parameters documentation:
   # https://github.com/gregbell/admin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters

@@ -1,5 +1,5 @@
 ActiveAdmin.register OagSchedule, :as => "Summaries" do
-  menu :parent => "Schedules"
+  menu :parent => "Data"
   actions :all, :except => [:new]
 
 

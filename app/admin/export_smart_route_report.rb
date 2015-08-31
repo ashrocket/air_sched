@@ -1,5 +1,5 @@
 ActiveAdmin.register ExportSmartRouteReport  do
-  menu label: 'Route Map Reports', parent: 'Reports'
+  menu priority: 1, label: 'Route Map Reports', parent: 'Reports'
   actions :all, :except => [:new]
 
   index do

@@ -2,7 +2,8 @@ class CreateOagSchedules < ActiveRecord::Migration
 
   def change
      create_table :oag_schedules do |t|
-       t.string :report_key
+       t.references :report_key
+
        t.datetime :eff_date
        t.datetime :disc_date
 
@@ -37,10 +38,10 @@ class CreateOagSchedules < ActiveRecord::Migration
 
        t.timestamps
      end
-     add_index :oag_schedules, [:report_key,:eff_date], :name => 'oag_eff_date'
-     add_index :oag_schedules, [:report_key, :disc_date], :name => 'oag_disc_date'
-     add_index :oag_schedules, [:report_key, :eff_date, :disc_date], :name => 'oag_eff_disc_dates'
-     add_index :oag_schedules, [:report_key, :eff_date, :disc_date, :origin_apt, :dep_time_local], :name => 'oag_origins'
+     add_index :oag_schedules, [:report_key_id,:eff_date], :name => 'oag_eff_date'
+     add_index :oag_schedules, [:report_key_id, :disc_date], :name => 'oag_disc_date'
+     add_index :oag_schedules, [:report_key_id, :eff_date, :disc_date], :name => 'oag_eff_disc_dates'
+     add_index :oag_schedules, [:report_key_id, :eff_date, :disc_date, :origin_apt, :dep_time_local], :name => 'oag_origins'
 
 
      add_index :oag_schedules, [:airline_code, :flight_num], :name => 'oag_flight_id'

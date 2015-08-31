@@ -13,7 +13,7 @@ require 'extras.rb'
 class OagSchedule < ActiveRecord::Base
 
   include ArelHelpers::ArelTable
-
+  belongs_to :report_key
 
   #attr_accessible :hub, :cxr
   #attr_accessible :eff_date, :disc_date
@@ -27,7 +27,7 @@ class OagSchedule < ActiveRecord::Base
 
   # oag_schedules = Arel::Table.new(:oag_schedules)
 
-  scope :keyed,     lambda {|report_key| where(OagSchedule[:report_key].eql?(report_key))}
+  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
 
   scope :branded,     lambda {|brand| where(OagSchedule[:report_key].in(brand.report_key_strings)) }
 
@@ -265,6 +265,9 @@ class OagSchedule < ActiveRecord::Base
 # Instance Methods
 #
 #################
+  def report_key_string
+    report_key.report_key
+  end
 
   def mkt_carriers_flights
     self.mkt_cxrs.split ';'

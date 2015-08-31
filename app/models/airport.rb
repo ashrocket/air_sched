@@ -2,7 +2,7 @@ class Airport < ActiveRecord::Base
   # :code
   # :name
   extend FriendlyId
-  friendly_id :code, use: :slugged
+  friendly_id :code, use: [:slugged, :finders]
 
   scope :by_code,   lambda {|code| where(:code => code)}
 

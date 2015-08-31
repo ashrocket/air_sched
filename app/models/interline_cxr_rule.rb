@@ -5,7 +5,7 @@ class InterlineCxrRule < ActiveRecord::Base
      def keyed(report_key)
        report_key_obj =  ReportKey.find_by(report_key: report_key)
        if report_key_obj
-        where('report_key_id = ?',  report_key_obj.id).order(:sequence)
+        where(report_key: report_key_obj).order(:sequence)
        else
          []
        end

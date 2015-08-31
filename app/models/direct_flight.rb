@@ -1,11 +1,13 @@
 class DirectFlight < ActiveRecord::Base
   include ArelHelpers::ArelTable
 
+  belongs_to :report_key
   # :cxx
   # :hub
   # :origin
   # :dest
   # :carriers
+  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
 
   class << self
     #
@@ -17,18 +19,6 @@ class DirectFlight < ActiveRecord::Base
     #def hub apt
     #  where("hub = ?",  apt)
     #end
-
-    def keyed report_keys
-      if report_keys.is_a? String
-        where(DirectFlight[:report_key].eql?(report_keys))
-      elsif report_keys.respond_to?(:first) and report_keys.first.is_a? String
-        where(DirectFlight[:report_key].in(report_keys))
-      elsif report_keys.respond_to?(:first) and report_keys.first.is_a? ReportKey
-        where(DirectFlight[:report_key].in(ReportKey.strings(report_keys)))
-      else
-        DirectFlight.none
-      end
-    end
 
 
     def pair o,d

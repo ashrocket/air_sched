@@ -1,6 +1,6 @@
 class Brand < ActiveRecord::Base
   extend FriendlyId
-  friendly_id :code, use: [:slugged, :finders]
+  friendly_id :brand_key, use: [:slugged, :finders]
 
   has_many :brand_report_keys, dependent: :destroy
   has_many :report_keys,  -> { order(report_key: :asc) }, through: :brand_report_keys

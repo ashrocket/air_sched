@@ -33,9 +33,17 @@ class ProcessAttachmentWorker
           processor = Oag::Process.new
 
 
-          key  = report.estimated_key
+          report_key  = report.estimated_report_key
+          if report_key.is_a? ReportKey
+            report.report_key = report_key
 
-          unless key.is_a? ReportKey
+            if report.report_status.eql?  'uninitialized'
+                   report.report_status =  'queued'
+                   report.save
+                   ScheduleImportWorker.perform_async(report.id)
+            end
+          else
+
             processor.finalize(report, 'rejected')
             report.report_status ='rejected'
             report.load_status['attachment_status'] = 'undefined or invalid report key'
@@ -43,14 +51,9 @@ class ProcessAttachmentWorker
             report.save
 
             Sidekiq::Logging.logger.info "Report rejected due to  undefined or invalid report key #{report.report_name}"
+          end
 
-          end
-          report.report_key = key.report_key if key
-          if report and report.report_key and report.report_status.eql?  'uninitialized'
-           report.report_status =  'queued'
-           report.save
-           ScheduleImportWorker.perform_async(report.id)
-          end
+
         # Attachment might be stuck
         elsif report and
               !report.report_status.eql? 'uninitialized' and report.attachment_status != 'stored' and

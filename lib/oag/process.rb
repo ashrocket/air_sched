@@ -21,7 +21,7 @@ module Oag
 
 
         # dest_group.compact.each do  |dest|
-        process_logger.info "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key}"
+        process_logger.info "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key.code}"
 
         Parallel.each_with_index(dest_group, in_threads:4) do |dest, index|
           # Oag::Util.refresh_forked_process_postgres_db_connection
@@ -50,7 +50,7 @@ module Oag
                  end
                end
                process_logger.debug "Filtering:  #{connected_schedules.count} connected_schedules for #{dest.origin_code}" +
-                                       "#{dest.hub_code} #{dest.dest_code} #{report.report_key}"
+                                       "#{dest.hub_code} #{dest.dest_code} #{report.report_key.code}"
 
                eff_days = connected_schedules.map{ |cs|  [ cs[:window][:eff].to_date,
                                                                  cs[:window][:disc].to_date,
@@ -170,7 +170,7 @@ module Oag
 
         tot = cnx.count
         cnx.in_groups_of(1000) do |cnx_group|
-          process_logger.info "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key}"
+          process_logger.info "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key.code}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
@@ -211,7 +211,7 @@ module Oag
           tot = pairs.count
           group_size = 1000
           pairs.in_groups_of(group_size) do |pair_group|
-            process_logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
+            process_logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key.code}"
             tot -= group_size
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])

@@ -132,20 +132,22 @@ module Oag
     schedules.in_groups_of(group_size) do |schedule_group|
       schedule_group.compact.each do |sched|
         begin
-          schedule_records << OagSchedule.new(sched.merge(:report_key => report.report_key))
+          oag_sched = OagSchedule.new(sched)
+          oag_sched.report_key = report.report_key
+          schedule_records << oag_sched
         rescue Exception => e
             Rails.logger.error sched
             Rails.logger.error e.message
             raise RuntimeError, e
         end
       end
-      Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+      Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key.code}."
       schedule_count = schedule_count - schedule_records.count
       loaded += schedule_records.count
       OagSchedule.import schedule_records
       schedule_records = []
     end
-    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key} ---"
+    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key.code} ---"
     report.report_status = 'importing'
     report.save
   end
@@ -154,13 +156,13 @@ module Oag
 
     orig_airports = schedules.collect{ |n| n[:origin_apt] }
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
-    OagSchedule.where(:report_key => report.report_key).delete_all
+    OagSchedule.keyed(report.report_key).delete_all
 
-    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key}"
+    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key.code}"
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status['expired_schedules_count'] = expired.count
 
-    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{report.report_key}."
+    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{report.report_key.code}."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status['schedules_count'] = schedules.count
 
@@ -172,7 +174,9 @@ module Oag
     schedules.in_groups_of(group_size) do |schedule_group|
     schedule_group.compact.each do |sched|
       begin
-        schedule_records << OagSchedule.new(sched.merge(:report_key => report.report_key))
+            oag_sched = OagSchedule.new(sched)
+            oag_sched.report_key = report.report_key
+            schedule_records << oag_sched
 
       rescue Exception => e
           Rails.logger.error sched
@@ -180,14 +184,14 @@ module Oag
           raise RuntimeError, e
       end
     end
-    Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key}."
+    Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key.code}."
     schedule_count = (schedule_count - schedule_records.count)
 
     loaded += schedule_records.count
     OagSchedule.import schedule_records
     schedule_records = []
   end
-  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key} ---"
+  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key.code} ---"
   report.load_status['report_status'] = 'imported'
   report.save
 
@@ -296,7 +300,7 @@ module Oag
     process_schedule_chunk(report, schedules)
     if report.load_status['report_line_ptr'].to_i >= report.attachment_lines
       report.report_status = 'schedules_loaded'
-      Rails.logger.info "There were  #{report.load_status['expired_schedules_count']} expired schedules in the file  for #{report.report_key}."
+      Rails.logger.info "There were  #{report.load_status['expired_schedules_count']} expired schedules in the file  for #{report.report_key.code}."
 
     end
 

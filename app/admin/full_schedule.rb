@@ -1,5 +1,5 @@
 ActiveAdmin.register OagSchedule, :as => "Full Schedule" do
-  menu :parent => "Data"
+  menu priority: 2,  :parent => "Data"
   actions :all, :except => [:new]
 
   # See permitted parameters documentation:

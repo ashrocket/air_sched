@@ -22,14 +22,14 @@ class ScheduleImportWorker
     if lock.acquire!
       begin
         report = OagReport.find_by(id: report_id)
-        Sidekiq::Logging.logger.info "Import Worker Lock acquired, processing #{report_id}: #{report.report_key}"
+        Sidekiq::Logging.logger.info "Import Worker Lock acquired, processing #{report_id}: #{report.report_key.code}"
 
         if report and !report.complete
           processor = Oag::Process.new
 
           case report.report_status
             when /queued/
-              Sidekiq::Logging.logger.info "Import Worker loading schedules #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker loading schedules #{report_id}: #{report.report_key.code}"
               if report.large_report?
 
                 ScheduleLargeImportWorker.perform_async(report_id)
@@ -39,14 +39,14 @@ class ScheduleImportWorker
               end
             when /schedules_loaded/
 
-              Sidekiq::Logging.logger.info "Import Worker refreshing airports  #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker refreshing airports  #{report_id}: #{report.report_key.code}"
               processor.refresh_airports(report)
               report.save
               UpdateAirportsWorker.perform_async()
 
             when /airports_refreshed/
 
-              Sidekiq::Logging.logger.info "Import Worker refreshing airlines  #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker refreshing airlines  #{report_id}: #{report.report_key.code}"
               processor.refresh_airlines(report)
               report.save
               # UpdateAirlinesWorker.perform_async()
@@ -55,12 +55,12 @@ class ScheduleImportWorker
 
 
 
-              Sidekiq::Logging.logger.info "Import Worker refreshing direct flights  #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker refreshing direct flights  #{report_id}: #{report.report_key.code}"
               processor.refresh_direct_flights(report)
               report.save
             when /direct_flights_refreshed/
 
-              Sidekiq::Logging.logger.info "Import Worker refreshing destinations   #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker refreshing destinations   #{report_id}: #{report.report_key.code}"
               report.load_status['destinations_map_status'] = 'refreshing'
               processor.refresh_destinations(report)
               report.load_status['destinations_map_status'] = 'refreshed'
@@ -68,18 +68,16 @@ class ScheduleImportWorker
               report.save
             when /destinations_refreshed/
 
-              Sidekiq::Logging.logger.info "Import Worker refreshing cnx_pairs   #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker refreshing cnx_pairs   #{report_id}: #{report.report_key.code}"
               processor.refresh_cnx_pairs(report)
               report.save
             when /connections_refreshed/
 
-              Sidekiq::Logging.logger.info "Import Worker finalizing    #{report_id}: #{report.report_key}"
+              Sidekiq::Logging.logger.info "Import Worker finalizing    #{report_id}: #{report.report_key.code}"
               report.save
               processor.finalize(report, 'processed')
-              rkey = ReportKey.where(report_key: report.report_key).first_or_create
-              rkey.active = true
-              rkey.save
           end
+
           unless report.complete or report.large_report?
             ScheduleImportWorker.perform_async(report_id)
           end
@@ -89,7 +87,7 @@ class ScheduleImportWorker
       end
     else
       report = OagReport.find_by(id: report_id)
-      Sidekiq::Logging.logger.info "Import Worker, busy, delaying #{report_id} for 1 minute #{report.report_key}"
+      Sidekiq::Logging.logger.info "Import Worker, busy, delaying #{report_id} for 1 minute #{report.report_key.code}"
       ScheduleImportWorker.delay_for(3.minute).perform_async(report_id)
     end
     #Do Something here with the message

@@ -9,7 +9,11 @@ class Destination < ActiveRecord::Base
   # :dest
   # :dest_code
   # :eff_days
-  scope :keyed,  lambda {|report_key| where("report_key = ?",  report_key)}
+  belongs_to :report_key
+
+
+  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
+
   class << self
     #
     # Scopes

@@ -2,7 +2,10 @@ class OagReport < ActiveRecord::Base
   # http://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Serialization/ClassMethods.html
   # serialize :load_status, JSON
 
-  scope :keyed, lambda {|report_key| where(report_key: report_key)}
+  belongs_to :report_key
+
+  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
+
   scope :latest, -> { order(updated_at: :desc).first}
   scope :complete,  -> { where(complete: true) }
   scope :incomplete,  -> { where(complete: false) }
@@ -27,8 +30,8 @@ class OagReport < ActiveRecord::Base
     end
   end
 
-  def estimated_key
-      ReportKey.match_key(report_name)
+  def estimated_report_key
+      ReportKey.match_filename(report_name)
   end
 
   def process_attachment

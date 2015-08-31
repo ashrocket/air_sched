@@ -7,11 +7,12 @@ class CnxPair < ActiveRecord::Base
   # :dest
   # :dest_name
   # :cxr
+  belongs_to :report_key
 
   scope :from_airport,       lambda {|origin| where("origin = ?",  origin)}
   #scope :cxx,  lambda {|cxx| where("cxr = ?",  cxx)}
   #scope :hub,       lambda {|hub| where("hub = ?",  hub)}
-  scope :keyed,       lambda {|report_key| where("report_key = ?",  report_key)}
+  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
 
   # -----------------
   # Class methods

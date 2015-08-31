@@ -2,7 +2,7 @@ class BrandConnectionTemplate < ActiveRecord::Base
 
 
 
-  scope :keyed,     lambda {|brand_key| where("brand_key = ?",  brand_key)}
+  scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
   scope :market,    lambda {|o,d|    where(:origin =>  o, :dest => d)}
 
 

@@ -4,7 +4,7 @@
   %dt Msg:
   %dd= @oag_report.msg_id
   %dt Report key:
-  %dd= @oag_report.report_key
+  %dd= link_to @oag_report.report_key.report_key, admin_data_key_path(@oag_report.report_key)
   %dt Report status:
   %dd= @oag_report.report_status
   %dt Attachment status:
@@ -23,3 +23,4 @@
   %dd= @oag_report.complete
   %dt Load status:
   %dd= @oag_report.load_status
+

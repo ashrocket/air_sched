@@ -18,8 +18,8 @@ class MarketDataExporter
     zipfile_name = filename + '.zip'
     zipped_file = File.new(zipfile_name,"w+")
 
-    @export_report_keys.each do |report_key|
-
+    @export_report_keys.each do |rk|
+      report_key = ReportKey.keyed(rk)
       markets = Destination.keyed(report_key)
       .pluck(:origin_code, :hub_code, :dest_code)
         # .where('destinations.cxr1 != destinations.cxr2')

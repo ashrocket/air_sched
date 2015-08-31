@@ -1,7 +1,7 @@
 class CreateDestinations < ActiveRecord::Migration
   def change
     create_table :destinations do |t|
-      t.string :report_key
+      t.references :report_key
       t.string :origin
       t.string :origin_code
       t.string :cxrs1, array: true, default: []

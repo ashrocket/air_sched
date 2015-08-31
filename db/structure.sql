@@ -13,14 +13,16 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -651,7 +653,7 @@ ALTER SEQUENCE city_pairs_id_seq OWNED BY city_pairs.id;
 
 CREATE TABLE cnx_pairs (
     id integer NOT NULL,
-    report_key character varying(12),
+    report_key_id integer,
     origin character varying(4),
     origin_name character varying,
     dest character varying(4),
@@ -684,7 +686,7 @@ ALTER SEQUENCE cnx_pairs_id_seq OWNED BY cnx_pairs.id;
 
 CREATE TABLE destinations (
     id integer NOT NULL,
-    report_key character varying,
+    report_key_id integer,
     origin character varying,
     origin_code character varying,
     cxrs1 character varying[] DEFAULT '{}'::character varying[],
@@ -724,7 +726,7 @@ ALTER SEQUENCE destinations_id_seq OWNED BY destinations.id;
 
 CREATE TABLE direct_flights (
     id integer NOT NULL,
-    report_key character varying,
+    report_key_id integer,
     origin character varying,
     dest character varying,
     carriers character varying[] DEFAULT '{}'::character varying[]
@@ -960,8 +962,8 @@ ALTER SEQUENCE interline_cxr_rules_id_seq OWNED BY interline_cxr_rules.id;
 
 CREATE TABLE oag_reports (
     id integer NOT NULL,
+    report_key_id integer,
     msg_id character varying,
-    report_key character varying,
     load_status json DEFAULT '{}'::json,
     report_status character varying DEFAULT 'uninitialized'::character varying,
     attachment_status character varying DEFAULT 'unstored'::character varying,
@@ -1001,7 +1003,7 @@ ALTER SEQUENCE oag_reports_id_seq OWNED BY oag_reports.id;
 
 CREATE TABLE oag_schedules (
     id integer NOT NULL,
-    report_key character varying,
+    report_key_id integer,
     eff_date timestamp without time zone,
     disc_date timestamp without time zone,
     airline_code character varying,
@@ -1652,7 +1654,7 @@ ALTER TABLE ONLY settings
 -- Name: cnx_pairs_o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX cnx_pairs_o_and_d ON cnx_pairs USING btree (report_key, origin, dest, origin_name, dest_name);
+CREATE INDEX cnx_pairs_o_and_d ON cnx_pairs USING btree (report_key_id, origin, dest, origin_name, dest_name);
 
 
 --
@@ -1932,21 +1934,21 @@ CREATE INDEX oag_comp_mkt ON oag_schedules USING btree (origin_apt, dest_apt);
 -- Name: oag_disc_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_disc_date ON oag_schedules USING btree (report_key, disc_date);
+CREATE INDEX oag_disc_date ON oag_schedules USING btree (report_key_id, disc_date);
 
 
 --
 -- Name: oag_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_eff_date ON oag_schedules USING btree (report_key, eff_date);
+CREATE INDEX oag_eff_date ON oag_schedules USING btree (report_key_id, eff_date);
 
 
 --
 -- Name: oag_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_eff_disc_dates ON oag_schedules USING btree (report_key, eff_date, disc_date);
+CREATE INDEX oag_eff_disc_dates ON oag_schedules USING btree (report_key_id, eff_date, disc_date);
 
 
 --
@@ -1967,7 +1969,7 @@ CREATE INDEX oag_flight_id_time ON oag_schedules USING btree (dep_time_local, fl
 -- Name: oag_origins; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_origins ON oag_schedules USING btree (report_key, eff_date, disc_date, origin_apt, dep_time_local);
+CREATE INDEX oag_origins ON oag_schedules USING btree (report_key_id, eff_date, disc_date, origin_apt, dep_time_local);
 
 
 --

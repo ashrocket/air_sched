@@ -1,5 +1,5 @@
 ActiveAdmin.register OagReport  do
-  menu label: 'Oag Imports', :parent => 'Reports'
+  menu priority: 0, label: 'Oag Imports', :parent => 'Reports'
   # actions :all, :except => [:new]
 
   # See permitted parameters documentation:
@@ -29,10 +29,10 @@ ActiveAdmin.register OagReport  do
         report.msg_id
       end
       column 'Report Key', :sortable => :report_key do |report|
-        report.report_key
+        link_to report.report_key.report_key, admin_data_key_path(report.report_key)
       end
       column 'Finished', :sortable => :complete  do |report|
-        report.complete
+        pretty_boolean(report.complete)
       end
       column 'Status', :sortable => :report_status do |report|
         report.report_status

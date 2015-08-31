@@ -17,7 +17,7 @@ class ScheduleLargeImportWorker
     if lock.acquire!
       begin
         report = OagReport.find_by(id: report_id)
-        Sidekiq::Logging.logger.info "Large Import Worker Lock acquired, processing #{report_id}: #{report.report_key}"
+        Sidekiq::Logging.logger.info "Large Import Worker Lock acquired, processing #{report_id}: #{report.report_key.code}"
         if report and !report.complete
           processor = Oag::Process.new
           case report.report_status

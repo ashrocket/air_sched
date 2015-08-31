@@ -1,5 +1,5 @@
 ActiveAdmin.register DirectFlight, :as => "Directs" do
-  menu :parent => "Data"
+  menu priority: 0,  :parent => "Data"
 
   
   # See permitted parameters documentation:

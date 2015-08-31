@@ -396,7 +396,6 @@ module Oag
 
     def build_brand_market_smart_routes(brand, seg_counts)
 
-      byebug
       seg_counts.each do |seg_count|
         BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).delete_all
         # BrandedRouteRequest.branded(brand).destroy_all

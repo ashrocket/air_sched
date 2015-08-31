@@ -16,8 +16,6 @@ module Oag
       Rails.logger.info "Building Branded Connections for Schedules from Brand #{brand.brand_key} #{brand.name}"
       filtered_cxrs = []
 
-      BrandConnection.branded(brand).delete_all
-      byebug
       origins = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
                            .pluck(:origin_apt)
                            .sort.uniq
@@ -80,46 +78,12 @@ module Oag
       end
       routes = routes.compact.flatten
 
-
-          # routes.map!{|route|  {
-           #     sched1: route[0],
-           #     sched2: route[1],
-           #     windows: {
-           #         sched1: {window: route[0].effective_dates, operating: route[0].arr_op_days},
-           #         sched2: {window: route[1].effective_dates, operating: route[1].dep_op_days},
-           #         route:  {window:  route.first.effective_window(route.last),
-           #                 operating: route.first.connection_days_of_week(route.last,2)}
-           #
-           #      }}
-           #
-           # }
-
-           # routes = routes.delete_if{ |route| route[:windows][:route][:window].blank? || route[:windows][:route][:operating].blank? }
-           # routes.each do |route|
-
-             # brand_connections <<
-                 # BrandConnection.new(brand_key: brand.brand_key,
-                 #                      origin: origin_code,  dest: route[:sched2].dest_apt, via: dest_code,
-                 #                      sched1_id:      route[:sched1].id,
-                 #                                    sched1_eff_dates
-                 #                                             t.json :sched1_operating
-                 #                                             t.json :sched2_eff_dates
-                 #                                             t.json :sched2_operating
-                 #                                             t.json :ct_minutes
-                 #                                             t.json :eff_window
-                 #                                             t.json :operating_window
-                 #
-                 #
-                 #
-                 #                                       sched2_id: route[:sched2].id,
-                 #                      eff_window: route[:windows])
-           # brand_route_maps << BrandRouteMap.new(brand_key: brand.brand_key,
-           #                                                 origin: origin_code, dest: dest_code,
-           #                                                 segments: 2,
-           #                                                 route_map: routes)
-
       group_size = 2000
       tot = routes.count
+
+
+      BrandConnection.branded(brand).delete_all
+
       routes.in_groups_of(group_size) do |connection_group|
 
           BrandConnection.import connection_group.compact
@@ -309,9 +273,7 @@ module Oag
            Benchmark.bm do |x|
               x.report("3 seg #{[e_origin, e_dest]}") { cbcs = BrandConnection.connecting_scheds(bc) }
               x.report("Each 3 seg #{[e_origin, e_dest]}") { connecting_bcs = bc.connects_with.to_a }
-              # if emkt_index.between? 6,7
-              #           byebug
-              # end
+
 
               destinations = connecting_bcs.pluck(:dest).sort.uniq
               destinations.each_with_index do |dest, index|
@@ -381,10 +343,10 @@ module Oag
        market_requests = []
        case segment_count
          when 1
-           one_segment_markets = DirectFlight.keyed(brand.report_key_strings).pluck(:origin, :dest).uniq
+           one_segment_markets = DirectFlight.keyed(brand.report_keys).pluck(:origin, :dest).uniq
            one_segment_markets.each_with_index do |pair, index|
              origin, dest = pair
-             Rails.logger.info " ==== (#{brand.brand_key}) Building 1 Segment mkt requests  for #{origin} #{dest} "
+             Rails.logger.info " ==== (#{brand.brand_key}) Building One Segment mkt requests  for #{origin} #{dest} "
              Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{one_segment_markets.count}) "
 
 
@@ -403,7 +365,7 @@ module Oag
 
              origin, dest = market
 
-             Rails.logger.info " ==== (#{brand.brand_key}) Building 2 Segment mkt requests  for #{origin} #{dest} "
+             Rails.logger.info " ==== (#{brand.brand_key}) Building Two Segment mkt requests  for #{origin} #{dest} "
              Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{two_segment_markets.count}) "
 
              market_requests = one_stop_market_routes(brand, origin, dest)
@@ -434,7 +396,7 @@ module Oag
 
     def build_brand_market_smart_routes(brand, seg_counts)
 
-
+      byebug
       seg_counts.each do |seg_count|
         BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).delete_all
         # BrandedRouteRequest.branded(brand).destroy_all
@@ -472,7 +434,6 @@ module Oag
 
       market_maps = {}
 
-      byebug
       markets.each do |mkt|
         origin, dest = mkt
         mkt_key = "#{origin}-#{dest}"

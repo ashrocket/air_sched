@@ -18,7 +18,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
     oag_reports = brand.report_keys.map{ |rk| OagReport.keyed(rk.report_key).latest}
     oag_reports.each do |report|
       if report and report.complete
-        update_status = {updated: report.updated_at,
+        updated_status = {updated: report.updated_at,
                          load_status: report.load_status["destinations_map_status"]}
 
         report_key_updates[report.report_key] = updated_status

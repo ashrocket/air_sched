@@ -11,21 +11,7 @@ class BrandedPriceRequest < ActiveRecord::Base
      pricing_key = [branded_route_request.key, eff_window_key].join('-')
   end
 
-  # def initialize(attributes = {})
-  #   byebug
-  #   unless attributes[branded_route_request_id]
-  #   branded_route_request = BrandedRouteRequest.where(attributes.except(:eff, :disc, :operating_window))
-  #       .first_or_create!
-  #   else
-  #     branded_route_request_id =  attributes[branded_route_request_id]
-  #   end     # prepare delegate object
-  #   eff = attributes[:eff]
-  #   disc = attributes[:disc]
-  #   operating_window = attributes[:operating_window]
-  #   pricing_key = [branded_route_request.key, eff_window_key].join('-')
-  #
-  #
-  # end
+
 
   def route_request
     branded_route_request

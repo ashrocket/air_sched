@@ -199,4 +199,12 @@ Add configuration values here, as shown below.
     MASTIFF_PASSWORD: EMAILPASSWORD
     MASTIFF_MAILHOST: subhost.mail.mailhost.com
 
+**TODOs**
+
+ 1. Update Schedule Importer to use a fast upsert methodology so schedule_ids don't need to be destroyed if they haven't changed.  Most likely a Blob Checksum, or a diff_set.
+ 2. Update BrandedConnection builder and later states to check against existing datasets and only update changes.
+ 3. Add realtime log viewing to Admin Console
+ 4. Refactor Import StateMachine to a real state machine
+ 5. Implement RouteMap Exporter as a statemachine
+ 
 

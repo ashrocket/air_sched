@@ -13,11 +13,7 @@ class BrandedRouteRequest < ActiveRecord::Base
      self.cxrs =  self.cxrs.sort.uniq
      self.key  = "#{brand.brand_key}:#{host}/#{origin}-#{dest}-#{cxrs.sort.join(',')}"
    end
-  # def initialize(attributes = {})
-  #   byebug
-  #   super(attributes)
-  #
-  # end
+
 
 
 

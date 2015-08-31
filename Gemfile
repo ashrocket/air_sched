@@ -69,7 +69,6 @@ gem 'seed_dump'
 group :development, :test do
     gem 'better_errors'
     gem 'binding_of_caller'
-
     gem 'byebug'
     gem 'rspec',  '~> 3.0.0.beta2'
     gem 'rspec-rails',  '~> 3.0.0.beta2'

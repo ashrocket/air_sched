@@ -58,7 +58,7 @@ gem 'sidekiq-lock', '~> 0.2.0'
 gem 'sidekiq-failures', '~> 0.4.5'
 gem 'sidetiq', '0.5.0'
 gem 'sinatra', '>= 1.3.0', :require => nil
-gem 'mastiff', '~> 0.1.0'
+gem 'mastiff', '~> 0.1'
 gem 'roo', '~> 2.1.1'
 
 

@@ -59,10 +59,10 @@ class Destination < ActiveRecord::Base
   end
 
   def disp_origin
-     "#{self.origin} (#{self.origin_code})"
+     "#{origin} (#{origin_code})"
   end
   def disp_dest
-    "#{self.dest} (#{self.dest_code})"
+    "#{dest} (#{dest_code})"
 
   end
 end

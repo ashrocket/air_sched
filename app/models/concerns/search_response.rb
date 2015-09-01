@@ -17,10 +17,10 @@ class SearchResponse
       outbound_results.each{|res| @ob << ResultSet.new(res)  }
       return_results.each{|res| @rt << ResultSet.new(res)  }
       @ob.each do |ob_result|
-        ob_result.errors.each{|err|  self.errors << error}
+        ob_result.errors.each{|err|  errors << error}
       end
       @rt.each do |rt_result|
-        rt_result.errors.each{|err| self.errors << err}
+        rt_result.errors.each{|err| errors << err}
       end
 
 

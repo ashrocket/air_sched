@@ -21,7 +21,7 @@ class BrandedPriceRequest < ActiveRecord::Base
     if( [host,cxrs, eff, disc, operating_window] ==
         [other.host, other.cxrs, other.eff, other.disc, other.operating_window]
       )
-      pr2 = self.clone
+      pr2 = clone
       pr2.dest = other.dest
       pr2.cxrs = (pr2.cxrs + other.cxrs).sort.uniq
       pr2

@@ -9,12 +9,12 @@ class AppSwitch < ActiveRecord::Base
 
   def wax_on
     self.enabled = true
-    self.save
+    save
   end
 
   def wax_off
     self.enabled = false
-    self.save
+    save
   end
 
 end

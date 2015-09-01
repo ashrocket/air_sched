@@ -9,8 +9,8 @@ class ExportSmartRouteReport < ActiveRecord::Base
 
 
   def build_steps
-    self.status =  'unitialized' unless self.status
-    details['progress'] = 'branded_connections:waiting'
+    self.status =  'unitialized' unless status
+     self.details['progress'] ='branded_connections:waiting'
 
     report_key_updates = {}
     in_progress_report_keys = []
@@ -26,9 +26,9 @@ class ExportSmartRouteReport < ActiveRecord::Base
         in_progress_report_keys << {report_key: report.report_key, status: report.status}
       end
     end
-    details['report_key_updates'] = report_key_updates
-    details['in_progress_report_keys'] = in_progress_report_keys
-    self.save
+     self.details['report_key_updates'] =report_key_updates
+     self.details['in_progress_report_keys'] =in_progress_report_keys
+    save
 
 
   end

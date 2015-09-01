@@ -106,7 +106,7 @@ class Flight
   end
 
   def x_time(flt)
-     return flt.dep_minutes_since_midnight - self.arr_minutes_since_midnight
+     return flt.dep_minutes_since_midnight - arr_minutes_since_midnight
   end
 
   def mct_valid?(flt,mct)

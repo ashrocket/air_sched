@@ -60,10 +60,10 @@ class CnxPair < ActiveRecord::Base
   end # class << self
 
   def disp_origin
-      "#{self.origin_name} (#{self.origin})"
+      "#{origin_name} (#{origin})"
    end
    def disp_dest
-     "#{self.dest_name} (#{self.dest})"
+     "#{dest_name} (#{dest})"
 
    end
 

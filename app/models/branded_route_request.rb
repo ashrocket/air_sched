@@ -10,7 +10,7 @@ class BrandedRouteRequest < ActiveRecord::Base
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
   after_initialize do |rr|
-     self.cxrs =  self.cxrs.sort.uniq
+     self.cxrs =  cxrs.sort.uniq
      self.key  = "#{brand.brand_key}:#{host}/#{origin}-#{dest}-#{cxrs.sort.join(',')}"
    end
 
@@ -25,7 +25,7 @@ class BrandedRouteRequest < ActiveRecord::Base
       pr2 = BrandedRouteRequest.where(
           attributes.deep_symbolize_keys.except(:id, :dest, :cxrs, :key)
               .merge(dest: other.dest,
-                     cxrs: (self.cxrs + other.cxrs).sort.uniq)
+                     cxrs: (cxrs + other.cxrs).sort.uniq)
       ).first_or_create!
     else
       nil

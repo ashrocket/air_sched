@@ -95,10 +95,10 @@ class Airline < ActiveRecord::Base
   # Instance Methods
   #----------------------
   def disp_airline
-     "#{self.name} (#{self.code})"
+     "#{name} (#{code})"
   end
   def to_label
-     "#{self.code} - #{self.name}"
+     "#{code} - #{name}"
   end
 
 

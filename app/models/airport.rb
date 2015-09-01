@@ -7,11 +7,11 @@ class Airport < ActiveRecord::Base
   scope :by_code,   lambda {|code| where(:code => code)}
 
   def correct_name
-    self.name.sub(' 00', '')
+    name.sub(' 00', '')
   end
 
   def correct_city
-    self.city.sub(' 00', '')
+    city.sub(' 00', '')
   end
 
   class << self
@@ -31,7 +31,7 @@ class Airport < ActiveRecord::Base
   #  destinations = OagSchedule.cxr(cxx).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
   #  airports = (origins + destinations).uniq!
   #  airports.each do |airport|
-  #     apt = self.where(code: airport[0]).first_or_create!
+  #     apt = where(code: airport[0]).first_or_create!
   #     apt.name = airport[1]
   #     apt.city = airport[2]
   #     apt.save
@@ -42,7 +42,7 @@ class Airport < ActiveRecord::Base
   #  destinations = OagSchedule.hub(hub).pluck(:dest_apt, :dest_apt_name, :dest_apt_city).uniq
   #  airports = (origins + destinations).uniq!
   #  airports.each do |airport|
-  #     apt = self.where(code: airport[0]).first_or_create!
+  #     apt = where(code: airport[0]).first_or_create!
   #     apt.name = airport[1]
   #     apt.city = airport[2]
   #     apt.save

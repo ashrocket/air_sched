@@ -6,6 +6,8 @@ gem 'pg', '~> 0.18.2'
 gem 'postgres_ext', '~> 2.4.1'
 gem 'arel-helpers', '~> 2.1.0'
 gem 'acts_as_singleton'
+gem 'workflow'
+# gem 'transitions', :require => ['transitions', 'active_model/transitions']
 
 gem 'friendly_id', '~> 5.0.0'
 gem 'activerecord-import', '~> 0.10.0'

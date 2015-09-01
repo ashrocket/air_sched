@@ -48,8 +48,8 @@ class OagSchedule < ActiveRecord::Base
 
 
   def print
-      puts [self.eff_date, self.disc_date, self.airline_code, self.flight_num, self.origin_apt, self.dest_apt,
-       self.dep_time_local, self.arr_time_local, self.dep_op_days].join " "
+      puts [eff_date, disc_date, airline_code, flight_num, origin_apt, dest_apt,
+       dep_time_local, arr_time_local, dep_op_days].join " "
       #:eff_date     =>  row[:efffrom],  :disc_date 	  => row[:effto],
       #         :airline_code => row[:carrier1],  :airline_name	=> row[:carrier1name],
       #         :flight_num   => row[:flightno1],
@@ -270,25 +270,25 @@ class OagSchedule < ActiveRecord::Base
   end
 
   def mkt_carriers_flights
-    self.mkt_cxrs.split ';'
+    mkt_cxrs.split ';'
   end
   def mkt_carriers
-    (self.mkt_cxrs.split ';').map{|v| (v.split ' ')[0]}
+    (mkt_cxrs.split ';').map{|v| (v.split ' ')[0]}
   end
 
   def effective_overlaps? sched
-    (self.eff_date..self.disc_date).overlaps?(sched.eff_date..sched.disc_date)
+    (eff_date..disc_date).overlaps?(sched.eff_date..sched.disc_date)
    end
 
   def effective_dates
-    {eff: self.eff_date,
-     disc: self.disc_date}
+    {eff: eff_date,
+     disc: disc_date}
   end
 
   def effective_window sched
     if self.effective_overlaps?(sched)
-      {eff: [self.eff_date,sched.eff_date].max,
-       disc: [self.disc_date,sched.disc_date].min}
+      {eff: [eff_date,sched.eff_date].max,
+       disc: [disc_date,sched.disc_date].min}
     else
       nil
     end
@@ -300,9 +300,9 @@ class OagSchedule < ActiveRecord::Base
   def connection_days_of_week sched, up_to_days
 
     departure_days_with_connections = []
-    self.dep_op_days.each do |day_num|
+    dep_op_days.each do |day_num|
       if sched.dep_op_days.include?(day_num) and
-          (self.arr_time_loc_minutes + 60) < sched.dep_time_loc_minutes
+          (arr_time_loc_minutes + 60) < sched.dep_time_loc_minutes
           departure_days_with_connections << day_num
       elsif up_to_days > 0
 

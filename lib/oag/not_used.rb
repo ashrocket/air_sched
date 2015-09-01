@@ -47,7 +47,6 @@ def host_combination_permutation combo
        route_map = []
        eff_groups = connections.group_by{|cn| [cn.eff_window, cn.operating_window]}
        eff_groups.keys.sort{ |eff_range| eff_range[0]['eff']}.each do |eff_range|
-         byebug
 
          conn_list = eff_groups[eff_range]
          puts "#{eff_range}"

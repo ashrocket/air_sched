@@ -16,18 +16,6 @@ class ReportKey < ActiveRecord::Base
        where(report_key: code).first
     end
 
-    # def has_current
-    #   where(current: true)
-    # end
-    #
-    # def current_report
-    #   has_current.first
-    # end
-    #
-    # def current_key
-    #   (current_report and current_report.report_key) || 'NONE'
-    # end
-
     def active
      where(active: true).uniq
     end

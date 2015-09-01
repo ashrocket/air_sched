@@ -1,6 +1,6 @@
 ActiveAdmin.register OagReport  do
   menu priority: 0, label: 'Oag Imports', :parent => 'Reports'
-  # actions :all, :except => [:new]
+  actions :all, :except => [:new]
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
@@ -33,6 +33,9 @@ ActiveAdmin.register OagReport  do
       end
       column 'Finished', :sortable => :complete  do |report|
         pretty_boolean(report.complete)
+      end
+      column 'Status', :sortable => :report_status do |report|
+        report.current_state.name
       end
       column 'Status', :sortable => :report_status do |report|
         report.report_status

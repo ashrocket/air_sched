@@ -13,16 +13,14 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -964,6 +962,7 @@ CREATE TABLE oag_reports (
     id integer NOT NULL,
     report_key_id integer,
     msg_id character varying,
+    workflow_state character varying,
     load_status json DEFAULT '{}'::json,
     report_status character varying DEFAULT 'uninitialized'::character varying,
     attachment_status character varying DEFAULT 'unstored'::character varying,

@@ -59,10 +59,10 @@ gem 'sidekiq', '~> 2.17'
 gem 'sidekiq-lock', '~> 0.2.0'
 gem 'sidekiq-failures', '~> 0.4.5'
 gem 'sidetiq', '0.5.0'
+gem 'sidekiq-unique-jobs', '~> 3.0.14'
 gem 'sinatra', '>= 1.3.0', :require => nil
 gem 'mastiff', '~> 0.1'
 gem 'roo', '~> 2.1.1'
-
 
 gem 'exception_handler'
 gem 'seed_dump'

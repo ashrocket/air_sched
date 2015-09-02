@@ -25,12 +25,13 @@ class SyncAttachmentWorker
         report = OagReport.where(msg_id: message_id).first
         if report
           Sidekiq::Logging.logger.info "Sync Attachment Worker ==> EXISTING Import Report found for #{message_id} #{report.id}"
+          report.reset!
         else
           report = OagReport.create(msg_id: message_id)
-          Sidekiq::Logging.logger.info "Sync Attachment Worker     -> New Import Report created for #{message_id} #{report.id}"
+          Sidekiq::Logging.logger.info "Sync Attachment Worker  -> New Import Report created for #{message_id} #{report.id}"
         end
 
-        if report.uninitialized? or report.queued?
+        if report.uninitialized?
           report.attachment_path   = att_path
           report.attachment_status = File.exist?(att_path) ? 'stored' : 'unstored'
           report.attachment_lines  = %x{wc -l < "#{att_path}"}.to_i  if File.exist?(att_path)
@@ -41,17 +42,13 @@ class SyncAttachmentWorker
           # From Here Mastiff  pulls the file down onto the local filesystem.
           # and then calls the Process Attachment Worker asynchronousely to
           # kick of unzipping and other elements before loading the CSV.
-          unless  File.exist?(att_path)
-            msg.sync_message_attachments
-            report.attachment_lines = %x{wc -l < "#{att_path}"}.to_i  if File.exist?(att_path)
-            report.save
-            Sidekiq::Logging.logger.info "Sync Attachment Worker  -> Email Attachment #{report.report_name} sync'd for report #{report.id} #{message_id} "
-          else
-            report.attachment_lines = %x{wc -l < "#{att_path}"}.to_i  if File.exist?(att_path)
-            report.save
+          if  File.exist?(att_path)
             Sidekiq::Logging.logger.info "Sync Attachment Worker ==> Email Attachment #{report.report_name} EXISTS for report #{report.id} #{message_id} "
-
           end
+          msg.sync_message_attachments
+          report.attachment_lines = %x{wc -l < "#{att_path}"}.to_i  if File.exist?(att_path)
+          report.save
+          Sidekiq::Logging.logger.info "Sync Attachment Worker  -> Email Attachment #{report.report_name} sync'd for report #{report.id} #{message_id} "
 
         else
           # Push Existing Report to try to finish

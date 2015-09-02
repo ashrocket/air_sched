@@ -6,7 +6,8 @@ class UpdateAirportsWorker
   include Sidetiq::Schedulable
   recurrence { hourly }
 
-  sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
+  sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true, unique: true
+
 
   sidekiq_options lock: {
         timeout: proc { |_, timeout = 1_200_000 | timeout * 2 },      # you don't use user_id here thus the naming

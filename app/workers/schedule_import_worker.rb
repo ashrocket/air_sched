@@ -33,7 +33,7 @@ class ScheduleImportWorker
     else
       report = OagReport.find_by(id: report_id)
       timeout_minutes = lock.timeout/60_000
-      delay_time = timeout_minutes/10
+      delay_time = timeout_minutes/6
 
       Sidekiq::Logging.logger.info "Import Worker, busy, check back on  #{report_id} in #{delay_time} minutes #{report.report_key.code}"
       ScheduleImportWorker.delay_for(delay_time.minute).perform_async(report_id)

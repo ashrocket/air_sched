@@ -22,7 +22,7 @@ class OagReport < ActiveRecord::Base
     state :queued do
       event :import_oag_file, :transitions_to => :schedules_loaded
       event :reject, :transitions_to => :rejected
-      event :process_attachment, :transitions_to => :queued
+      event :reset, :transitions_to => :uninitialized
     end
     state :schedules_loaded do
       event :refresh_airports, :transitions_to => :airports_refreshed
@@ -63,10 +63,10 @@ class OagReport < ActiveRecord::Base
     after_transition do |from, to, triggering_event, *event_args|
       case to
         when /unitialized|finished|rejected/
+          Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to}"
+        else
           Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
           ScheduleImportWorker.perform_async(id)
-        else
-          Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to}"
       end
     end
 

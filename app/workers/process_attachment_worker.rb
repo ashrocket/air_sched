@@ -19,18 +19,22 @@ class ProcessAttachmentWorker
       msg = Mastiff::Email::Message.get(message_id)
       report = OagReport.where(msg_id: message_id).first
       Sidekiq::Logging.logger.info "Process Attachment Worker, autoload => #{AppSwitch.on?('autoload')}"
+
       if report and AppSwitch.on?('autoload')
 
         report.load_status['autoload'] = true
         report.save
-        report.process_attachment!
+        Sidekiq::Logging.logger.info "Process Attachment Worker, Triggering Process Attachment Event => #{message_id} #{report.id}: #{report.report_key.code}"
+        unless report.queued?
+          report.process_attachment!
+        end
 
       elsif report
 
           report.load_status['autoload'] = false
           report.save
-
       else
+
           err_string = "Process Attachment Worker - Report #{message_id} does not exist yet!"
           Sidekiq::Logging.logger.info err_string
           raise(err_string)

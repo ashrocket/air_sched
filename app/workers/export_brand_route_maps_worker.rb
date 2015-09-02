@@ -15,16 +15,17 @@ class ExportBrandRouteMapsWorker
 
 
   def perform(brand_key, report_id)
+    Sidekiq::Logging.logger.info "ExportBrandRouteMapsWorker called with  #{brand_key}, #{report_id}"
 
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
-        Sidekiq::Logging.logger.info "Smart Routes Worker checking if Export is Ready for  #{brand_key}"
+        Sidekiq::Logging.logger.info "ExportBrandRouteMapsWorker checking if Export is Ready for  #{brand_key}"
         report = ExportSmartRouteReport.find(report_id)
-        Sidekiq::Logging.logger.info "Smart Routes Worker found report:  #{brand_key}, #{report.id}: #{report.current_state.name}"
+        Sidekiq::Logging.logger.info "ExportBrandRouteMapsWorker found report:  #{brand_key}, #{report.id}: #{report.current_state.name}"
 
         if report and not report.exported?
-            Sidekiq::Logging.logger.info "Smart Routes Worker: #{brand_key}, #{report.id}: advancing state."
+            Sidekiq::Logging.logger.info "ExportBrandRouteMapsWorker: #{brand_key}, #{report.id}: advancing state."
 
             report.advance_state!
         end
@@ -36,7 +37,7 @@ class ExportBrandRouteMapsWorker
     else
       delay_val = (300..900).to_a.sample
 
-      Sidekiq::Logging.logger.info "Smart Routes Worker, busy, delaying #{brand_key} for #{delay_val} seconds."
+      Sidekiq::Logging.logger.info "ExportBrandRouteMapsWorker, busy, delaying #{brand_key} for #{delay_val} seconds."
       ExportBrandRouteMapsWorker.delay_for(delay_val.seconds).perform_async(brand_key, report_id)
     end
     #Do Something here with the message

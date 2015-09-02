@@ -113,7 +113,13 @@ ActiveAdmin.register Brand, as: 'Brands' do
        redirect_to :back, alert: 'In Progress! - Already exporting route map (this may take a while)'
      end
    end
+  member_action :reset_data_states do
+    @brand = Brand.friendly.find(params[:id])
+    @brand.data_states = {}
+    @brand.save
+    redirect_to :back, notice: 'Data States reset'
 
+  end
 
   action_item(:build_connections, only: :show)  do
     link_to('Build Brand Connections', build_connections_admin_brand_path(brand))
@@ -129,7 +135,10 @@ ActiveAdmin.register Brand, as: 'Brands' do
   end
   action_item(:export_only, only: :show) do
      link_to('Route Map Export', export_only_route_maps_admin_brand_path(brand))
-    end
+  end
+  action_item(:reset_data_states, only: :show) do
+     link_to('Reset DataState', reset_data_states_admin_brand_path(brand))
+  end
 
 
 

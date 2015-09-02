@@ -15,7 +15,7 @@ class BrandConnection < ActiveRecord::Base
   # class method
 
   def self.connecting_scheds(connection)
-    where(sched1_id: connection.sched1_id).to_a
+    where(sched1: connection.sched2).to_a
         .delete_if{|other| other.sched2_id == connection.sched1_id or other.dest == connection.origin}
   end
   # instance methods

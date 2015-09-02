@@ -189,7 +189,7 @@ module Oag
 
    def two_stop_routes(brand)
 
-       #  1 Stops
+       #  2 Stops
        markets = []
 
        one_seg_markets = DirectFlight.keyed(brand.report_keys).pluck(:origin, :dest).uniq
@@ -203,47 +203,9 @@ module Oag
 
        three_segment_mkt_connects = Hash.new([])
 
-       # bc_connections = {}
-       # Benchmark.bm do |x|
-       #
-       #    bc_set = BrandConnection.branded(brand).select(:origin, :via, :dest, :id)
-       #                 .group(:origin, :via, :dest, :id)
-       #                 .group_by{|gi|  gi.attributes.except("id")}
-       #                 # .each{|k,v_list|  v_list.map!{|v| v.id} }
-       #
-       #    # first_leg_routes = bc_set.keys.map{|k| [k[:origin], k[:via]]}
-       #    # next_leg_routes  = bc_set.keys.map{|k| [k[:via], k[:dest]]}
-       #
-       #
-       #
-       #      x.report("Build connected connections") {
-       #
-       #        route_key_count = bc_set.keys.count
-       #        bc_set.keys.each_with_index do |bc_key, bc_set_index|
-       #          route_key = [bc_key[:origin] , bc_key[:via] , bc_key[:dest]].join('-')
-       #          Rails.logger.info "(#{brand.brand_key}) connecting #{bc_set_index} (#{route_key}) of (#{route_key_count}) connecting paths."
-       #
-       #          route_branded_connections = bc_set[bc_key]
-       #          valid_connection = false
-       #          connecting_route = []
-       #          route_branded_connections.each do | rbc|
-       #            cbcs = BrandConnection.connecting_scheds(rbc)
-       #            bc_connections[rbc.id] = cbcs
-       #
-       #            if cbcs.count > 0
-       #               valid_connection = true
-       #              break
-       #            end
-       #          end
-       #
-       #        end
-       #      }
-       #
-       #
-       #  end
 
 
-       existing_markets[0..20].each_with_index do |e_mkt, emkt_index|
+       existing_markets[0..10].each_with_index do |e_mkt, emkt_index|
          e_origin, e_dest = e_mkt
 
 
@@ -254,34 +216,21 @@ module Oag
             Rails.logger.info "(#{brand.brand_key}) Building connections  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets"
          end
 
-         # Could use the parallel gem her.  Each with index, no return value needed.
-         # Return an array of hashes
-         #  three_segment_mkt_connects[mkt] = multi_connections
-         # And then convert that into a hash of objects
-
 
          three_segment_arrays = Parallel.map_with_index(bc_list, in_threads:6) do |bc, bc_index|
            results_arr = []
 
-         # bc_list[0..20].each_with_index do |bc, bc_index|
 
            Rails.logger.info " ==== (#{brand.brand_key}) Building Three Seg connects from #{bc_index} of (#{bc_list.count}) "
            origin = bc.origin
 
 
-           # cbcs = []
-           # connecting_bcs = []
-           # Benchmark.bm do |x|
-              # Using the Class method is fastest by 2x
-              # x.report("3 seg #{[e_origin, e_dest]}") { cbcs = BrandConnection.connecting_scheds(bc) }
-              # x.report("Each 3 seg #{[e_origin, e_dest]}") { connecting_bcs = bc.connects_with.to_a }
 
            connecting_bcs = BrandConnection.connecting_scheds(bc)
 
            destinations = connecting_bcs.pluck(:dest).sort.uniq
            destinations.each_with_index do |dest, index|
 
-             # x.report("mapping from References"){
              mkt = "#{origin}-#{dest}"
              Rails.logger.info " ==== (#{brand.brand_key}) Building Three Segment mkt requests  for #{mkt} "
              Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{destinations.count}) "
@@ -295,13 +244,10 @@ module Oag
              uniq_cb_list = cb_list.map{|other| ConnRef.new(id: other.id, key: other.key)}.uniq{|cr| cr.key}
 
              multi_connections = uniq_cb_list.map{|c2| MultiConnRef.new(conns: [c1,c2])}.uniq{|mc| mc.key}
-             # three_segment_mkt_connects[mkt] = multi_connections
              results_arr << [mkt,  multi_connections]
 
-               # } End x.report
            end
            results_arr
-           # end # End Benchmark
 
          end
          three_segment_arrays = three_segment_arrays.flatten(1)
@@ -318,6 +264,7 @@ module Oag
          mkt_connections = []
 
          mkt_conns.each do |mcr|
+           byebug
            bcs = mcr.conns.map{|c| BrandConnection.find(c.id)}
            rrs = bcs.map{|c| c.to_route_requests}.flatten.uniq
            rr_ids = rrs.map{|rr| rr.id}

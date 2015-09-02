@@ -2,7 +2,6 @@ class CreateBrandConnections < ActiveRecord::Migration
   def change
     create_table :brand_connections do |t|
       t.references :brand,  null: false
-      t.string :brand_key,  null: false
       t.string :origin
       t.string :via
       t.string :dest

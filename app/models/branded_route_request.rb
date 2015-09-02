@@ -2,11 +2,11 @@ class BrandedRouteRequest < ActiveRecord::Base
   include ArelHelpers::ArelTable
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
+
   has_many :branded_market_route_request, :dependent => :destroy
   has_many :branded_market_requests, through: :branded_market_route_request
 
-  scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
-  scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
+  scope :branded,    lambda {|brand|    where(brand:  brand)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
   after_initialize do |rr|
@@ -23,7 +23,7 @@ class BrandedRouteRequest < ActiveRecord::Base
 
     if( host.eql? other.host)
       pr2 = BrandedRouteRequest.where(
-          attributes.deep_symbolize_keys.except(:id, :dest, :cxrs, :key)
+          attributes.deep_symbolize_keys.except(:id, :dest, :cxrs)
               .merge(dest: other.dest,
                      cxrs: (cxrs + other.cxrs).sort.uniq)
       ).first_or_create!

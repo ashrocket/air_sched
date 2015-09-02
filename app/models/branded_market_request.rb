@@ -5,8 +5,7 @@ class BrandedMarketRequest < ActiveRecord::Base
   has_many :branded_market_route_request, :dependent => :destroy
   has_many :branded_route_requests, through: :branded_market_route_request
 
-  scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
-  scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
+  scope :branded,      lambda {|brand|    where(brand:  brand)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
 
@@ -40,10 +39,11 @@ class BrandedMarketRequest < ActiveRecord::Base
       brr_list = shrink_ray(brr_list)
 
       if brr_list.count != branded_route_requests.count
+
         bmr = BrandedMarketRequest.joins(:branded_route_requests)
                             .where(BrandedRouteRequest[:id].in brr_list.map{|brr| [brr.id]})
-                            .where(brand_key: brand_key, brand_id: brand_id,
-                                   origin: origin, dest: dest).first_or_create!
+                            .where(brand: brand, origin: origin, dest: dest)
+                            .first_or_create!
 
         bmr.branded_route_requests << brr_list if  bmr.branded_route_requests.blank?
         return bmr

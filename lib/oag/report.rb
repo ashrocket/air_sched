@@ -54,7 +54,7 @@ module Oag
                 window    = sched1.effective_window(sched2)
                 op_window = sched1.connection_days_of_week(sched2,2)
                 if not window.blank? and not op_window.blank?
-                  possible_routes <<  BrandConnection.new(brand_id: brand.id, brand_key: brand.brand_key,
+                  possible_routes <<  BrandConnection.new(brand: brand,
                             origin: origin_code, via: via_code, dest: sched2.dest_apt,
                             sched1_cxr: sched1.airline_code, sched2_cxr: sched2.airline_code,
                             sched1_id: sched1.id,
@@ -118,13 +118,14 @@ module Oag
         # dht_by_host.each do |host, cxr_host_list |
         hosts.each do |host|
           carriers = host.carrier_codes & df.carriers
-          brr = BrandedRouteRequest.where( brand_id: brand.id, brand_key: brand.brand_key,
-                           origin: origin,  dest: dest,  host: host.code, cxrs: carriers
-                           ).first_or_create!
+
+          brr = BrandedRouteRequest.where( brand: brand, origin: origin, dest: dest,
+                                           host: host.code, cxrs: carriers  ).first_or_create!
+
           bmr = BrandedMarketRequest.joins(:branded_route_requests)
                     .where(BrandedRouteRequest[:id].in [brr.id])
-                    .where(brand_key: brand.brand_key, brand_id: brand.id,
-                           origin: origin, dest: dest).first_or_create!
+                    .where(brand: brand, origin: origin, dest: dest)
+                    .first_or_create!
 
           # What is this doing?  Are we keeping the values uniq?  If so this may not be the way to do it.
           bmr.branded_route_requests << brr if  bmr.branded_route_requests.blank?
@@ -140,11 +141,14 @@ module Oag
    def one_stop_market_routes(brand, origin, dest)
 
      #  1 Stops
-      mkt_connections = BrandConnection.keyed(brand.brand_key).market(origin,dest)
+      mkt_connections = BrandConnection.branded(brand).market(origin,dest)
 
       routes =  mkt_connections.to_a.uniq{|c| c.key}
 
-      routes_requests = routes.map{|c| c.to_route_requests}
+      routes_requests = []
+      routes.each do |c|
+        routes_requests =  routes_requests + c.to_route_requests
+      end
 
       grouped_rrs = routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
 
@@ -164,8 +168,8 @@ module Oag
 
            bmr = BrandedMarketRequest.joins(:branded_route_requests)
                      .where(BrandedRouteRequest[:id].in [brr0.id, brr1.id])
-                     .where(brand_key: brand.brand_key, brand_id: brand.id,
-                            origin: origin, dest: dest).first_or_create!
+                     .where(brand: brand, origin: origin, dest: dest)
+                     .first_or_create!
 
            bmr.branded_route_requests << [brr0,brr1] if  bmr.branded_route_requests.blank?
 
@@ -254,7 +258,7 @@ module Oag
          e_origin, e_dest = e_mkt
 
 
-         bc_list = BrandConnection.keyed(brand.brand_key).market(e_origin, e_dest)
+         bc_list = BrandConnection.branded(brand).market(e_origin, e_dest)
          if bc_list.count == 0
            Rails.logger.info "(#{brand.brand_key}) Building connections - Skip  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets, no connections exist"
          else
@@ -314,7 +318,7 @@ module Oag
 
            bmr = BrandedMarketRequest.joins(:branded_route_requests)
                        .where(BrandedRouteRequest[:id].in rr_ids)
-                       .where(brand_key: brand.brand_key, brand_id: brand.id,
+                       .where(brand: brand,
                               origin: origin, dest: dest).first_or_create!
 
            bmr.branded_route_requests << rrs if  bmr.branded_route_requests.blank?
@@ -325,7 +329,7 @@ module Oag
          # TODO:  Generate Through Requests
          
          unless  mkt_connections.blank?
-            BrandedMarketSegmentsRequest.create(brand_id: brand.id, brand_key: brand.brand_key,
+            BrandedMarketSegmentsRequest.create(brand: brand,
                            origin: origin, dest:dest, segment_count: 3,
                            branded_market_request_ids: mkt_connections.map{|bmr| bmr.id} )
          end
@@ -337,8 +341,7 @@ module Oag
 
    def build_brand_market_routes(brand, segment_count)
        BrandedMarketSegmentsRequest.branded(brand)
-                                   .where(segment_count: segment_count)
-                                    .destroy_all
+                                   .where(segment_count: segment_count).destroy_all
 
        market_requests = []
        case segment_count
@@ -353,14 +356,14 @@ module Oag
              market_requests = direct_market_routes(brand, origin, dest)
 
              unless  market_requests.blank?
-                    BrandedMarketSegmentsRequest.create(brand_id: brand.id, brand_key: brand.brand_key,
-                                   origin: origin, dest:dest, segment_count: segment_count,
+                    BrandedMarketSegmentsRequest.create(brand: brand, origin: origin, dest:dest,
+                                   segment_count: segment_count,
                                    branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
              end
            end
            # market_requests = direct_market_routes(brand, origin, dest)
          when 2
-           two_segment_markets = BrandConnection.keyed(brand.brand_key).pluck(:origin, :dest).sort.uniq
+           two_segment_markets = BrandConnection.branded(brand).pluck(:origin, :dest).sort.uniq
            two_segment_markets.each_with_index do |market, index|
 
              origin, dest = market
@@ -372,7 +375,7 @@ module Oag
 
 
              unless  market_requests.blank?
-               BrandedMarketSegmentsRequest.create(brand_id: brand.id, brand_key: brand.brand_key,
+               BrandedMarketSegmentsRequest.create(brand: brand,
                                                  origin: origin, dest:dest, segment_count: segment_count,
                                                  branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
              end
@@ -386,7 +389,7 @@ module Oag
        end
 
        # unless  market_requests.blank?
-       # BrandedMarketSegmentsRequest.create(brand_id: brand.id, brand_key: brand.brand_key,
+       # BrandedMarketSegmentsRequest.create(brand: brand,
        #                origin: origin, dest:dest, segment_count: segment_count,
        #                branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
        # end
@@ -473,9 +476,8 @@ module Oag
         puts JSON.pretty_generate(market_map)
 
       end
-      BrandedRouteMap.where(brand_id: brand.id, brand_key: brand.brand_key).destroy_all
-      BrandedRouteMap.create(brand_id: brand.id, brand_key: brand.brand_key,
-                        route_map: market_maps)
+      BrandedRouteMap.branded(brand).destroy
+      BrandedRouteMap.create(brand: brand, route_map: market_maps)
 
 
 

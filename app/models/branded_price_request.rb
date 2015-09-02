@@ -2,7 +2,7 @@ class BrandedPriceRequest < ActiveRecord::Base
   extend Forwardable
 
   belongs_to :branded_route_request
-  def_delegators :branded_route_request, :key, :brand_key, :origin, :dest, :cxrs, :host
+  def_delegators :branded_route_request, :key, :brand, :origin, :dest, :cxrs, :host
 
   attr_accessor  :eff, :disc, :operating_window
 

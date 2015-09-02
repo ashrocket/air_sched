@@ -309,7 +309,6 @@ ALTER SEQUENCE app_switches_id_seq OWNED BY app_switches.id;
 CREATE TABLE brand_connections (
     id integer NOT NULL,
     brand_id integer NOT NULL,
-    brand_key character varying NOT NULL,
     origin character varying,
     via character varying,
     dest character varying,
@@ -386,7 +385,6 @@ ALTER SEQUENCE brand_report_keys_id_seq OWNED BY brand_report_keys.id;
 CREATE TABLE branded_market_requests (
     id integer NOT NULL,
     brand_id integer,
-    brand_key character varying NOT NULL,
     origin character varying,
     dest character varying
 );
@@ -449,7 +447,6 @@ ALTER SEQUENCE branded_market_route_requests_id_seq OWNED BY branded_market_rout
 CREATE TABLE branded_market_segments_requests (
     id integer NOT NULL,
     brand_id integer,
-    brand_key character varying NOT NULL,
     origin character varying,
     dest character varying,
     segment_count integer,
@@ -483,7 +480,6 @@ ALTER SEQUENCE branded_market_segments_requests_id_seq OWNED BY branded_market_s
 CREATE TABLE branded_route_maps (
     id integer NOT NULL,
     brand_id integer,
-    brand_key character varying NOT NULL,
     route_map json DEFAULT '{}'::json
 );
 
@@ -514,7 +510,6 @@ ALTER SEQUENCE branded_route_maps_id_seq OWNED BY branded_route_maps.id;
 CREATE TABLE branded_route_requests (
     id integer NOT NULL,
     brand_id integer,
-    brand_key character varying NOT NULL,
     key character varying,
     origin character varying,
     dest character varying,
@@ -548,8 +543,9 @@ ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
-    name character varying DEFAULT 'NULLBRAND'::character varying,
+    brand_key character varying NOT NULL,
+    name character varying NOT NULL,
+    report_keys character varying[] DEFAULT '{}'::character varying[],
     description character varying,
     default_currency character varying,
     active boolean,
@@ -1100,10 +1096,10 @@ CREATE TABLE report_keys (
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
     city character varying,
     active boolean,
-    current boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    current boolean DEFAULT false
 );
 
 

@@ -5,8 +5,7 @@ class BrandConnection < ActiveRecord::Base
   belongs_to :sched2, :class_name => 'OagSchedule'
 
 
-  scope :keyed,     lambda {|brand_key| where(brand_key: brand_key)}
-  scope :branded,    lambda {|brand|    where(brand_id:  brand.id)}
+  scope :branded,    lambda {|brand|    where(brand:  brand)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
   scope :arriving,        lambda {|dest|   where(:dest => dest)            }
@@ -46,8 +45,8 @@ class BrandConnection < ActiveRecord::Base
 
    def to_pricing_requests
 
-     rr1 = BrandedRouteRequest.where( brand_id: brand_id, brand_key: brand_key, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
-     rr2 = BrandedRouteRequest.where( brand_id: brand_id, brand_key: brand_key, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
+     rr1 = BrandedRouteRequest.where( brand: brand, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
+     rr2 = BrandedRouteRequest.where( brand: brand, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
 
      pr1 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr1.id).first_or_create!
      pr2 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr2.id).first_or_create!
@@ -58,9 +57,12 @@ class BrandConnection < ActiveRecord::Base
    end
 
   def to_market_request
-     rr1 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
-     rr2 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
-     mkt_r = BrandedMarketRequest.joins(:branded_route_requests).where(BrandedRouteRequest[:id].in [rr1.id, rr2.id]).where(brand_key: brand_key, brand_id: brand_id, origin: origin, dest: dest).first_or_create!
+     rr1 = BrandedRouteRequest.where( brand: brand, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
+     rr2 = BrandedRouteRequest.where( brand: brand, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
+
+     mkt_r = BrandedMarketRequest.joins(:branded_route_requests)
+                 .where(BrandedRouteRequest[:id].in [rr1.id, rr2.id])
+                 .where(brand: brand, origin: origin, dest: dest).first_or_create!
      mkt_r.branded_route_requests << [rr1,rr2] if  mkt_r.branded_route_requests.blank?
      # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).joins(:branded_route_requests).where(BrandedRouteRequest[:id].in [rr1.id, rr2.id].sort)
      # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).where(branded_route_request_ids: [rr1.id, rr2.id].sort)
@@ -76,13 +78,21 @@ class BrandConnection < ActiveRecord::Base
    end
 
   def to_route_requests
+    rr_arr = []
+    hosts_1 = brand.hosts_for(sched1_cxr).uniq
+    hosts_2 = brand.hosts_for(sched2_cxr).uniq
 
-    rr1 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
-    rr2 = BrandedRouteRequest.where( brand_id: brand_id,brand_key: brand_key, origin: via,  dest: dest, cxrs: [sched2_cxr],   host: brand.host_map[sched2_cxr]).first_or_create!
+    hosts_1.each do |host1|
+      hosts_2.each do |host2|
+        rr1 = BrandedRouteRequest.where(brand: brand, origin: origin,  dest: via,
+                cxrs: [sched1_cxr], host: host1.code).first_or_create!
+        rr2 = BrandedRouteRequest.where(brand: brand, origin: via,  dest: dest,
+                cxrs: [sched2_cxr], host: host2.code).first_or_create!
 
-    [rr1,rr2]
-
-
+        rr_arr << [rr1,rr2]
+      end
+    end
+    rr_arr
   end
 
 

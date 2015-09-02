@@ -59,7 +59,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
       case current_state.name
         when /uninitialized/
           check_branded_connections!
-        when /waiting_for_branded_connections/
+        when /waiting_for_report_keys/
           build_branded_connections!
         when /connections_built/
           build_smart_routes!

@@ -44,7 +44,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
            Rails.logger.info "#{self.id}: #{self.brand.name} #{triggering_event} transitioned FROM #{from} -> #{to}"
          else
            Rails.logger.info "#{self.id}: #{self.brand.name} #{triggering_event} transitioned FROM #{from} -> #{to} calling ExportWorker"
-           ExportBrandRouteMapsWorker.perform_async(brand.brand_key, self.id)
+           ExportBrandRouteMapsWorker.delay(30.seconds).perform_async(brand.brand_key, self.id)
        end
      end
 

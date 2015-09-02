@@ -2287,13 +2287,13 @@ COPY airlines (id, code, name, country_name, slug) FROM stdin;
 -- Data for Name: hosts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY hosts (id, name, code, created_at, updated_at, brand_id) FROM stdin;
-1	Scoot Navitaire	TZ	2015-08-24 04:39:35.051448	2015-08-24 04:39:35.051448	1
-2	NokScoot Navitaire	XW	2015-08-24 15:45:01.123549	2015-08-24 15:45:01.123549	1
-5	Nok Navitaire	DD	2015-08-24 16:02:25.758282	2015-08-24 16:02:25.758282	1
-7	Nok Navitaire	DD	2015-08-31 09:07:40.218443	2015-08-31 09:07:40.218443	2
-9	NokScoot Navitaire	XW	2015-08-31 09:11:15.761392	2015-08-31 09:11:15.761392	2
-10	Scoot Navitaire	TZ	2015-08-31 09:11:58.301918	2015-08-31 09:11:58.301918	2
+COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
+1	1	Scoot Navitaire	TZ	2015-08-24 04:39:35.051448	2015-08-24 04:39:35.051448
+2	1	NokScoot Navitaire	XW	2015-08-24 15:45:01.123549	2015-08-24 15:45:01.123549
+5	1	Nok Navitaire	DD	2015-08-24 16:02:25.758282	2015-08-24 16:02:25.758282
+7	2	Nok Navitaire	DD	2015-08-31 09:07:40.218443	2015-08-31 09:07:40.218443
+9	2	NokScoot Navitaire	XW	2015-08-31 09:11:15.761392	2015-08-31 09:11:15.761392
+10	2	Scoot Navitaire	TZ	2015-08-31 09:11:58.301918	2015-08-31 09:11:58.301918
 \.
 
 

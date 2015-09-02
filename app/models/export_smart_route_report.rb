@@ -57,7 +57,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
   # Linear State Machine Advance method
     def advance_state!
       case current_state.name
-        when /unitialized/
+        when /uninitialized/
           check_branded_connections!
         when /waiting_for_branded_connections/
           build_branded_connections!
@@ -74,19 +74,20 @@ class ExportSmartRouteReport < ActiveRecord::Base
     def check_branded_connections
       brand.data_states['route_maps_export'] = 'processing'
       brand.save
+      Rails.logger.info "#{brand.name}  -> checking if for report is finished."
 
       import_reports = brand.report_keys.map{ |rk| rk.latest_report}
       import_reports.each do |report|
 
         if report
             unless  report.finished?
-              Rails.logger.info "#{brand.name} #{report_key.code} -> waiting for report #{report.id} to finish."
+              Rails.logger.info "#{brand.name} #{report.report_key.code} -> waiting for report #{report.id} to finish."
               ExportBrandRouteMapsWorker.delay_for(10.minute).perform_async(brand.brand_key, self.id)
 
               halt
             end
         else
-          Rails.logger.info "#{brand.name} : #{report_key.code}  -> No Import Report exists !!!"
+          Rails.logger.info "#{brand.name} :  -> No Import Report exists !!!"
           reject!
         end
       end

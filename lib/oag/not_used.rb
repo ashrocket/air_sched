@@ -29,10 +29,10 @@ def host_combination_permutation combo
 
      # build_brand_connections(brand)
 
-     connections = BrandConnection.keyed(brand.brand_key)
+     connections = BrandConnection.branded(brand)
 
      connections.group_by{|c| c.market}
-     markets = BrandConnection.keyed(brand.brand_key).pluck(:origin, :dest).sort.uniq
+     markets = BrandConnection.branded(brand).pluck(:origin, :dest).sort.uniq
      brand_route_maps = []
      itineraries = []
      # # Build the direct schedules
@@ -42,7 +42,7 @@ def host_combination_permutation combo
 
        h = BrandConnection.all.pluck(:origin, :dest, :eff_window).group_by{|item| [item[0],item[1]]}
 
-       connections = BrandConnection.keyed(brand.brand_key).market(origin,dest)
+       connections = BrandConnection.branded(brand).market(origin,dest)
 
        route_map = []
        eff_groups = connections.group_by{|cn| [cn.eff_window, cn.operating_window]}
@@ -130,12 +130,12 @@ def build_brand_connection_templates(brand)
   BrandConnectionTemplate.keyed(brand.brand_key).delete_all
 
   templates = []
-  connections = BrandConnection.keyed(brand.brand_key)
+  connections = BrandConnection.branded(brand)
 
   markets = connections.pluck(:origin, :dest).sort.uniq
 
 
-  mkt_groups = BrandConnection.keyed(brand.brand_key).group_by{|c| [c.origin, c.dest]}
+  mkt_groups = BrandConnection.branded(brand).group_by{|c| [c.origin, c.dest]}
   tot = mkt_groups.keys.count
 
   mkt_groups.each do |k, mkt_conns |

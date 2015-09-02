@@ -24,6 +24,10 @@ class ReportKey < ActiveRecord::Base
      where(active: true).uniq.pluck(:report_key)
     end
 
+    def current_key
+      AppControl.singleton.report_key
+    end
+
     # def set_current report_key
     #   update_all(current: false)
     #   report_key.current = true

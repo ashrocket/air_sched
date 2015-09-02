@@ -13,14 +13,16 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -546,9 +548,8 @@ ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying NOT NULL,
-    name character varying NOT NULL,
-    report_keys character varying[] DEFAULT '{}'::character varying[],
+    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
+    name character varying DEFAULT 'NULLBRAND'::character varying,
     description character varying,
     default_currency character varying,
     active boolean,
@@ -855,11 +856,11 @@ ALTER SEQUENCE friendly_id_slugs_id_seq OWNED BY friendly_id_slugs.id;
 
 CREATE TABLE hosts (
     id integer NOT NULL,
+    brand_id integer,
     name character varying,
     code character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    brand_id integer
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -1099,10 +1100,10 @@ CREATE TABLE report_keys (
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
     city character varying,
     active boolean,
+    current boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    current boolean DEFAULT false
+    updated_at timestamp without time zone
 );
 
 

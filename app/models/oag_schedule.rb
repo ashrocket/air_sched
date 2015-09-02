@@ -29,7 +29,7 @@ class OagSchedule < ActiveRecord::Base
 
   scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
 
-  scope :branded,     lambda {|brand| where(OagSchedule[:report_key].in(brand.report_key_strings)) }
+  scope :branded,     lambda {|brand| where(report_key: brand.report_keys) }
 
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}
   scope :for_cxrs,  lambda {|carriers| carriers.empty? ? where.not(:airline_code => nil) :

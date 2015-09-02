@@ -1,8 +1,8 @@
 class CreateBrands < ActiveRecord::Migration
   def change
     create_table :brands do |t|
-      t.string :brand_key,  null: false
-      t.string :name,  null: false
+      t.string :brand_key,  default: 'NULLBRAND'
+      t.string :name, default: 'NULLBRAND' 
       t.string :description
       t.string :default_currency
 

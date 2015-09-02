@@ -7,6 +7,11 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 AppControl.first_time_setup
 
+au = AdminUser.where(email: 'admin@example.com').first
+unless au
+  create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password')
+end
+
 ABBConfig.mct = 60
 config = ABBConfig.where(:var => 'mct').first
 config.tip = "in minutes"

@@ -15,7 +15,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
     report_key_updates = {}
     in_progress_report_keys = []
 
-    oag_reports = brand.report_keys.map{ |rk| OagReport.keyed(rk.report_key).latest}
+    oag_reports = brand.report_keys.map{ |rk| OagReport.keyed(rk).latest}
     oag_reports.each do |report|
       if report and report.complete
         updated_status = {updated: report.updated_at,
@@ -26,8 +26,8 @@ class ExportSmartRouteReport < ActiveRecord::Base
         in_progress_report_keys << {report_key: report.report_key, status: report.status}
       end
     end
-     self.details['report_key_updates'] =report_key_updates
-     self.details['in_progress_report_keys'] =in_progress_report_keys
+     self.details['report_key_updates'] = report_key_updates
+     self.details['in_progress_report_keys'] = in_progress_report_keys
     save
 
 

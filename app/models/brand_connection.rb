@@ -45,25 +45,27 @@ class BrandConnection < ActiveRecord::Base
 
    def to_pricing_requests
 
-     rr1 = BrandedRouteRequest.where( brand: brand, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
-     rr2 = BrandedRouteRequest.where( brand: brand, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
-
-     pr1 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr1.id).first_or_create!
-     pr2 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr2.id).first_or_create!
-
-     [pr1,pr2]
-
+     pr_arr = []
+     rr_arr = self.to_route_requests
+     rr_arr.each do |rr1, rr2|
+        pr1 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr1.id).first_or_create!
+        pr2 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr2.id).first_or_create!
+        pr_arr << [pr1,pr2]
+     end
+     pr_arr
 
    end
 
   def to_market_request
-     rr1 = BrandedRouteRequest.where( brand: brand, origin: origin,  dest: via, cxrs: [sched1_cxr], host: brand.host_map[sched1_cxr]).first_or_create!
-     rr2 = BrandedRouteRequest.where( brand: brand, origin: via,  dest: dest, cxrs: [sched2_cxr], host: brand.host_map[sched2_cxr]).first_or_create!
-
-     mkt_r = BrandedMarketRequest.joins(:branded_route_requests)
-                 .where(BrandedRouteRequest[:id].in [rr1.id, rr2.id])
-                 .where(brand: brand, origin: origin, dest: dest).first_or_create!
-     mkt_r.branded_route_requests << [rr1,rr2] if  mkt_r.branded_route_requests.blank?
+     mr_arr = []
+     rr_arr = self.to_route_requests
+     rr_arr.each do |rr1, rr2|
+       mkt_r = BrandedMarketRequest.joins(:branded_route_requests)
+                   .where(BrandedRouteRequest[:id].in [rr1.id, rr2.id])
+                   .where(brand: brand, origin: origin, dest: dest).first_or_create!
+       mkt_r.branded_route_requests << [rr1,rr2] if  mkt_r.branded_route_requests.blank?
+       mr_arr << mkt_r
+     end
      # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).joins(:branded_route_requests).where(BrandedRouteRequest[:id].in [rr1.id, rr2.id].sort)
      # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).where(branded_route_request_ids: [rr1.id, rr2.id].sort)
      # unless mkt_r
@@ -72,9 +74,7 @@ class BrandConnection < ActiveRecord::Base
      #   mkt_r.branded_route_requests << rr2
      #   mkt_r.save
      # end
-     mkt_r
-
-
+     mr_arr
    end
 
   def to_route_requests

@@ -48,7 +48,7 @@ CREATE TABLE brand_report_keys (
 );
 
 
-ALTER TABLE brand_report_keys OWNER TO postgres;
+ALTER TABLE public.brand_report_keys OWNER TO postgres;
 
 --
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -62,7 +62,7 @@ CREATE SEQUENCE brand_report_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE brand_report_keys_id_seq OWNER TO postgres;
+ALTER TABLE public.brand_report_keys_id_seq OWNER TO postgres;
 
 --
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -77,21 +77,20 @@ ALTER SEQUENCE brand_report_keys_id_seq OWNED BY brand_report_keys.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying NOT NULL,
-    name character varying NOT NULL,
-    report_keys character varying[] DEFAULT '{}'::character varying[],
+    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
+    name character varying DEFAULT 'NULLBRAND'::character varying,
     description character varying,
     default_currency character varying,
+    data_states json DEFAULT '{}'::json,
+    max_segments integer DEFAULT 3,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    data_states json DEFAULT '{}'::json,
-    max_segments integer DEFAULT 3
+    updated_at timestamp without time zone
 );
 
 
-ALTER TABLE brands OWNER TO postgres;
+ALTER TABLE public.brands OWNER TO postgres;
 
 --
 -- Name: brands_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -105,7 +104,7 @@ CREATE SEQUENCE brands_id_seq
     CACHE 1;
 
 
-ALTER TABLE brands_id_seq OWNER TO postgres;
+ALTER TABLE public.brands_id_seq OWNER TO postgres;
 
 --
 -- Name: brands_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -133,7 +132,7 @@ CREATE TABLE report_keys (
 );
 
 
-ALTER TABLE report_keys OWNER TO postgres;
+ALTER TABLE public.report_keys OWNER TO postgres;
 
 --
 -- Name: report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -147,7 +146,7 @@ CREATE SEQUENCE report_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE report_keys_id_seq OWNER TO postgres;
+ALTER TABLE public.report_keys_id_seq OWNER TO postgres;
 
 --
 -- Name: report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -182,8 +181,8 @@ ALTER TABLE ONLY report_keys ALTER COLUMN id SET DEFAULT nextval('report_keys_id
 --
 
 COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
-9	2	10
-10	1	11
+3	2	10
+4	1	11
 \.
 
 
@@ -191,16 +190,16 @@ COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brand_report_keys_id_seq', 10, true);
+SELECT pg_catalog.setval('brand_report_keys_id_seq', 4, true);
 
 
 --
 -- Data for Name: brands; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY brands (id, brand_key, name, report_keys, description, default_currency, active, slug, created_at, updated_at, data_states, max_segments) FROM stdin;
-2	XW	Nok Scoot	{}	Brand for Nok Scoot Website	SGD	t	xw	2015-08-31 08:13:30.945498	2015-09-02 03:18:56.098189	{}	3
-1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-02 18:15:23.757224	{"branded_connections":{"state":"idle","count":184457,"updated_at":"2015-09-02T14:12:22.104-04:00"},"smart_routes":{"state":"processing"}}	3
+COPY brands (id, brand_key, name, description, default_currency, data_states, max_segments, active, slug, created_at, updated_at) FROM stdin;
+2	XW	Nok Scoot 	Brand for Nok Scoot Website 	SGD	{}	3	t	xw	2015-09-02 18:43:22.617569	2015-09-02 18:47:49.020787
+1	TZ	Scoot	Scoot Interline Network	AUD	{}	3	t	tz	2015-09-02 18:45:10.071365	2015-09-02 18:46:01.668282
 \.
 
 
@@ -208,7 +207,7 @@ COPY brands (id, brand_key, name, report_keys, description, default_currency, ac
 -- Name: brands_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brands_id_seq', 6, true);
+SELECT pg_catalog.setval('brands_id_seq', 2, true);
 
 
 --

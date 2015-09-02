@@ -5,7 +5,8 @@ class CreateBrands < ActiveRecord::Migration
       t.string :name, default: 'NULLBRAND' 
       t.string :description
       t.string :default_currency
-
+      t.json   :data_states, default: {}
+      t.integer :max_segments, default: 3
       t.boolean :active
       t.string :slug
 

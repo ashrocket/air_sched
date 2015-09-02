@@ -15,7 +15,8 @@ module Oag
 
       Rails.logger.info "Building Branded Connections for Schedules from Brand #{brand.brand_key} #{brand.name}"
       filtered_cxrs = []
-
+      brand.data_states['branded_connections'] = {'state': 'processing'}
+      brand.save
 
       # CURRENTLY DOES NOT SUPPORT EMBEDDED SEGMENTS, AS THE SCHEDULE MODEL DOESN'T KNOW THE VIA POINT
       # AND FURTHER MORE YOU CAN End Up with Circle Trip Flights like TR 2771
@@ -81,7 +82,8 @@ module Oag
       end
       routes = routes.compact.flatten
 
-      group_size = 2000
+      group_size = 5000
+      total_branded_connections = routes.count
       tot = routes.count
 
 
@@ -95,7 +97,8 @@ module Oag
           tot = tot - connection_group.compact.count
       end
 
-      # BrandRouteMap.import brand_route_maps
+      brand.data_states['branded_connections'] = {'state': 'idle', 'count': total_branded_connections, 'updated_at': Time.now}
+      brand.save
 
 
 
@@ -352,6 +355,9 @@ module Oag
 
     def build_brand_market_smart_routes(brand, seg_counts)
 
+      brand.data_states['smart_routes'] = {'state': 'processing'}
+      brand.save
+
       seg_counts.each do |seg_count|
         BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).delete_all
         # BrandedRouteRequest.branded(brand).destroy_all
@@ -362,6 +368,11 @@ module Oag
         build_brand_market_routes(brand, seg_count)
 
       end
+      counts_array = BrandedMarketSegmentsRequest.branded(brand).pluck('DISTINCT segment_count')
+      counts_array.map!{ |c| { segs: c, count: BrandedMarketSegmentsRequest.branded(brand).with_segs(c).count} }
+      brand.data_states['smart_routes'] = {'state': 'idle', 'count': counts_array, 'updated_at': Time.now}
+      brand.save
+
 
     end
 
@@ -384,6 +395,8 @@ module Oag
 
     def build_brand_route_maps(brand, seg_counts)
       
+      brand.data_states['route_maps'] = {'state': 'processing'}
+      brand.save
 
       markets = BrandedMarketSegmentsRequest.branded(brand).pluck(:origin, :dest).sort.uniq
 
@@ -432,6 +445,8 @@ module Oag
       BrandedRouteMap.branded(brand).destroy
       BrandedRouteMap.create(brand: brand, route_map: market_maps)
 
+      brand.data_states['route_maps'] = {'state': 'idle',  'updated_at': Time.now}
+      brand.save
 
 
     end

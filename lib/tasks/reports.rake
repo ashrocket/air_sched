@@ -114,25 +114,25 @@ namespace :reports do
        end
   end
 
-  desc "Export Smart Market Route Maps to file"
-      task :export_remote_market_route_maps, [:brands] => :environment do |t, args|
-        ActiveRecord::Base.logger.level = Logger::INFO
-
-        args.with_defaults(:brands => [AppControl.singleton.brand.brand_key])
-
-
-        brand_keys = args[:brands].split ' '
-
-        brand_keys.each do |brand_key|
-         brand = Brand.keyed(brand_key)
-         @export_report = ExportSmartRouteReport.create(brand: brand, status: 'started')
-         exporter = Oag::SmartRoutesExporter.new
-         url = exporter.export_to_s3(brand)
-         @export_report.status = 'exported'
-         @export_report.location = url.to_s
-
-         @export_report.save
-        end
-   end
+  # desc "Export Smart Market Route Maps to file"
+  #     task :export_remote_market_route_maps, [:brands] => :environment do |t, args|
+  #       ActiveRecord::Base.logger.level = Logger::INFO
+  #
+  #       args.with_defaults(:brands => [AppControl.singleton.brand.brand_key])
+  #
+  #
+  #       brand_keys = args[:brands].split ' '
+  #
+  #       brand_keys.each do |brand_key|
+  #        brand = Brand.keyed(brand_key)
+  #        @export_report = ExportSmartRouteReport.create(brand: brand, status: 'started')
+  #        exporter = Oag::SmartRoutesExporter.new
+  #        url = exporter.export_to_s3(brand)
+  #        @export_report.status = 'exported'
+  #        @export_report.location = url.to_s
+  #
+  #        @export_report.save
+  #       end
+  #  end
 
 end    

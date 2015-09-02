@@ -32,6 +32,27 @@ class Brand < ActiveRecord::Base
 
   end
 
+  def processing_connections?
+    data_states['branded_connections'] and
+    data_states['branded_connections']['state'] and
+    data_states['branded_connections']['state'].eql? 'processing'
+  end
+  def processing_smart_routes?
+    data_states['smart_routes'] and
+    data_states['smart_routes']['state'] and
+    data_states['smart_routes']['state'].eql? 'processing'
+  end
+  def processing_route_maps?
+    data_states['route_maps'] and
+    data_states['route_maps']['state'] and
+    data_states['route_maps']['state'].eql? 'processing'
+  end
+  def processing_route_map_export?
+    data_states['route_maps_export'] and
+    data_states['route_maps_export']['state'] and
+    data_states['route_maps_export']['state'].eql? 'processing'
+  end
+
   def build_connections
     oag_reports = report_keys.map{ |rk| OagReport.keyed(rk.report_key).latest}
 

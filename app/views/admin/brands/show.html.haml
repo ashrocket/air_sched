@@ -19,6 +19,9 @@
   %dt Default currency:
   %dd= @brand.default_currency
   %br
+  %dt Max Segments:
+  %dd= @brand.max_segments
+  %br
   %dt Hosts:
   %dd
     %ul#sorted_hosts.list-group
@@ -27,6 +30,10 @@
           = link_to(h.name, [:admin,h])
 
   %br
+  %dt Data States:
+  %dd= @brand.data_states
+  %br
+
   %dt Active:
   %dd
     = @brand.active? ? content_tag(:span, 'Yes',class:'status_tag yes') : content_tag(:span, 'No',class:'status_tag no')

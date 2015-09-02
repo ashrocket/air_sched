@@ -7,6 +7,7 @@ class CreateReportKeys < ActiveRecord::Migration
       t.string :city
       t.boolean :active
       t.boolean :current
+      t.string :state, default: 'idle'
       t.string :slug
 
 

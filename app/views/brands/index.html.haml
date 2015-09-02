@@ -16,6 +16,7 @@
         %th Description
         %th Default currency
         %th Hosts
+        %th MaxSegments
         %th Active
         %th Slug
         %th
@@ -34,6 +35,7 @@
                   = link_to(rk.name, edit_admin_data_key_path(rk))
           %td= brand.description
           %td= brand.default_currency
+          %td= brand.max_segments
           %td
             %ul#sorted_hosts.list-group
               - brand.hosts.each do |h|

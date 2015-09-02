@@ -53,10 +53,15 @@ class OagReport < ActiveRecord::Base
 
     end
     state :connections_refreshed do
+      event :wait_for_destinations_filter, :transitions_to => :waiting_for_destinations_filtered
+      event :reject, :transitions_to => :rejected
+      event :process_attachment, :transitions_to => :queued
+    end
+    state :waiting_for_destinations_filtered do
       event :finalize, :transitions_to => :finished
       event :reject, :transitions_to => :rejected
       event :process_attachment, :transitions_to => :queued
-     end
+    end
     state :finished
     state :rejected
 
@@ -93,6 +98,8 @@ class OagReport < ActiveRecord::Base
       when /destinations_refreshed/
         refresh_cnx_pairs!
       when /connections_refreshed/
+        wait_for_destinations_filter!
+      when /waiting_for_destinations_filtered/
         finalize!
     end
   end
@@ -101,6 +108,7 @@ class OagReport < ActiveRecord::Base
 
   # State Machine events
   def process_attachment
+
       process_email_attachment
       estimated_report_key  = ReportKey.match_filename(report_name)
       if estimated_report_key.is_a? ReportKey
@@ -116,6 +124,10 @@ class OagReport < ActiveRecord::Base
   end
 
   def import_oag_file
+      self.report_key.state = 'processing'
+      self.report_key.save
+      self.load_status['schedule_import_time'] = Time.now
+
       if large_report?
         ScheduleLargeImportWorker.perform_async(id)
       else
@@ -148,12 +160,33 @@ class OagReport < ActiveRecord::Base
     processor.refresh_cnx_pairs(self)
     save
   end
+  def wait_for_destinations_filter
+  end
+
   def finalize
-    processor.finalize(self, 'processed')
-    save
+    unless load_status['destinations_map_status'].eql? 'eff_days_filtered'
+      Rails.logger.info "#{msg_id} #{id}: #{report_key.code}  -> waiting for destinations filter"
+      ScheduleImportWorker.delay_for(1.minute).perform_async(id)
+      halt
+    else
+      processor.finalize(self, 'processed')
+      self.report_key.state = 'idle'
+      self.report_key.save
+      save
+
+      delay_time = 60
+      report_key.brands.each do |brand|
+        report = ExportSmartRouteReport.create(brand: brand)
+        ExportBrandRouteMapsWorker.delay_for(delay_time.minute).perform_async(brand.brand_key, report.id)
+      end
+
+    end
   end
   def reject
     processor.finalize(self, 'processed')
+    self.report_key.state = 'idle'
+    self.report_key.save
+
     save
   end
 

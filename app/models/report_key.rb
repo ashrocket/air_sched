@@ -71,6 +71,10 @@ class ReportKey < ActiveRecord::Base
     report_key
   end
 
+  def latest_report
+    OagReport.keyed(self).with_approved_state.latest
+  end
+
   # def validate
   #   errors.add_to_base 'You can only have one current report_key' unless self.current_flag_valid?
   # end

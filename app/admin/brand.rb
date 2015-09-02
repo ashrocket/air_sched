@@ -5,7 +5,8 @@ ActiveAdmin.register Brand, as: 'Brands' do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :brand_key, :report_keys, :name,  :description, :default_currency, :active, report_key_ids: [], host_ids: []
+  permit_params :brand_key, :report_keys, :name,  :description,
+                :default_currency, :max_segments,  :active, report_key_ids: [], host_ids: []
   #
   # or
   #
@@ -54,9 +55,84 @@ ActiveAdmin.register Brand, as: 'Brands' do
            }.join.html_safe
          end
        end
+       column :default_currency
+       column :max_segments
 
        actions
+  end
+
+  member_action :build_connections do
+   @brand = Brand.friendly.find(params[:id])
+   unless @brand.processing_connections?
+
+     UpdateBrandConnectionsWorker.perform_async(@brand.brand_key)
+     redirect_to :back, notice: 'Beginning to build Branded Connections ...'
+   else
+     redirect_to :back, alert: 'Already building Branded Connections! - In Progress'
    end
+  end
+
+  member_action :build_smart_routes do
+    @brand = Brand.friendly.find(params[:id])
+    unless @brand.processing_smart_routes?
+
+      UpdateSmartRoutesWorker.perform_async(@brand.brand_key)
+      redirect_to :back, notice: 'Beginning to build Smart Routes ...'
+    else
+      redirect_to :back, alert: 'Already building Smart Routes! - In Progress'
+    end
+  end
+
+  member_action :build_route_maps do
+    @brand = Brand.friendly.find(params[:id])
+    unless @brand.processing_route_maps?
+
+      UpdateRouteMapsWorker.perform_async(@brand.brand_key)
+      redirect_to :back, notice: 'Beginning to build Route Maps ...'
+    else
+      redirect_to :back, alert: 'Already building Route Maps! - In Progress'
+    end
+  end
+  member_action :full_export_route_maps do
+    @brand = Brand.friendly.find(params[:id])
+    unless @brand.processing_route_map_export?
+      report = ExportSmartRouteReport.create(brand: @brand)
+      ExportBrandRouteMapsWorker.perform_async(@brand.brand_key, report.id)
+      redirect_to :back, notice: 'Beginning to build Full Route Maps and Export (this may take a while)...'
+    else
+      redirect_to :back, alert: 'In Progress! - Already building build Full Route Maps and Export (this may take a while)'
+    end
+  end
+  member_action :export_only_route_maps do
+     @brand = Brand.friendly.find(params[:id])
+     unless @brand.processing_route_map_export?
+       report = ExportSmartRouteReport.create(brand: @brand)
+       report.finalize!
+       redirect_to :back, notice: 'Beginning to Export route map...'
+     else
+       redirect_to :back, alert: 'In Progress! - Already exporting route map (this may take a while)'
+     end
+   end
+
+
+  action_item(:build_connections, only: :show)  do
+    link_to('Build Brand Connections', build_connections_admin_brand_path(brand))
+  end
+  action_item(:build_smart_routes, only: :show) do
+   link_to('Build Smart Routes', build_smart_routes_admin_brand_path(brand))
+  end
+  action_item(:build_route_maps, only: :show) do
+   link_to('Build Route Maps', build_route_maps_admin_brand_path(brand))
+  end
+  action_item(:full_export, only: :show) do
+   link_to('Route Map Build/Export', full_export_route_maps_admin_brand_path(brand))
+  end
+  action_item(:export_only, only: :show) do
+     link_to('Route Map Export', export_only_route_maps_admin_brand_path(brand))
+    end
+
+
+
 
   controller do
       # def index

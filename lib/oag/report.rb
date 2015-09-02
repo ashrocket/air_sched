@@ -205,7 +205,7 @@ module Oag
 
 
 
-       existing_markets[0..10].each_with_index do |e_mkt, emkt_index|
+       existing_markets.each_with_index do |e_mkt, emkt_index|
          e_origin, e_dest = e_mkt
 
 
@@ -264,7 +264,6 @@ module Oag
          mkt_connections = []
 
          mkt_conns.each do |mcr|
-           byebug
            bcs = mcr.conns.map{|c| BrandConnection.find(c.id)}
            rrs = bcs.map{|c| c.to_route_requests}.flatten.uniq
            rr_ids = rrs.map{|rr| rr.id}

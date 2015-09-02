@@ -199,6 +199,16 @@ Add configuration values here, as shown below.
     MASTIFF_PASSWORD: EMAILPASSWORD
     MASTIFF_MAILHOST: subhost.mail.mailhost.com
 
+**DATABSED REBUILD**
+
+    pg_dump -c dbname=air_sched_development -t report_keys -t brand_report_keys -t brands -f brands_report_keys.sql
+    psql -f brands_report_keys.sql -d your_db_name 
+
+    pg_dump --data-only dbname=air_sched_development  -t airports  -t airport_currencies  -t airlines -t airlines_hosts -t hosts  -t interline_cxr_rules -f seed_starter_data.sql
+    psql -f seed_starter_data.sql -d your_db_name
+
+These files are already in the db folder.
+
 **TODOs**
 
  1. Update Schedule Importer to use a fast upsert methodology so schedule_ids don't need to be destroyed if they haven't changed.  Most likely a Blob Checksum, or a diff_set.

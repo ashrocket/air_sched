@@ -21,7 +21,11 @@ class ExportBrandRouteMapsWorker
       begin
         Sidekiq::Logging.logger.info "Smart Routes Worker checking if Export is Ready for  #{brand_key}"
         report = ExportSmartRouteReport.find(report_id)
+        Sidekiq::Logging.logger.info "Smart Routes Worker found report:  #{brand_key}, #{report.id}: #{report.current_state.name}"
+
         if report and not report.exported?
+            Sidekiq::Logging.logger.info "Smart Routes Worker: #{brand_key}, #{report.id}: advancing state."
+
             report.advance_state!
         end
 

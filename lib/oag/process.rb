@@ -211,7 +211,7 @@ module Oag
           tot = pairs.count
           group_size = 1000
           pairs.in_groups_of(group_size) do |pair_group|
-            process_logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key}"
+            process_logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key.code}"
             tot -= group_size
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])

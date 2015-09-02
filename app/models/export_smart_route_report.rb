@@ -44,7 +44,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
            Rails.logger.info "#{self.id}: #{self.brand.name} #{triggering_event} transitioned FROM #{from} -> #{to}"
          else
            Rails.logger.info "#{self.id}: #{self.brand.name} #{triggering_event} transitioned FROM #{from} -> #{to} calling ExportWorker"
-           ExportBrandRouteMapsWorker.delay_for(30).perform_async(brand.brand_key, self.id)
+           ExportBrandRouteMapsWorker.delay_for(1.minute).perform_async(brand.brand_key, self.id)
        end
      end
 
@@ -94,15 +94,36 @@ class ExportSmartRouteReport < ActiveRecord::Base
     end
 
     def build_branded_connections
-      UpdateBrandConnectionsWorker.perform_async(brand.brand_key)
+      unless brand.processing_connections?
+        UpdateBrandConnectionsWorker.perform_async(brand.brand_key)
+      end
+       if brand.processing_connections?
+         Rails.logger.info "#{brand.name} :  -> Waiting for branded connections to complete ..."
+
+         halt
+       end
     end
 
     def build_smart_routes
-      UpdateSmartRoutesWorker.perform_async(brand.brand_key)
+      unless brand.processing_smart_routes?
+        UpdateSmartRoutesWorker.perform_async(brand.brand_key)
+      end
+      if brand.processing_smart_routes?
+        Rails.logger.info "#{brand.name} :  -> Waiting for smart route generation to complete ..."
+
+        halt
+      end
     end
 
     def build_route_maps
-      UpdateRouteMapsWorker.perform_async(brand.brand_key)
+      unless brand.processing_route_maps?
+        UpdateRouteMapsWorker.perform_async(brand.brand_key)
+       end
+       if brand.processing_route_maps?
+         Rails.logger.info "#{brand.name} :  -> Waiting for route map generation to complete ..."
+
+         halt
+       end
     end
 
     def finalize

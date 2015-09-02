@@ -9,7 +9,7 @@ AppControl.first_time_setup
 
 au = AdminUser.where(email: 'admin@example.com').first
 unless au
-  create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password')
+  AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password')
 end
 
 ABBConfig.mct = 60

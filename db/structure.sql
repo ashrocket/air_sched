@@ -543,9 +543,8 @@ ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying NOT NULL,
-    name character varying NOT NULL,
-    report_keys character varying[] DEFAULT '{}'::character varying[],
+    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
+    name character varying DEFAULT 'NULLBRAND'::character varying,
     description character varying,
     default_currency character varying,
     active boolean,
@@ -1096,10 +1095,10 @@ CREATE TABLE report_keys (
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
     city character varying,
     active boolean,
+    current boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    current boolean DEFAULT false
+    updated_at timestamp without time zone
 );
 
 

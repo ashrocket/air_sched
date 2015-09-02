@@ -9,7 +9,7 @@ default: &default
 
 development:
   <<: *default
-  database: air_sched_clean
+  database: air_sched_development
 
 
 test:

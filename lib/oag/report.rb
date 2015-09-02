@@ -221,7 +221,8 @@ module Oag
            results_arr = []
 
 
-           Rails.logger.info " ==== (#{brand.brand_key}) Building Three Seg connects from #{bc_index} of (#{bc_list.count}) "
+           Rails.logger.info " ==== (#{brand.brand_key}) Building Three Seg connects from #{bc.origin} #{bc.via} #{bc.dest} " +
+                                 " id:#{bc.id} #{bc_index} of (#{bc_list.count}) - #{emkt_index} of (#{existing_markets.count}) markets "
            origin = bc.origin
 
 
@@ -232,8 +233,8 @@ module Oag
            destinations.each_with_index do |dest, index|
 
              mkt = "#{origin}-#{dest}"
-             Rails.logger.info " ==== (#{brand.brand_key}) Building Three Segment mkt requests  for #{mkt} "
-             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{destinations.count}) "
+             Rails.logger.info " ==== (#{brand.brand_key}) Building Three Segment mkt requests  for #{mkt}  "  +
+                               "  #{index} of (#{destinations.count}) #{emkt_index} of (#{existing_markets.count})"
 
 
              markets = markets | [[origin, dest]]

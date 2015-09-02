@@ -13,16 +13,14 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -789,6 +787,7 @@ CREATE TABLE export_smart_route_reports (
     id integer NOT NULL,
     brand_id integer,
     status character varying,
+    workflow_state character varying,
     location character varying,
     details json DEFAULT '{}'::json,
     created_at timestamp without time zone,

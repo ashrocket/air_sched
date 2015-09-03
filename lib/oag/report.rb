@@ -220,7 +220,7 @@ module Oag
          end
 
 
-         three_segment_arrays = Parallel.map_with_index(bc_list, in_threads:6) do |bc, bc_index|
+         three_segment_arrays = Parallel.map_with_index(bc_list, in_threads:12) do |bc, bc_index|
            results_arr = []
 
 

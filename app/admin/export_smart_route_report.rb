@@ -7,7 +7,9 @@ ActiveAdmin.register ExportSmartRouteReport  do
             report.id
           end
           column :brand
-
+          column :state do |report|
+            report.current_state.name
+          end
           column :status
           column :location
           column 'Modified', :sortable => :updated_at do |report|

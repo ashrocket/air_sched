@@ -19,8 +19,11 @@
 
   .form-inputs
     = f.input :name
-    = f.input :enabled
+    = f.input :enabled,  label: false,
+        input_html: {'data-toggle': 'toggle', 'data-size':'small', 'data-onstyle': 'success',
+         'data-on': 'Enabled', 'data-off': 'Disabled'}
 
+  %br
   .form-actions.col-sm-offset-3.col-sm-9
     = f.submit class: 'btn btn-primary'
 

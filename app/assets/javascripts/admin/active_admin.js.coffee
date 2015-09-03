@@ -1,6 +1,37 @@
 #= require active_admin/base
 #= require admin/abb_configs
 
+
+#= require jquery/dist/jquery
+#= require jquery-ui/jquery-ui
+#= require jquery-ui/ui/core
+#= require jquery-ui/ui/progressbar
+#= require jquery-ui/ui/widget
+#= require js-routes
+#= require bootstrap
+#= require jasny-bootstrap/dist/js/jasny-bootstrap
+#= require bootstrap-datepicker/dist/js/bootstrap-datepicker
+
+#= require datatables/media/js/jquery.dataTables
+#= require datatables-tabletools/js/dataTables.tableTools
+#= require datatables-plugins/pagination/jPaginator/dataTables.jPaginator
+#= require datatables-plugins/integration/bootstrap/3/dataTables.bootstrap
+
+#= require jquery/jquery.dataTables.fileSize
+
+#= require hogan/web/1.0.0/hogan
+#= require lodash/lodash.min
+#= require underscore.string/dist/underscore.string.min
+#= require typeahead.js/dist/typeahead
+#= require jquery-file-upload/js/jquery.fileupload
+#= require dates
+
+#= require bootstrap-toggle/js/bootstrap-toggle
+
+#= require bootstrap_init
+
+
+
 # app/assets/javascripts/array-input.coffee
 #$ ->
 #  removeFromArrayInput = (el) ->

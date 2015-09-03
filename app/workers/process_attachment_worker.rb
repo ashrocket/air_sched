@@ -1,5 +1,5 @@
 # app/workers/process_attachment_worker.rb
-require 'oag/process'
+
 class ProcessAttachmentWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker

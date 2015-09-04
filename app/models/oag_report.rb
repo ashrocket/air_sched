@@ -71,7 +71,9 @@ class OagReport < ActiveRecord::Base
           Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to}"
         else
           Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
-          ScheduleImportWorker.perform_async(id)
+
+          dly = (30..300).to_a.sample
+          ScheduleImportWorker.delay_for(dly).perform_async(id)
       end
     end
 

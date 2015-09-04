@@ -34,7 +34,7 @@
 //= require jquery-file-upload/js/jquery.fileupload
 //= require dates
 
-//= require bootstrap-toggle/js/bootstrap2-toggle'
+//= require bootstrap-toggle/js/bootstrap2-toggle
 
 //= require bootstrap_init
 

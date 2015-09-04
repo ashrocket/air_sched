@@ -1,5 +1,5 @@
-ActiveAdmin.register ReportKey, as: 'Data Keys' do
-  menu priority: 3,  :parent => 'Config'
+ActiveAdmin.register ReportKey do
+  menu priority: 3,  label: 'Data Keys', :parent => 'Config'
 
 
   # See permitted parameters documentation:
@@ -23,7 +23,7 @@ ActiveAdmin.register ReportKey, as: 'Data Keys' do
          content_tag :ul, class: 'list-group' do
            report_key.brands.collect{ |br|
              content_tag(:li, class: 'list-group-item') do
-                link_to(br.name, admin_data_key_path(br))
+                link_to(br.name, admin_report_key_path(br))
              end
            }.join.html_safe
          end

@@ -32,7 +32,7 @@
             %ul#sorted_report_keys.list-group
               - brand.report_keys.each do |rk|
                 %li.list-group-item.col-sm-4
-                  = link_to(rk.name, edit_admin_data_key_path(rk))
+                  = link_to(rk.name, edit_admin_report_key_path(rk))
           %td= brand.description
           %td= brand.default_currency
           %td= brand.max_segments

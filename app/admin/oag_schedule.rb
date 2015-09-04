@@ -20,7 +20,7 @@ ActiveAdmin.register OagSchedule, :as => "Summaries" do
   # end
     index do
          column 'Key', :sortable => :report_key_string do |sched|
-           link_to sched.report_key.report_key, admin_data_key_path(sched.report_key)
+           link_to sched.report_key.report_key, admin_report_key_path(sched.report_key)
          end
          column 'EffectiveDT' do |sched|
            sched.eff_date.strftime('%Y-%m-%d')

@@ -29,7 +29,7 @@ ActiveAdmin.register OagReport  do
         report.msg_id
       end
       column 'Report Key', :sortable => :report_key do |report|
-        link_to report.report_key.report_key, admin_data_key_path(report.report_key)
+        link_to report.report_key.report_key, admin_report_key_path(report.report_key)
       end
       column 'Finished', :sortable => :complete  do |report|
         pretty_boolean(report.complete)

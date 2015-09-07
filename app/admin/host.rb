@@ -29,8 +29,8 @@ ActiveAdmin.register Host do
   end
 
   index do
-    column(:brand, :sortable => :'brands.name')
-    column('BrandKey', :sortable => :'brands.brand_key'){|host| host.brand.brand_key}
+    column(:brand, :sortable => :'brands.name'){|host| host.brand.name ? host.brand.name : nil}
+    column('BrandKey', :sortable => :'brands.brand_key'){|host| host.brand.brand_key ? host.brand.brand_key : nil}
 
     column 'Host Name', :name
     column 'Host Code', :code

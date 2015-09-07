@@ -1,8 +1,10 @@
 ActiveAdmin.register Host do
-  menu :parent => "Codes"
+  menu priority: 3,  :parent => 'Config'
+
   filter :name, filters: [:cont, :eq, :start, :end]
   filter :code, filters: [:cont, :eq, :start, :end]
   filter :airlines
+  filter :brand
   # filter :name
 
   # See permitted parameters documentation:
@@ -17,13 +19,22 @@ ActiveAdmin.register Host do
   #   byebug
   #   link_to 'Clone', clone_admin_host_path(host) if (host and host.id)
   # end
-
+  # [ :all ].each do |sym|
+  #     scope(sym, :default => (sym == :all) ) do |hosts|
+  #       hosts.includes [:brand]
+  #     end
+  # end
+  def scoped_collection
+    super.includes :brand # prevents N+1 queries to your database
+  end
 
   index do
-    column :brand
-    column :code
-    column :name
-    column :airlines  do |host|
+    column(:brand, :sortable => :'brands.name')
+    column('BrandKey', :sortable => :'brands.brand_key'){|host| host.brand.brand_key}
+
+    column 'Host Name', :name
+    column 'Host Code', :code
+    column 'Hosted Airlines', :airlines  do |host|
       content_tag :ul, class: 'list-group' do
         host.airlines.collect{ |al|
           content_tag :li, class: 'list-group-item' do
@@ -53,6 +64,10 @@ ActiveAdmin.register Host do
   end
 
   controller do
+    def scoped_collection
+         end_of_association_chain.includes(:brand)
+    end
+
     # def index
     #   @hosts = Host.all
     #   render :index,  layout: 'active_admin'

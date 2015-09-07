@@ -1,6 +1,6 @@
 ActiveAdmin.register OagReport  do
   menu priority: 0, label: 'Oag Imports', :parent => 'Reports'
-  actions :all, :except => [:new]
+  actions :all, :except => [:new, :edit]
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters

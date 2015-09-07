@@ -3,7 +3,7 @@
 
 %dl.dl-horizontal
   %dt Brand:
-  %dd= @host.brand.name
+  %dd= @host.brand ? @host.brand.name : nil
   %dt Name:
   %dd= @host.name
   %dt Code:

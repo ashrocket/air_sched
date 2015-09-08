@@ -7,7 +7,7 @@
   %dt Name:
   %dd= @brand.name
   %br
-  %dt Report keys:
+  %dt Report Keys:
   %dd
     %ul#sorted_report_keys.list-group
       - @brand.report_keys.each do |rk|
@@ -38,5 +38,3 @@
   %dd
     = @brand.active? ? content_tag(:span, 'Yes',class:'status_tag yes') : content_tag(:span, 'No',class:'status_tag no')
   %br
-  %dt Slug:
-  %dd= @brand.slug

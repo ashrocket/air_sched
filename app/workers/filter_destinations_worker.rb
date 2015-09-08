@@ -19,25 +19,28 @@ class FilterDestinationsWorker
     if lock.acquire!
       begin
         report = OagReport.find_by(id: report_id)
-        Sidekiq::Logging.logger.info "Filter Destinations Worker Lock acquired, processing #{report_id}: #{report.report_key.code}"
+        Sidekiq::Logging.logger.info "Filter Destinations Worker Lock acquired for #{report_id}"
 
-        if report and report.load_status and report.load_status['destinations_map_status'] == 'refreshed'
-          processor = Oag::Process.new
-          processor.logger = Sidekiq::Logging.logger
+        if report
+          Sidekiq::Logging.logger.info "Filter Destinations Worker processing #{report_id}: #{report.report_key_code}"
+          if report.load_status and report.load_status['destinations_map_status'] == 'refreshed'
+            processor = Oag::Process.new
+            processor.logger = Sidekiq::Logging.logger
 
-          Sidekiq::Logging.logger.info "Filter Destinations Worker filtering destinations   #{report_id}: #{report.report_key.code}"
-          report.load_status['destinations_map_status'] = 'filtering_eff_days'
-          processor.filter_destinations(report)
-          report.load_status['destinations_map_status'] == 'filtered_eff_days'
-          report.save
+            Sidekiq::Logging.logger.info "Filter Destinations Worker filtering destinations   #{report_id}: #{report.report_key_code}"
+            report.load_status['destinations_map_status'] = 'filtering_eff_days'
+            processor.filter_destinations(report)
+            report.load_status['destinations_map_status'] == 'filtered_eff_days'
+            report.save
 
+          end
         end
       ensure
         lock.release!
       end
     else
       report = OagReport.find_by(id: report_id)
-      Sidekiq::Logging.logger.info "Filter Destinations Worker, busy, delaying #{report_id} for 08 minute #{report.report_key.code}"
+      Sidekiq::Logging.logger.info "Filter Destinations Worker, busy, delaying #{report_id} for 08 minute #{report.report_key_code}"
       FilterDestinationsWorker.delay_for(8.minute).perform_async(report_id)
     end
     #Do Something here with the message

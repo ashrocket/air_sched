@@ -3,10 +3,13 @@
 %dl.dl-horizontal
   %dt Msg:
   %dd= @oag_report.msg_id
-  %dt Report key:
-  %dd= link_to @oag_report.report_key.report_key, admin_report_key_path(@oag_report.report_key)
+  %dt Report Key:
+  - if @oag_report.report_key
+    %dd= link_to @oag_report.report_key.report_key, admin_report_key_path(@oag_report.report_key)
+  - else
+    %dd
   %dt Report status:
-  %dd= @oag_report.report_status
+  %dd= @oag_report.current_state.name
   %dt Attachment status:
   %dd= @oag_report.attachment_status
   %dt Received:
@@ -23,4 +26,9 @@
   %dd= @oag_report.complete
   %dt Load status:
   %dd= @oag_report.load_status
+  %dt Load status:
+  %dd
+    %ul
+      - @oag_report.log_data.each do |log_line|
+        %li= log_line
 

@@ -29,16 +29,17 @@ ActiveAdmin.register OagReport  do
         report.msg_id
       end
       column 'Report Key', :sortable => :report_key do |report|
-        link_to report.report_key.report_key, admin_report_key_path(report.report_key)
+        if report.report_key
+          link_to report.report_key.report_key, admin_report_key_path(report.report_key)
+        else
+          'No Report Key Matched'
+        end
       end
       column 'Finished', :sortable => :complete  do |report|
         pretty_boolean(report.complete)
       end
       column 'Status', :sortable => :report_status do |report|
         report.current_state.name
-      end
-      column 'Status', :sortable => :report_status do |report|
-        report.report_status
       end
       column 'Modified', :sortable => :updated_at do |report|
         report.updated_at

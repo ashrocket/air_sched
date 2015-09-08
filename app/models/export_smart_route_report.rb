@@ -95,11 +95,11 @@ class ExportSmartRouteReport < ActiveRecord::Base
       brand.report_keys.each do |report_key|
         report = report_key.latest_report
         if not report
-          Rails.logger.info "#{brand.name} #{report_key.code} :  -> No Import Report exists !!!"
+          Rails.logger.info "#{brand.name} #{report_key_code} :  -> No Import Report exists !!!"
           reject!
         end
         unless  report.finished?
-          Rails.logger.info "#{brand.name} #{report_key.code} :  -> Waiting for Import Report #{report.id} to complete ..."
+          Rails.logger.info "#{brand.name} #{report_key_code} :  -> Waiting for Import Report #{report.id} to complete ..."
           ExportBrandRouteMapsWorker.delay_for(7.minute).perform_async(brand.brand_key, self.id)
           halt
         end
@@ -198,6 +198,10 @@ class ExportSmartRouteReport < ActiveRecord::Base
 
     end
 
+    #Helper Methods
+    def report_key_code
+     report_key ? report_key.code : 'No Report Key Matched'
+    end
 
 
 end

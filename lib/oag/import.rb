@@ -120,11 +120,22 @@ module Oag
     orig_airports = schedules.collect{ |n| n[:origin_apt] }
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
+
+    report.stash_log "Loading chunk of #{schedules.count} schedules into Schedule tables for #{report.report_key_code}"
+
     report.load_status['expired_schedules_count'] = 0 unless report.load_status.has_key?('expired_schedules_count')
     report.load_status['schedules_count']         = 0 unless report.load_status.has_key?('schedules_count')
     report.load_status['expired_schedules_count'] +=  expired.count
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status['schedules_count'] +=  schedules.count
+    report.save
+
+
+    report.stash_log "There are  #{expired.count} expired schedules in chunk  for #{report.report_key_code}."
+    report.stash_log "There are  #{report.load_status['expired_schedules_count']} expired schedules so far  for #{report.report_key_code}."
+    report.stash_log "There are  #{report.load_status['schedules_count']} schedules so far for #{report.report_key_code}."
+
+
     schedule_records = []
     loaded = 0
     group_size = 500
@@ -141,15 +152,13 @@ module Oag
             raise RuntimeError, e
         end
       end
-      Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key.code}."
+      report.stash_log "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key_code}."
       schedule_count = schedule_count - schedule_records.count
       loaded += schedule_records.count
       OagSchedule.import schedule_records
       schedule_records = []
     end
-    Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key.code} ---"
-    report.report_status = 'importing'
-    report.save
+    report.stash_log "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key_code} ---"
   end
 
   def process_schedules(report, schedules, options={})
@@ -158,11 +167,11 @@ module Oag
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
     OagSchedule.keyed(report.report_key).delete_all
 
-    Rails.logger.info "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key.code}"
+    report.stash_log "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key_code}"
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status['expired_schedules_count'] = expired.count
 
-    Rails.logger.info "There are  #{expired.count} expired schedules in the file  for #{report.report_key.code}."
+    report.stash_log "There are  #{expired.count} expired schedules in the file  for #{report.report_key_code}."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
     report.load_status['schedules_count'] = schedules.count
 
@@ -184,14 +193,14 @@ module Oag
           raise RuntimeError, e
       end
     end
-    Rails.logger.info "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key.code}."
+    report.stash_log "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key_code}."
     schedule_count = (schedule_count - schedule_records.count)
 
     loaded += schedule_records.count
     OagSchedule.import schedule_records
     schedule_records = []
   end
-  Rails.logger.info "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key.code} ---"
+  report.stash_log "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key_code} ---"
   report.load_status['report_status'] = 'imported'
   report.save
 
@@ -246,8 +255,8 @@ module Oag
             end
             if csv_row_num >= starting_row
               if csv_row_num.eql? starting_row
-                Rails.logger.info "Parsing Block # #{starting_row/block_size} of #{blocks} blocks containing #{block_size} rows."
-                Rails.logger.info "Scanning line numbers #{csv_row_num}-#{end_row} of #{line_count} #{report.load_status['report_path']}"
+                report.stash_log "Parsing Block # #{starting_row/block_size} of #{blocks} blocks containing #{block_size} rows."
+                report.stash_log "Scanning line numbers #{csv_row_num}-#{end_row} of #{line_count} #{report.load_status['report_path']}"
               end
               csv_rows << row
             end
@@ -266,7 +275,7 @@ module Oag
 
     schedule_rows.flatten!
     report.load_status['report_line_ptr'] = report.load_status['report_line_ptr'] + schedule_rows.count
-    Rails.logger.info "Scanned #{schedule_rows.count} rows of #{report.load_status['report_path']}"
+    report.stash_log "Scanned #{schedule_rows.count} rows of #{report.load_status['report_path']}"
     schedule_rows
 
   end
@@ -282,25 +291,27 @@ module Oag
   end
 
   def parse_and_load_large_report(report)
-
-    if report.report_status.eql? 'queued'
-      OagSchedule.where(:report_key => report.report_key).delete_all
-      report.report_status = 'importing'
-    end
     begin
       schedule_rows = parse_large_report(report)
     rescue Exception => ex
       Rails.logger.error ex.message
     end
     schedules = []
+
+    # TODO:  If file is to large to load into memory, load it in with chunks, and process each chunk
     # schedule_rows.each do |csv_data_set|
     schedules << self.load_schedule(schedule_rows, options={})
     # end
+
     schedules.flatten!
+    OagSchedule.keyed(report.report_key).delete_all
+
+    # TODO: Currently This is not doing anything different than process schedules.
+    # Needs to process them in chunks.
     process_schedule_chunk(report, schedules)
     if report.load_status['report_line_ptr'].to_i >= report.attachment_lines
-      report.report_status = 'schedules_loaded'
-      Rails.logger.info "There were  #{report.load_status['expired_schedules_count']} expired schedules in the file  for #{report.report_key.code}."
+      # report.report_status = 'schedules_loaded'
+      report.stash_log "There were  #{report.load_status['expired_schedules_count']} expired schedules in the file  for #{report.report_key_code}."
 
     end
 

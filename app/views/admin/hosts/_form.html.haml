@@ -19,8 +19,8 @@
 
   .form-inputs
     = f.association :brand
-    = f.input 'Host Name', :name
-    = f.input :code
+    = f.input :name, label: 'Host Name'
+    = f.input :code, label: 'Host Code'
     = f.association :airlines, include_hidden: false,  input_html: { size: 10}
 
   .form-actions.col-sm-offset-3.col-sm-9

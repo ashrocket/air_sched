@@ -2,7 +2,7 @@
 #
 # require 'sidekiq-lock'
 #
-# class ProcessInboxWorker
+class ProcessInboxWorker
 #   include Sidekiq::Worker
 #   include Sidekiq::Lock::Worker
 #   include Sidetiq::Schedulable
@@ -46,4 +46,4 @@
 #       end
 #     end
 #   end
-# end
+end

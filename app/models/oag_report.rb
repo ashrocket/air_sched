@@ -18,48 +18,68 @@ class OagReport < ActiveRecord::Base
     state :uninitialized do
       event :process_attachment, :transitions_to => :queued
       event :reject, :transitions_to => :rejected
+      event :reset, :transitions_to => :uninitialized
     end
     state :queued do
       event :import_oag_file, :transitions_to => :schedules_loaded
+      event :queue_large_oag_file, :transition_to => :queued_for_large_file
       event :reject, :transitions_to => :rejected
       event :reset, :transitions_to => :uninitialized
+    end
+    state :queued_for_large_file do
+      event :import_large_oag_file, :transitions_to => :schedules_loaded
+      event :reject, :transitions_to => :rejected
+      event :reset, :transitions_to => :uninitialized
+
     end
     state :schedules_loaded do
       event :refresh_airports, :transitions_to => :airports_refreshed
       event :reject, :transitions_to => :rejected
       event :process_attachment, :transitions_to => :queued
-
+      event :reset, :transitions_to => :uninitialized
     end
     state :airports_refreshed do
       event :refresh_airlines, :transitions_to => :airlines_refreshed
       event :reject, :transitions_to => :rejected
+      event :reset, :transitions_to => :uninitialized
+
       event :process_attachment, :transitions_to => :queued
     end
     state :airlines_refreshed do
        event :refresh_direct_flights, :transitions_to => :direct_flights_refreshed
        event :reject, :transitions_to => :rejected
+       event :reset, :transitions_to => :uninitialized
+
        event :process_attachment, :transitions_to => :queued
     end
     state :direct_flights_refreshed do
        event :refresh_destinations, :transitions_to => :destinations_refreshed
        event :reject, :transitions_to => :rejected
+       event :reset, :transitions_to => :uninitialized
+
        event :process_attachment, :transitions_to => :queued
 
     end
     state :destinations_refreshed do
        event :refresh_cnx_pairs, :transitions_to => :connections_refreshed
        event :reject, :transitions_to => :rejected
+       event :reset, :transitions_to => :uninitialized
+
        event :process_attachment, :transitions_to => :queued
 
     end
     state :connections_refreshed do
       event :wait_for_destinations_filter, :transitions_to => :waiting_for_destinations_filtered
       event :reject, :transitions_to => :rejected
+      event :reset, :transitions_to => :uninitialized
+
       event :process_attachment, :transitions_to => :queued
     end
     state :waiting_for_destinations_filtered do
       event :finalize, :transitions_to => :finished
       event :reject, :transitions_to => :rejected
+      event :reset, :transitions_to => :uninitialized
+
       event :process_attachment, :transitions_to => :queued
     end
     state :finished
@@ -67,18 +87,18 @@ class OagReport < ActiveRecord::Base
 
     after_transition do |from, to, triggering_event, *event_args|
       case to
-        when /unitialized|finished|rejected/
-          Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to}"
+        when /uninitialized|finished|rejected|queued_for_large_file/
+          stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
         else
-          Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
+          stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
 
-          dly = (30..300).to_a.sample
+          dly = (30..180).to_a.sample
           ScheduleImportWorker.delay_for(dly).perform_async(id)
       end
     end
 
     on_transition do |from, to, triggering_event, *event_args|
-      Rails.logger.info "#{msg_id} #{id}: #{report_key.code} #{triggering_event} transitioning FROM #{from} -> #{to}"
+      stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioning FROM #{from} -> #{to}"
     end
   end
 
@@ -89,6 +109,8 @@ class OagReport < ActiveRecord::Base
         process_attachment!
       when /queued/
         import_oag_file!
+      when /queued_for_large_file/
+        import_large_oag_file!
       when /schedules_loaded/
         refresh_airports!
       when /airports_refreshed/
@@ -106,7 +128,9 @@ class OagReport < ActiveRecord::Base
     end
   end
   
-
+  def reset
+    #TODO enable button to reset schedule import.
+  end
 
   # State Machine events
   def process_attachment
@@ -114,29 +138,39 @@ class OagReport < ActiveRecord::Base
       process_email_attachment
       estimated_report_key  = ReportKey.match_filename(report_name)
       if estimated_report_key.is_a? ReportKey
-        self.report_key =estimated_report_key
+        self.report_key = estimated_report_key
+        save
       else
-        Rails.logger.info "Report rejected due to  undefined or invalid report key #{report_name}"
+        stash_log "Report rejected due to  undefined or invalid report key #{report_name}"
         self.load_status['attachment_status'] = 'undefined or invalid report key'
         self.attachment_status ='undefined or invalid report key'
+        self.report_key_id = nil
         save
         reject!
+        halt
       end
-      save
   end
 
   def import_oag_file
       self.report_key.state = 'processing'
       self.report_key.save
       self.load_status['schedule_import_time'] = Time.now
-
       if large_report?
-        ScheduleLargeImportWorker.perform_async(id)
+        ScheduleLargeImportWorker.delay_for(60).perform_async(self.id)
+        queue_large_oag_file!
+        halt
       else
         processor.import_oag_file(self)
       end
       save
   end
+  def import_large_oag_file!
+        self.load_status['schedule_import_time'] = Time.now
+
+        processor.import_large_oag_file(self)
+        save
+    end
+
 
   def refresh_airports
     processor.refresh_airports(self)
@@ -167,7 +201,7 @@ class OagReport < ActiveRecord::Base
 
   def finalize
     unless load_status['destinations_map_status'].eql? 'eff_days_filtered'
-      Rails.logger.info "#{msg_id} #{id}: #{report_key.code}  -> waiting for destinations filter"
+      stash_log "#{msg_id} #{id}: #{report_key_code}  -> waiting for destinations filter"
       ScheduleImportWorker.delay_for(1.minute).perform_async(id)
       halt
     else
@@ -178,22 +212,31 @@ class OagReport < ActiveRecord::Base
 
       delay_time = 60
       report_key.brands.each do |brand|
-        report = ExportSmartRouteReport.create(brand: brand)
-        ExportBrandRouteMapsWorker.delay_for(delay_time.minute).perform_async(brand.brand_key, report.id)
+        if brand.active? and AppSwitch.on?('autogenerate_routemaps')
+          report = ExportSmartRouteReport.create(brand: brand)
+          ExportBrandRouteMapsWorker.delay_for(delay_time.minute).perform_async(brand.brand_key, report.id)
+        end
       end
 
     end
   end
   def reject
-    processor.finalize(self, 'processed')
-    self.report_key.state = 'idle'
-    self.report_key.save
+    processor.finalize(self, 'rejected')
+     if self.report_key
+       self.report_key.state = 'idle'
+       self.report_key.save
+     end
 
     save
   end
 
 
   # Helper methods
+  def report_key_code
+    report_key ? report_key.code : 'No Report Key Matched'
+  end
+
+
   def processor
     Oag::Process.new
   end
@@ -229,16 +272,16 @@ class OagReport < ActiveRecord::Base
   def process_email_attachment
     # TODO:  Check for Existing Report Key filename patterns and only process if Key Exists.
 
-    Rails.logger.info "Decompressing Email Attachment for message #{msg_id} #{attachment_path}"
+    stash_log "Decompressing Email Attachment for message #{msg_id} #{attachment_path}"
 
     ext = File.extname(attachment_path)
 
     if ext.eql? '.csv'
       if File.exists? attachment_path
-        update(attachment_status: 'stored',attachment_size: File.stat(attachment_path).size)
+        update(attachment_status: 'stored', attachment_size: File.stat(attachment_path).size)
         self.load_status['attachment_status'] =  'uncompressed'
         self.load_status['report_path'] =  attachment_path
-        self.load_status['report_size'] =  load_status['attachment_size']
+        self.load_status['report_size'] =  attachment_size
         save
 
       end
@@ -263,8 +306,15 @@ class OagReport < ActiveRecord::Base
 
   end
 
+  def stash_log msg
+    Rails.logger.info msg
+    self.log_data << msg
+    save
+  end
+
   private
    def set_null_report_key
-     self.report_key = ReportKey.where(name: 'Null Report', report_key: 'NONE').first_or_create if report_key.blank?
+     # self.report_key = ReportKey.none
+     # self.report_key = ReportKey.where(name: 'Null Report', report_key: 'NONE').first_or_create if report_key.blank?
    end
 end

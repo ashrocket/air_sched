@@ -47,7 +47,6 @@ class ReportKey < ActiveRecord::Base
       matched_list = []
       all.each do |report_key|
         matches = pattern.match(report_key.file_pattern)
-
         if  matches
           if matches.captures  and matches.captures.first
             matched_list <<  {key: report_key, match: matches.captures.first.lstrip}
@@ -57,9 +56,12 @@ class ReportKey < ActiveRecord::Base
         end
 
       end
+
       unless matched_list.empty?
         matched_list.sort_by! { |m| m[:match].length}
-        matching_key = matched_list.last[:key]
+        longest_match = matched_list.last
+        matching_key = longest_match[:key]
+
       end
       matching_key
     end

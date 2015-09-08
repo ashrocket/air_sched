@@ -4,9 +4,8 @@ class CreateReportKeys < ActiveRecord::Migration
       t.string :report_key,  null: false
       t.string :name,  null: false
       t.string :file_pattern,  null: false, default: '(?!)'
-      t.string :city
+      t.string :comment
       t.boolean :active
-      t.boolean :current
       t.string :state, default: 'idle'
       t.string :slug
 

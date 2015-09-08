@@ -12,13 +12,12 @@
       %tr
         %th Brand key
         %th Name
-        %th Report keys
+        %th Report Keys
         %th Description
         %th Default currency
         %th Hosts
         %th MaxSegments
         %th Active
-        %th Slug
         %th
         %th
         %th
@@ -42,7 +41,6 @@
                 %li.list-group-item.col-sm-4
                   = link_to(h.name, [:admin,h])
           %td= brand.active
-          %td= brand.slug
           -#%td= link_to 'Show', [:admin,brand]
           -#%td= link_to 'Edit', edit_admin_brand_path(brand)
           -#%td= link_to 'Destroy', [:admin,brand], data: { confirm: 'Are you sure?' }, method: :delete

@@ -21,7 +21,7 @@ module Oag
 
 
         # dest_group.compact.each do  |dest|
-        process_logger.info "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key.code}"
+        report.stash_log "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key_code}"
 
         Parallel.each_with_index(dest_group, in_threads:4) do |dest, index|
           # Oag::Util.refresh_forked_process_postgres_db_connection
@@ -50,7 +50,7 @@ module Oag
                  end
                end
                process_logger.debug "Filtering:  #{connected_schedules.count} connected_schedules for #{dest.origin_code}" +
-                                       "#{dest.hub_code} #{dest.dest_code} #{report.report_key.code}"
+                                       "#{dest.hub_code} #{dest.dest_code} #{report.report_key_code}"
 
                eff_days = connected_schedules.map{ |cs|  [ cs[:window][:eff].to_date,
                                                                  cs[:window][:disc].to_date,
@@ -84,8 +84,6 @@ module Oag
            apt.city = airport[2]
            apt.save
         end
-        report.report_status = 'airports_refreshed'
-        report.save
     end
 
     def refresh_airlines(report)
@@ -98,8 +96,6 @@ module Oag
         # seperately from OAG as the list of airlines
         #
 
-        report.report_status = 'airlines_refreshed'
-        report.save
     end
 
 
@@ -117,8 +113,6 @@ module Oag
           direct_flight_records << DirectFlight.new(report_key: report.report_key, origin: combo[0][0], dest: combo[0][1], carriers: combo[1])
         end
         DirectFlight.import direct_flight_records
-        report.report_status = 'direct_flights_refreshed'
-        report.save
     end
 
     def refresh_destinations report
@@ -170,7 +164,7 @@ module Oag
 
         tot = cnx.count
         cnx.in_groups_of(1000) do |cnx_group|
-          process_logger.info "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key.code}"
+          report.stash_log "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key_code}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
@@ -192,7 +186,6 @@ module Oag
           connections = []
         end
       report.load_status['destinations_map_status'] = 'refreshed'
-      report.report_status = 'destinations_refreshed'
       report.save
     end
 
@@ -211,7 +204,7 @@ module Oag
           tot = pairs.count
           group_size = 1000
           pairs.in_groups_of(group_size) do |pair_group|
-            process_logger.info "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key.code}"
+            report.stash_log "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key_code}"
             tot -= group_size
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
@@ -221,19 +214,16 @@ module Oag
             CnxPair.import connections
             connections = []
           end
-          report.report_status = 'connections_refreshed'
-          report.save
 
     end
     #TODO provide the option to store the processed files in the processed folder
     def finalize report, status
-        process_logger.info "Finalizing #{report.attachment_path} import"
+        report.stash_log "Finalizing #{report.attachment_path} import"
 
         File.delete report.attachment_path if File.exist?(report.attachment_path)
         File.delete report.report_path if File.exist?(report.report_path)
         Mastiff::Email.finalize([report.msg_id], status)
         report.load_status['attachment_status'] = status
-        report.report_status                    = 'finished'
         report.complete = true
         report.save
     end
@@ -245,11 +235,9 @@ module Oag
         begin
           importer = Oag::Import.new
           importer.parse_and_load_report report
-          report.report_status = 'schedules_loaded'
-          report.save
         rescue Exception => ex
-               process_logger.info ex.message
-               process_logger.info report.inspect
+               report.stash_log ex.message
+               report.stash_log report.inspect
         end
 
 
@@ -260,8 +248,8 @@ module Oag
           importer.parse_and_load_large_report report
 
         rescue Exception => ex
-               process_logger.info ex.message
-               process_logger.info report.inspect
+               report.stash_log ex.message
+               report.stash_log report.inspect
         end
     end
 

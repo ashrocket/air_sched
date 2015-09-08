@@ -1,8 +1,8 @@
 -#TODO: Make this a remote form and use the JS fucntions to signal success
 - @app_control = app_control unless @app_control
 = simple_form_for [:admin, @app_control], as: :app_control,     |
-  :url => admin_current_data_key_set_url, remote: false,         |
-  html: { method: :put, id: :set_current_data_key_form,         |
+  :url => admin_current_report_key_set_url, remote: false,         |
+  html: { method: :put, id: :set_current_report_key_form,         |
   class: 'form-inline' }   do |f|                               |
 
   - if @app_control.errors.any?
@@ -17,7 +17,7 @@
           %li= msg
 
   .form-inputs.col-sm-offset-1.col-sm-9
-    = f.association :report_key, include_blank: false, label: 'Current Data Key'
+    = f.association :report_key, include_blank: false, label: 'Current Report Key'
 
 
 -#<%= f.input :location,:collection => @locations,:label_method => :location_name,:value_method => :id,:label => "Location" ,:include_blank => false %>

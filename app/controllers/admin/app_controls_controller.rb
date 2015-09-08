@@ -1,5 +1,5 @@
 class AppControlsController < ApplicationController
-  before_action :set_app_control, only: [:show, :edit, :edit_current_data_key, :update]
+  before_action :set_app_control, only: [:show, :edit, :edit_current_report_key, :update]
 
   # GET /app_controls
 
@@ -13,14 +13,14 @@ class AppControlsController < ApplicationController
   end
 
     # GET /app_controls/1/edit
-  def edit_current_data_key
+  def edit_current_report_key
   end
    # GET /app_controls/1/edit
-  def set_current_data_key
+  def set_current_report_key
     if @app_control.update(app_control_params)
       redirect_to @app_control, notice: 'App control was successfully updated.'
     else
-      render :edit_current_data_key
+      render :edit_current_report_key
     end
   end
 

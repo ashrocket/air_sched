@@ -6,7 +6,7 @@ ActiveAdmin.register_page "Dashboard" do
     div do
       @app_control =  AppControl.first
       render partial: admin_current_brand_edit_path, locals: {app_control: @app_control}
-      render partial: admin_current_data_key_edit_path, locals: {app_control: @app_control}
+      render partial: admin_current_report_key_edit_path, locals: {app_control: @app_control}
       render 'admin/export/tasks'
     end
 

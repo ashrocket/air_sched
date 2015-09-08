@@ -27,4 +27,6 @@ ABBConfig.maxmaxct = 2880
  config.tip = "in minutes"
  config.save
 
-AppSwitch.where(name: 'autoload').first_or_create!
+AppSwitch.where(name: 'autoload_oag').first_or_create!
+AppSwitch.where(name: 'autogenerate_routemaps').first_or_create!
+

@@ -5,7 +5,7 @@ class CreateOagReports < ActiveRecord::Migration
       t.string   :msg_id
       t.string   :workflow_state
       t.json     :load_status, default: {}
-      t.string   :report_status, default: 'uninitialized'
+      t.json     :log_data, default: []
       t.string   :attachment_status, default: 'unstored'
       t.datetime :received
       t.integer  :attachment_lines, default: 0

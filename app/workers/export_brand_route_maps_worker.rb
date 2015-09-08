@@ -6,6 +6,7 @@ class ExportBrandRouteMapsWorker
   include Sidekiq::Lock::Worker
 
   sidekiq_options :queue => :report_queue, :retry => false, :backtrace => true, unique: true,
+                  unique_job_expiration: 120 * 60,
                   unique_args: ->(args) { [ args.first ] },
                   lock: {
                   timeout: proc { |_, timeout = 1_200_000 | timeout * 2 },

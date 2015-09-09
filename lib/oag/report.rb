@@ -439,10 +439,9 @@ module Oag
                 roundtrip: roundtrip
         }}
         market_maps.merge! market_map
-        puts JSON.pretty_generate(market_map)
 
       end
-      BrandedRouteMap.branded(brand).destroy
+      BrandedRouteMap.branded(brand).destroy_all
       BrandedRouteMap.create(brand: brand, route_map: market_maps)
 
       brand.data_states['route_maps'] = {'state': 'idle',  'updated_at': Time.now}

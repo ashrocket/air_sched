@@ -92,7 +92,7 @@
 
   .action_items {
     span.action_item {
-      & > a, & > .dropdown_menu > a {
+      & > a.btn-primary, & > .dropdown_menu > a.btn-primary {
 
 
         @include light-button;

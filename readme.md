@@ -201,10 +201,10 @@ Add configuration values here, as shown below.
 
 **DATABSED REBUILD**
 
-    pg_dump -c dbname=air_sched_development -t report_keys -t brand_report_keys -t brands -f brands_report_keys.sql
+    pg_dump -c dbname=air_sched_development -t hosts -t airlines_hosts -t report_keys -t brand_report_keys -t brands -f brands_report_keys.sql
     psql -f brands_report_keys.sql -d your_db_name 
 
-    pg_dump --data-only dbname=air_sched_development  -t airports  -t airport_currencies  -t airlines -t airlines_hosts -t hosts  -t interline_cxr_rules -f seed_starter_data.sql
+    pg_dump --data-only dbname=air_sched_development  -t airports  -t airport_currencies  -t airlines -t interline_cxr_rules -f db/seed_starter_data.sql
     psql -f seed_starter_data.sql -d your_db_name
 
 These files are already in the db folder.

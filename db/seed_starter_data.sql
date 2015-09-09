@@ -2284,45 +2284,6 @@ COPY airlines (id, code, name, country_name, slug) FROM stdin;
 
 
 --
--- Data for Name: hosts; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
-2	1	NokScoot Navitaire	XW	2015-08-24 15:45:01.123549	2015-08-24 15:45:01.123549
-5	1	Nok Navitaire	DD	2015-08-24 16:02:25.758282	2015-08-24 16:02:25.758282
-7	2	Nok Navitaire	DD	2015-08-31 09:07:40.218443	2015-09-02 18:45:10.075155
-9	2	NokScoot Navitaire	XW	2015-08-31 09:11:15.761392	2015-09-02 18:45:10.076616
-10	1	Scoot Navitaire	TZ	2015-08-31 09:11:58.301918	2015-09-02 18:53:47.339998
-1	2	Scoot Navitaire	TZ	2015-08-24 04:39:35.051448	2015-09-02 18:54:20.496365
-\.
-
-
---
--- Data for Name: airlines_hosts; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY airlines_hosts (id, airline_id, host_id) FROM stdin;
-1	4183	1
-2	4212	1
-3	4445	2
-5	3011	5
-7	4290	1
-8	3011	7
-9	4445	9
-10	4183	10
-11	4212	10
-12	4290	10
-\.
-
-
---
--- Name: airlines_hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('airlines_hosts_id_seq', 12, true);
-
-
---
 -- Name: airlines_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -10240,13 +10201,6 @@ COPY airports (id, code, name, city, lat, long, slug) FROM stdin;
 --
 
 SELECT pg_catalog.setval('airports_id_seq', 610, true);
-
-
---
--- Name: hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('hosts_id_seq', 10, true);
 
 
 --

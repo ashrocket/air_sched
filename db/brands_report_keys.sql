@@ -11,6 +11,8 @@ SET client_min_messages = warning;
 
 SET search_path = public, pg_catalog;
 
+ALTER TABLE ONLY public.airlines_hosts DROP CONSTRAINT fk_rails_a8b0cd38f8;
+ALTER TABLE ONLY public.airlines_hosts DROP CONSTRAINT fk_rails_a68c11e0aa;
 ALTER TABLE ONLY public.brand_report_keys DROP CONSTRAINT fk_rails_538425cf32;
 ALTER TABLE ONLY public.brand_report_keys DROP CONSTRAINT fk_rails_3be8df1480;
 DROP INDEX public.index_report_keys_on_slug;
@@ -19,23 +21,67 @@ DROP INDEX public.index_brands_on_slug;
 DROP INDEX public.index_brands_on_brand_key;
 DROP INDEX public.index_brand_report_keys_on_report_key_id;
 DROP INDEX public.index_brand_report_keys_on_brand_id;
+DROP INDEX public.index_airlines_hosts_on_host_id;
+DROP INDEX public.index_airlines_hosts_on_airline_id;
 ALTER TABLE ONLY public.report_keys DROP CONSTRAINT report_keys_pkey;
+ALTER TABLE ONLY public.hosts DROP CONSTRAINT hosts_pkey;
 ALTER TABLE ONLY public.brands DROP CONSTRAINT brands_pkey;
 ALTER TABLE ONLY public.brand_report_keys DROP CONSTRAINT brand_report_keys_pkey;
+ALTER TABLE ONLY public.airlines_hosts DROP CONSTRAINT airlines_hosts_pkey;
 ALTER TABLE public.report_keys ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.hosts ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.brands ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.brand_report_keys ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.airlines_hosts ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE public.report_keys_id_seq;
 DROP TABLE public.report_keys;
+DROP SEQUENCE public.hosts_id_seq;
+DROP TABLE public.hosts;
 DROP SEQUENCE public.brands_id_seq;
 DROP TABLE public.brands;
 DROP SEQUENCE public.brand_report_keys_id_seq;
 DROP TABLE public.brand_report_keys;
+DROP SEQUENCE public.airlines_hosts_id_seq;
+DROP TABLE public.airlines_hosts;
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
+
+--
+-- Name: airlines_hosts; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE airlines_hosts (
+    id integer NOT NULL,
+    airline_id integer,
+    host_id integer
+);
+
+
+ALTER TABLE airlines_hosts OWNER TO postgres;
+
+--
+-- Name: airlines_hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE airlines_hosts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE airlines_hosts_id_seq OWNER TO postgres;
+
+--
+-- Name: airlines_hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE airlines_hosts_id_seq OWNED BY airlines_hosts.id;
+
 
 --
 -- Name: brand_report_keys; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -48,7 +94,7 @@ CREATE TABLE brand_report_keys (
 );
 
 
-ALTER TABLE public.brand_report_keys OWNER TO postgres;
+ALTER TABLE brand_report_keys OWNER TO postgres;
 
 --
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -62,7 +108,7 @@ CREATE SEQUENCE brand_report_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.brand_report_keys_id_seq OWNER TO postgres;
+ALTER TABLE brand_report_keys_id_seq OWNER TO postgres;
 
 --
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -77,20 +123,21 @@ ALTER SEQUENCE brand_report_keys_id_seq OWNED BY brand_report_keys.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
-    name character varying DEFAULT 'NULLBRAND'::character varying,
+    brand_key character varying NOT NULL,
+    name character varying NOT NULL,
+    report_keys character varying[] DEFAULT '{}'::character varying[],
     description character varying,
     default_currency character varying,
-    data_states json DEFAULT '{}'::json,
-    max_segments integer DEFAULT 3,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    data_states json DEFAULT '{}'::json,
+    max_segments integer DEFAULT 3
 );
 
 
-ALTER TABLE public.brands OWNER TO postgres;
+ALTER TABLE brands OWNER TO postgres;
 
 --
 -- Name: brands_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -104,13 +151,50 @@ CREATE SEQUENCE brands_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.brands_id_seq OWNER TO postgres;
+ALTER TABLE brands_id_seq OWNER TO postgres;
 
 --
 -- Name: brands_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE brands_id_seq OWNED BY brands.id;
+
+
+--
+-- Name: hosts; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE hosts (
+    id integer NOT NULL,
+    brand_id integer,
+    name character varying,
+    code character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE hosts OWNER TO postgres;
+
+--
+-- Name: hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE hosts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE hosts_id_seq OWNER TO postgres;
+
+--
+-- Name: hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE hosts_id_seq OWNED BY hosts.id;
 
 
 --
@@ -122,17 +206,16 @@ CREATE TABLE report_keys (
     report_key character varying NOT NULL,
     name character varying NOT NULL,
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
-    city character varying,
+    comment character varying,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    current boolean DEFAULT false,
     state character varying DEFAULT 'idle'::character varying
 );
 
 
-ALTER TABLE public.report_keys OWNER TO postgres;
+ALTER TABLE report_keys OWNER TO postgres;
 
 --
 -- Name: report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -146,13 +229,20 @@ CREATE SEQUENCE report_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.report_keys_id_seq OWNER TO postgres;
+ALTER TABLE report_keys_id_seq OWNER TO postgres;
 
 --
 -- Name: report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE report_keys_id_seq OWNED BY report_keys.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY airlines_hosts ALTER COLUMN id SET DEFAULT nextval('airlines_hosts_id_seq'::regclass);
 
 
 --
@@ -173,7 +263,40 @@ ALTER TABLE ONLY brands ALTER COLUMN id SET DEFAULT nextval('brands_id_seq'::reg
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
+ALTER TABLE ONLY hosts ALTER COLUMN id SET DEFAULT nextval('hosts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
 ALTER TABLE ONLY report_keys ALTER COLUMN id SET DEFAULT nextval('report_keys_id_seq'::regclass);
+
+
+--
+-- Data for Name: airlines_hosts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY airlines_hosts (id, airline_id, host_id) FROM stdin;
+1	4183	1
+2	4212	1
+3	4445	2
+5	3011	5
+7	4290	1
+13	4445	11
+14	3011	12
+15	4212	13
+16	4445	14
+17	3011	15
+18	4212	16
+\.
+
+
+--
+-- Name: airlines_hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('airlines_hosts_id_seq', 18, true);
 
 
 --
@@ -181,8 +304,8 @@ ALTER TABLE ONLY report_keys ALTER COLUMN id SET DEFAULT nextval('report_keys_id
 --
 
 COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
-3	2	10
-4	1	11
+13	1	51
+14	1	52
 \.
 
 
@@ -190,16 +313,15 @@ COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brand_report_keys_id_seq', 4, true);
+SELECT pg_catalog.setval('brand_report_keys_id_seq', 14, true);
 
 
 --
 -- Data for Name: brands; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY brands (id, brand_key, name, description, default_currency, data_states, max_segments, active, slug, created_at, updated_at) FROM stdin;
-2	XW	Nok Scoot 	Brand for Nok Scoot Website 	SGD	{}	3	t	xw	2015-09-02 18:43:22.617569	2015-09-02 18:47:49.020787
-1	TZ	Scoot	Scoot Interline Network	AUD	{}	3	t	tz	2015-09-02 18:45:10.071365	2015-09-02 18:46:01.668282
+COPY brands (id, brand_key, name, report_keys, description, default_currency, active, slug, created_at, updated_at, data_states, max_segments) FROM stdin;
+1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-09 02:17:41.949898	{"branded_connections":{"state":"processing"},"smart_routes":{"state":"processing"},"route_maps":{"state":"idle","updated_at":"2015-09-08T21:43:15.328-04:00"},"route_maps_export":"idle"}	3
 \.
 
 
@@ -207,34 +329,50 @@ COPY brands (id, brand_key, name, description, default_currency, data_states, ma
 -- Name: brands_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brands_id_seq', 2, true);
+SELECT pg_catalog.setval('brands_id_seq', 6, true);
+
+
+--
+-- Data for Name: hosts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
+5	1	SCOOT NOKAIR HOST NOK	DD	2015-08-24 16:02:25.758282	2015-09-09 02:38:06.436689
+2	1	SCOOT NOKSCOOT HOST	XW	2015-08-24 15:45:01.123549	2015-09-09 02:38:21.643041
+1	1	SCOOT SCOOT OWN HOST	TZ	2015-08-24 04:39:35.051448	2015-09-09 02:38:39.69726
+11	\N	NOKSCOOT OWN HOST	XW	2015-09-09 02:39:09.057972	2015-09-09 02:39:09.057972
+12	\N	NOKAIR OWN HOST	DD	2015-09-09 02:39:52.10576	2015-09-09 02:39:52.10576
+13	\N	NOKAIR SCOOT HOST	TZ	2015-09-09 02:40:49.02952	2015-09-09 02:40:49.02952
+14	\N	NOAIR NOKSCOOT HOST	XW	2015-09-09 02:41:09.95503	2015-09-09 02:41:09.95503
+15	\N	NOKSCOOT NOKAIR HOST	DD	2015-09-09 02:41:40.32594	2015-09-09 02:41:40.32594
+16	\N	NOKSCOOT SCOOT HOST	TZ	2015-09-09 02:41:59.662666	2015-09-09 02:41:59.662666
+\.
+
+
+--
+-- Name: hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('hosts_id_seq', 16, true);
 
 
 --
 -- Data for Name: report_keys; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY report_keys (id, report_key, name, file_pattern, city, active, slug, created_at, updated_at, current, state) FROM stdin;
-24	LGWU2EK	Gatwick Easy Jet - Emirates Connections	(?!)	London, UK	f	lgwu2ek	2014-10-27 04:38:14.700334	2014-12-11 22:00:00.603855	f	idle
-22	ATHMKTS	Athens Airport	(?!)	Athens, GR	f	ath	2014-08-21 04:30:10	2014-09-07 00:10:07	f	idle
-25	BLR	Bengalaru	(?!)	Bengalaru, India	f	blr	2014-10-27 04:38:14.700334	2014-10-27 04:42:02.806931	f	idle
-23	ATH1STOP	Athens Airport (limited carriers)	(?!)	Athens, GR	f	ath1stop	2014-08-21 04:30:10	2014-12-11 21:59:45.277245	f	idle
-21	LGWDYVS	London Gatwick Airport (Norwegian and Virgin)	(?!)	London, UK	f	lgwdyvs	2014-08-21 04:18:49	2014-12-11 22:00:14.219882	f	idle
-2	SIN	Changi Airport	(HUBSIN)_\\d+	Sinagpore, SG	t	sin	2014-08-21 04:18:19	2015-06-05 05:15:27.553249	f	idle
-12	TZBRANDSG	Singapore Airlines	(TZBRAND_SQ)_\\d+	LCC Alliance	t	tzbrandsg	2015-08-04 02:39:15.01327	2015-08-04 07:29:43.723399	f	idle
-1	MXP	Milan Airport	HUB(MXP)_\\d+	Milan, IT	t	mxp	2014-08-21 04:18:04	2015-06-09 18:10:49.073466	f	idle
-20	DY	Norwegian Air	(?!)	All Cities	\N	dy	2014-08-21 04:29:52	2014-09-07 00:10:44	f	idle
-19	DDTZ	Nok and Scoot 	CXX(_TZDD)_\\d+	All Cities	t	ddtz	2014-08-21 04:29:52	2015-07-25 02:05:24.025831	f	idle
-13	TZBRANDMI	Silk Air	TZBRAND_MI_\\d+	LCC Alliance	t	tzbrandmi	2015-08-04 02:37:28.328034	2015-08-04 02:40:01.532276	f	idle
-16	SINCXX5JTZ	Singapore Cebu And Scoot	HUB(SIN_CXX5JTZ)_\\d+	Singapore	t	sin-cxx5jtz	2015-06-04 19:55:40.431811	2015-06-05 05:13:39.380934	f	idle
-26	SIN_VA	Singapore Virgin Australia	(CXX_Virgin_australia)_\\d+	Singapore	t	sin_va	2015-06-05 05:18:03.120174	2015-06-10 02:23:49.082566	f	idle
-49	NONE	Null Report	(?!)	\N	\N	none	2015-09-02 03:25:35.545824	2015-09-02 03:25:35.545824	f	idle
-5	BCN	Barcelona Airport	(?!)	Barcelona, Spain	f	bcn	2014-08-21 04:34:18	2014-09-01 17:29:23	f	idle
-3	MAN	Manchester Airport	HUB(MAN)_\\d+	Manchester, UK	t	man	2014-08-21 04:19:04	2015-06-05 05:15:46.961036	f	idle
-6	SNN	Shannon Airport	HUB(SNN)_\\d+	Shannon, Ireland	t	snn	2014-08-21 20:56:20	2015-06-05 05:15:16.688462	f	idle
-4	FR	Ryan Air	CXX(FR)_\\d+	All Cities	t	fr	2014-08-21 04:29:52	2015-06-05 05:16:41.494787	f	idle
-10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-02 15:28:47.84803	f	idle
-11	TZBRANDVA	Virgina Australia	(TZBRAND_VA)_\\d+	LCC Alliance	t	tzbrandva	2015-08-04 02:40:23.300228	2015-09-02 16:16:50.553264	f	idle
+COPY report_keys (id, report_key, name, file_pattern, comment, active, slug, created_at, updated_at, state) FROM stdin;
+2	SIN	Changi Airport	(HUBSIN)_\\d+	Sinagpore, SG	t	sin	2014-08-21 04:18:19	2015-06-05 05:15:27.553249	idle
+1	MXP	Milan Airport	HUB(MXP)_\\d+	Milan, IT	t	mxp	2014-08-21 04:18:04	2015-06-09 18:10:49.073466	idle
+16	SINCXX5JTZ	Singapore Cebu And Scoot	HUB(SIN_CXX5JTZ)_\\d+	Singapore	t	sin-cxx5jtz	2015-06-04 19:55:40.431811	2015-06-05 05:13:39.380934	idle
+3	MAN	Manchester Airport	HUB(MAN)_\\d+	Manchester, UK	t	man	2014-08-21 04:19:04	2015-06-05 05:15:46.961036	idle
+6	SNN	Shannon Airport	HUB(SNN)_\\d+	Shannon, Ireland	t	snn	2014-08-21 20:56:20	2015-06-05 05:15:16.688462	idle
+4	FR	Ryan Air	CXX(FR)_\\d+	All Cities	t	fr	2014-08-21 04:29:52	2015-06-05 05:16:41.494787	idle
+11	TZBRANDVA	Virgina Australia	(TZBRAND_VA)_\\d+	LCC Alliance	t	tzbrandva	2015-08-04 02:40:23.300228	2015-09-03 00:14:36.502521	idle
+10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-08 18:19:44.454567	idle
+53	TR	Tiger Singapore OAG Schedule	(TZBRAND_TR).*	LCC Alliance	t	tr	2015-09-08 18:22:24.379082	2015-09-08 18:31:07.046253	idle
+50	TZ	Scoot OAG Schedules	(TZBRAND_TZ).*		t	tz	2015-09-08 18:08:53.135762	2015-09-09 02:15:24.09684	processing
+51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-09 02:41:33.607177	processing
+52	DD	NokAir Oag Schedules	(DD_BRAND).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-09 02:41:48.605657	processing
 \.
 
 
@@ -242,7 +380,15 @@ COPY report_keys (id, report_key, name, file_pattern, city, active, slug, create
 -- Name: report_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('report_keys_id_seq', 49, true);
+SELECT pg_catalog.setval('report_keys_id_seq', 53, true);
+
+
+--
+-- Name: airlines_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY airlines_hosts
+    ADD CONSTRAINT airlines_hosts_pkey PRIMARY KEY (id);
 
 
 --
@@ -262,11 +408,33 @@ ALTER TABLE ONLY brands
 
 
 --
+-- Name: hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY hosts
+    ADD CONSTRAINT hosts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: report_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
 ALTER TABLE ONLY report_keys
     ADD CONSTRAINT report_keys_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_airlines_hosts_on_airline_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX index_airlines_hosts_on_airline_id ON airlines_hosts USING btree (airline_id);
+
+
+--
+-- Name: index_airlines_hosts_on_host_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX index_airlines_hosts_on_host_id ON airlines_hosts USING btree (host_id);
 
 
 --
@@ -325,6 +493,22 @@ ALTER TABLE ONLY brand_report_keys
 
 ALTER TABLE ONLY brand_report_keys
     ADD CONSTRAINT fk_rails_538425cf32 FOREIGN KEY (report_key_id) REFERENCES report_keys(id);
+
+
+--
+-- Name: fk_rails_a68c11e0aa; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY airlines_hosts
+    ADD CONSTRAINT fk_rails_a68c11e0aa FOREIGN KEY (airline_id) REFERENCES airlines(id);
+
+
+--
+-- Name: fk_rails_a8b0cd38f8; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY airlines_hosts
+    ADD CONSTRAINT fk_rails_a8b0cd38f8 FOREIGN KEY (host_id) REFERENCES hosts(id);
 
 
 --

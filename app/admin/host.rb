@@ -1,5 +1,6 @@
 ActiveAdmin.register Host do
   menu priority: 3,  :parent => 'Config'
+  config.sort_order = 'name_asc'
 
   filter :name, filters: [:cont, :eq, :start, :end]
   filter :code, filters: [:cont, :eq, :start, :end]

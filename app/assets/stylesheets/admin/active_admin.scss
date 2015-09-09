@@ -94,48 +94,31 @@
     span.action_item {
       & > a, & > .dropdown_menu > a {
 
-
         @include light-button;
         text-shadow: none;
         padding: 12px 17px 10px;
-        span.icon { vertical-align: bottom; margin-right: 4px;}
+        span.icon {
+          vertical-align: bottom;
+          margin-right: 4px;
+        }
         margin: 0px;
-
         &:hover{
           @include icon-color(#000);
 
         }
-
       }
       & > a.btn-primary, & > .dropdown_menu > a.btn-primary {
-
-
-        @include light-button;
-        text-shadow: none;
-        padding: 12px 17px 10px;
-        span.icon { vertical-align: bottom; margin-right: 4px;}
-        margin: 0px;
-
-        &:hover{
-          @include icon-color(#000);
-          background-color: #286090;
-          border-color: #204d74;
-          @include gradient(lighten(#204d74, 18%), darken(#204d74, 9%));
-
-        }
         &:not(.disabled) {
           &:hover{
             @include icon-color(#000);
             background-color: #286090;
             border-color: #204d74;
-
             @include gradient(#286090, darken(#286090, 1%));
 
           }
         }
 
       }
-
     & > a.btn-lg {
       @extend .btn-lg
     }

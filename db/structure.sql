@@ -13,14 +13,16 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -962,7 +964,7 @@ CREATE TABLE oag_reports (
     msg_id character varying,
     workflow_state character varying,
     load_status json DEFAULT '{}'::json,
-    report_status character varying DEFAULT 'uninitialized'::character varying,
+    log_data json DEFAULT '[]'::json,
     attachment_status character varying DEFAULT 'unstored'::character varying,
     received timestamp without time zone,
     attachment_lines integer DEFAULT 0,
@@ -1095,13 +1097,12 @@ CREATE TABLE report_keys (
     report_key character varying NOT NULL,
     name character varying NOT NULL,
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
-    city character varying,
+    comment character varying,
     active boolean,
+    state character varying DEFAULT 'idle'::character varying,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    current boolean DEFAULT false,
-    state character varying DEFAULT 'idle'::character varying
+    updated_at timestamp without time zone
 );
 
 

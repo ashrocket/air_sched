@@ -131,7 +131,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
    link_to('Build Route Maps', build_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
   action_item(:export_only, only: :show) do
-     link_to('Route Map Export', export_only_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
+     link_to('Export Route Map', export_only_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
   action_item(:full_export, only: :show) do
    link_to('Auto Export Route', full_export_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')

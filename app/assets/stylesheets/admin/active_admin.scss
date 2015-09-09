@@ -92,6 +92,21 @@
 
   .action_items {
     span.action_item {
+      & > a, & > .dropdown_menu > a {
+
+
+        @include light-button;
+        text-shadow: none;
+        padding: 12px 17px 10px;
+        span.icon { vertical-align: bottom; margin-right: 4px;}
+        margin: 0px;
+
+        &:hover{
+          @include icon-color(#000);
+
+        }
+
+      }
       & > a.btn-primary, & > .dropdown_menu > a.btn-primary {
 
 

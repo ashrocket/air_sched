@@ -24,7 +24,7 @@ ActiveAdmin.register ReportKey do
          content_tag :ul, class: 'list-group' do
            report_key.brands.collect{ |br|
              content_tag(:li, class: 'list-group-item') do
-                link_to(br.name, admin_report_key_path(br))
+                link_to(br.name, admin_brand_path(br))
              end
            }.join.html_safe
          end

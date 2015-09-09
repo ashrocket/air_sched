@@ -17,7 +17,6 @@ class UpdateRouteMapsWorker
         brand = Brand.keyed(brand_key)
         seg_counts_array = [*1..brand.max_segments]
         r = Oag::Report.new
-        byebug
         r.build_brand_route_maps(brand, seg_counts_array)
 
 

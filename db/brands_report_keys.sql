@@ -321,7 +321,7 @@ SELECT pg_catalog.setval('brand_report_keys_id_seq', 14, true);
 --
 
 COPY brands (id, brand_key, name, report_keys, description, default_currency, active, slug, created_at, updated_at, data_states, max_segments) FROM stdin;
-1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-09 02:17:41.949898	{"branded_connections":{"state":"processing"},"smart_routes":{"state":"processing"},"route_maps":{"state":"idle","updated_at":"2015-09-08T21:43:15.328-04:00"},"route_maps_export":"idle"}	3
+1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-09 02:51:57.159447	{}	3
 \.
 
 
@@ -371,8 +371,8 @@ COPY report_keys (id, report_key, name, file_pattern, comment, active, slug, cre
 10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-08 18:19:44.454567	idle
 53	TR	Tiger Singapore OAG Schedule	(TZBRAND_TR).*	LCC Alliance	t	tr	2015-09-08 18:22:24.379082	2015-09-08 18:31:07.046253	idle
 50	TZ	Scoot OAG Schedules	(TZBRAND_TZ).*		t	tz	2015-09-08 18:08:53.135762	2015-09-09 02:15:24.09684	processing
-51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-09 02:41:33.607177	processing
-52	DD	NokAir Oag Schedules	(DD_BRAND).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-09 02:41:48.605657	processing
+52	DD	NokAir Oag Schedules	(DD_BRAND).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-09 02:50:40.800111	idle
+51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-09 02:50:55.774008	idle
 \.
 
 

@@ -103,6 +103,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
       redirect_to :back, alert: 'In Progress! - Already building build Full Route Maps and Export (this may take a while)'
     end
   end
+  # TODO: Move this into a seperate sidekiq worker
   member_action :export_only_route_maps do
      @brand = Brand.friendly.find(params[:id])
      unless @brand.processing_route_map_export?

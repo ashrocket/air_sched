@@ -390,6 +390,7 @@ module Oag
           end
 
           requests.uniq
+          requests
     end
 
 
@@ -402,9 +403,11 @@ module Oag
 
       market_maps = {}
 
-      markets.each do |mkt|
+      markets.each_with_index do |mkt,mkt_index|
+
         origin, dest = mkt
         mkt_key = "#{origin}-#{dest}"
+        Rails.logger.info "(#{brand.brand_key}) Building routemap for market  #{mkt_key} #{mkt_index} of (#{markets.count})"
 
         mkt_requests        = market_route_map(brand, origin, dest, seg_counts)
         reverse_mkt_request = market_route_map(brand, dest, origin, seg_counts)
@@ -441,10 +444,11 @@ module Oag
         market_maps.merge! market_map
 
       end
-      BrandedRouteMap.branded(brand).destroy_all
-      BrandedRouteMap.create(brand: brand, route_map: market_maps)
+      branded_route_map = BrandedRouteMap.where(brand: brand).first_or_create!
+      branded_route_map.route_map = market_maps
+      branded_route_map.save
 
-      brand.data_states['route_maps'] = {'state': 'idle',  'updated_at': Time.now}
+      brand.data_states['route_maps'] = {'state': 'idle',  'updated_at': Time.now, 'markets': market_maps.keys.count}
       brand.save
 
 

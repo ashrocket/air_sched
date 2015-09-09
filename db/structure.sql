@@ -543,17 +543,16 @@ ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying NOT NULL,
-    name character varying NOT NULL,
-    report_keys character varying[] DEFAULT '{}'::character varying[],
+    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
+    name character varying DEFAULT 'NULLBRAND'::character varying,
     description character varying,
     default_currency character varying,
+    data_states json DEFAULT '{}'::json,
+    max_segments integer DEFAULT 3,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    data_states json DEFAULT '{}'::json,
-    max_segments integer DEFAULT 3
+    updated_at timestamp without time zone
 );
 
 
@@ -789,7 +788,6 @@ ALTER SEQUENCE export_market_data_reports_id_seq OWNED BY export_market_data_rep
 CREATE TABLE export_smart_route_reports (
     id integer NOT NULL,
     brand_id integer,
-    status character varying,
     workflow_state character varying,
     location character varying,
     details json DEFAULT '{}'::json,
@@ -1100,10 +1098,10 @@ CREATE TABLE report_keys (
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
     comment character varying,
     active boolean,
+    state character varying DEFAULT 'idle'::character varying,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    state character varying DEFAULT 'idle'::character varying
+    updated_at timestamp without time zone
 );
 
 

@@ -1,13 +1,30 @@
 
-  a.btn {
+  .btn, .action-items .action-item a.btn, a.btn, .action_items span.action_item > a.btn
+  form input[type=submit].btn, form input[type=button].btn, form button[type=submit].btn, form button.btn,
+  #title_bar .action_items span.action_item > a.btn
+  {
     @extend .btn;
   }
-  a.btn-primary {
+  .btn-primary, .action-items .action-item a.btn-primary, a.btn-primary,
+  form input[type=submit].btn-primary, form input[type=button].btn-primary, form button[type=submit].btn-primary, form button.btn-primary,
+  #title_bar .action_items span.action_item > a.btn-primary
+  {
     @extend .btn-primary;
   }
-  a.btn-default {
+  .btn-default, .action-items .action-item a.btn-default, a.btn-default,
+  form input[type=submit].btn-default, form input[type=button].btn-default, form button[type=submit].btn-default, form button.btn-default,
+  #title_bar .action_items span.action_item > a.btn-default
+  {
     @extend .btn-default;
   }
+  .btn-success, .action-items .action-item a.btn-success, a.btn-success,
+  #title_bar .action_items span.action_item > a.btn
+  form input[type=submit].btn-success, form input[type=button].btn-success, form button[type=submit].btn-success, form button.btn-success,
+  #title_bar .action_items span.action_item > a.btn-success
+  {
+    @extend .btn-success;
+  }
+
 
 
   form {

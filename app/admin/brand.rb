@@ -122,22 +122,22 @@ ActiveAdmin.register Brand, as: 'Brands' do
   end
 
   action_item(:build_connections, only: :show)  do
-    link_to('Build Brand Connections', build_connections_admin_brand_path(brand))
+    link_to('Build Brand Connections', build_connections_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
   action_item(:build_smart_routes, only: :show) do
-   link_to('Build Smart Routes', build_smart_routes_admin_brand_path(brand))
+   link_to('Build Smart Routes', build_smart_routes_admin_brand_path(brand), class: 'btn btn-primary')
   end
   action_item(:build_route_maps, only: :show) do
-   link_to('Build Route Maps', build_route_maps_admin_brand_path(brand))
-  end
-  action_item(:full_export, only: :show) do
-   link_to('Route Map Build/Export', full_export_route_maps_admin_brand_path(brand))
+   link_to('Build Route Maps', build_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
   action_item(:export_only, only: :show) do
-     link_to('Route Map Export', export_only_route_maps_admin_brand_path(brand))
+     link_to('Route Map Export', export_only_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
+  end
+  action_item(:full_export, only: :show) do
+   link_to('Auto Export Route', full_export_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
   action_item(:reset_data_states, only: :show) do
-     link_to('Reset DataState', reset_data_states_admin_brand_path(brand))
+     link_to('Reset DataState', reset_data_states_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
 
 

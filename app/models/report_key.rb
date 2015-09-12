@@ -72,9 +72,11 @@ class ReportKey < ActiveRecord::Base
   def code
     report_key
   end
-
-  def latest_report
+  def latest_finished_report
     OagReport.keyed(self).with_finished_state.latest
+  end
+  def latest_report
+    OagReport.keyed(self).latest
   end
 
   # def validate

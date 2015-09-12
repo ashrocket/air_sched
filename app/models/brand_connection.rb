@@ -56,26 +56,26 @@ class BrandConnection < ActiveRecord::Base
 
    end
 
-  def to_market_request
-     mr_arr = []
-     rr_arr = self.to_route_requests
-     rr_arr.each do |rr1, rr2|
-       mkt_r = BrandedMarketRequest.joins(:branded_route_requests)
-                   .where(BrandedRouteRequest[:id].in [rr1.id, rr2.id])
-                   .where(brand: brand, origin: origin, dest: dest).first_or_create!
-       mkt_r.branded_route_requests << [rr1,rr2] if  mkt_r.branded_route_requests.blank?
-       mr_arr << mkt_r
-     end
-     # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).joins(:branded_route_requests).where(BrandedRouteRequest[:id].in [rr1.id, rr2.id].sort)
-     # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).where(branded_route_request_ids: [rr1.id, rr2.id].sort)
-     # unless mkt_r
-     #   mkt_r = BrandedMarketRequest.create(brand_id: brand_id, brand_key: brand_key, origin: origin, dest: dest)
-     #   mkt_r.branded_route_requests << rr1
-     #   mkt_r.branded_route_requests << rr2
-     #   mkt_r.save
-     # end
-     mr_arr
-   end
+  # def to_market_request
+  #    mr_arr = []
+  #    rr_arr = self.to_route_requests
+  #    rr_arr.each do |rr1, rr2|
+  #      mkt_r = BrandedMarketRequest.joins(:branded_route_requests)
+  #                  .where(BrandedRouteRequest[:id].in [rr1.id, rr2.id])
+  #                  .where(brand: brand, origin: origin, dest: dest).first_or_create!
+  #      mkt_r.branded_route_requests << [rr1,rr2] if  mkt_r.branded_route_requests.blank?
+  #      mr_arr << mkt_r
+  #    end
+  #    # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).joins(:branded_route_requests).where(BrandedRouteRequest[:id].in [rr1.id, rr2.id].sort)
+  #    # mkt_r = BrandedMarketRequest.branded(brand).market(origin, dest).where(branded_route_request_ids: [rr1.id, rr2.id].sort)
+  #    # unless mkt_r
+  #    #   mkt_r = BrandedMarketRequest.create(brand_id: brand_id, brand_key: brand_key, origin: origin, dest: dest)
+  #    #   mkt_r.branded_route_requests << rr1
+  #    #   mkt_r.branded_route_requests << rr2
+  #    #   mkt_r.save
+  #    # end
+  #    mr_arr
+  #  end
 
   def to_route_requests
     rr_arr = []

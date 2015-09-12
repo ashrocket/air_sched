@@ -386,7 +386,8 @@ CREATE TABLE branded_market_requests (
     id integer NOT NULL,
     brand_id integer,
     origin character varying,
-    dest character varying
+    dest character varying,
+    seg_count integer DEFAULT 0
 );
 
 
@@ -410,12 +411,44 @@ ALTER SEQUENCE branded_market_requests_id_seq OWNED BY branded_market_requests.i
 
 
 --
+-- Name: branded_market_route_maps; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_market_route_maps (
+    id integer NOT NULL,
+    brand_id integer,
+    origin character varying,
+    dest character varying,
+    route_map json DEFAULT '{}'::json
+);
+
+
+--
+-- Name: branded_market_route_maps_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_market_route_maps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_market_route_maps_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_market_route_maps_id_seq OWNED BY branded_market_route_maps.id;
+
+
+--
 -- Name: branded_market_route_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE branded_market_route_requests (
     id integer NOT NULL,
-    "order" integer,
+    "position" integer,
     branded_route_request_id integer,
     branded_market_request_id integer
 );
@@ -543,16 +576,17 @@ ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
 
 CREATE TABLE brands (
     id integer NOT NULL,
-    brand_key character varying DEFAULT 'NULLBRAND'::character varying,
-    name character varying DEFAULT 'NULLBRAND'::character varying,
+    brand_key character varying NOT NULL,
+    name character varying NOT NULL,
+    report_keys character varying[] DEFAULT '{}'::character varying[],
     description character varying,
     default_currency character varying,
-    data_states json DEFAULT '{}'::json,
-    max_segments integer DEFAULT 3,
     active boolean,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    data_states json DEFAULT '{}'::json,
+    max_segments integer DEFAULT 3
 );
 
 
@@ -1098,10 +1132,10 @@ CREATE TABLE report_keys (
     file_pattern character varying DEFAULT '(?!)'::character varying NOT NULL,
     comment character varying,
     active boolean,
-    state character varying DEFAULT 'idle'::character varying,
     slug character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    state character varying DEFAULT 'idle'::character varying
 );
 
 
@@ -1243,6 +1277,13 @@ ALTER TABLE ONLY brand_report_keys ALTER COLUMN id SET DEFAULT nextval('brand_re
 --
 
 ALTER TABLE ONLY branded_market_requests ALTER COLUMN id SET DEFAULT nextval('branded_market_requests_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branded_market_route_maps ALTER COLUMN id SET DEFAULT nextval('branded_market_route_maps_id_seq'::regclass);
 
 
 --
@@ -1478,6 +1519,14 @@ ALTER TABLE ONLY brand_report_keys
 
 ALTER TABLE ONLY branded_market_requests
     ADD CONSTRAINT branded_market_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branded_market_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_market_route_maps
+    ADD CONSTRAINT branded_market_route_maps_pkey PRIMARY KEY (id);
 
 
 --
@@ -2078,4 +2127,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000180');
 INSERT INTO schema_migrations (version) VALUES ('20150727000200');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000500');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000520');
 

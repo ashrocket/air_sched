@@ -4,6 +4,7 @@ class CreateBrandedMarketRequests < ActiveRecord::Migration
       t.references :brand
       t.string :origin
       t.string :dest
+      t.integer :seg_count, default: 0
 
     end
 

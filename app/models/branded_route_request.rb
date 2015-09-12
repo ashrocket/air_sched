@@ -3,8 +3,10 @@ class BrandedRouteRequest < ActiveRecord::Base
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
 
-  has_many :branded_market_route_request, :dependent => :destroy
-  has_many :branded_market_requests, through: :branded_market_route_request
+  has_many :branded_market_route_requests,  :dependent => :destroy
+  has_many :branded_market_requests, through: :branded_market_route_requests
+
+
 
   scope :branded,    lambda {|brand|    where(brand:  brand)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}

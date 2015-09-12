@@ -3,6 +3,7 @@ ActiveAdmin.register ExportMarketDataReport, :as => "Market Exports" do
   actions :all, :except => [:new]
 
   index do
+          selectable_column
           column 'Report Id' do |report|
             report.id
           end
@@ -14,6 +15,7 @@ ActiveAdmin.register ExportMarketDataReport, :as => "Market Exports" do
           column 'Created', :sortable => :created_at do |report|
             report.created_at
           end
+          actions
 
   end
 

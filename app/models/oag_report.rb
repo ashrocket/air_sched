@@ -92,7 +92,7 @@ class OagReport < ActiveRecord::Base
         else
           stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
 
-          dly = (30..180).to_a.sample
+          dly = (10..120).to_a.sample
           ScheduleImportWorker.delay_for(dly).perform_async(id)
       end
     end
@@ -210,11 +210,12 @@ class OagReport < ActiveRecord::Base
       self.report_key.save
       save
 
-      delay_time = 60
+      delay_minutes  = (20..60).to_a.sample
+
       report_key.brands.each do |brand|
         if brand.active? and AppSwitch.on?('autogenerate_routemaps')
           report = ExportSmartRouteReport.create(brand: brand)
-          ExportBrandRouteMapsWorker.delay_for(delay_time.minute).perform_async(brand.brand_key, report.id)
+          ExportBrandRouteMapsWorker.delay_for(delay_minutes.minute).perform_async(brand.brand_key, report.id)
         end
       end
 

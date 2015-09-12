@@ -106,13 +106,20 @@ ActiveAdmin.register Brand, as: 'Brands' do
   # TODO: Move this into a seperate sidekiq worker
   member_action :export_only_route_maps do
      @brand = Brand.friendly.find(params[:id])
-     unless @brand.processing_route_map_export?
-       report = ExportSmartRouteReport.create(brand: @brand)
-       report.finalize!
-       redirect_to :back, notice: 'Beginning to Export route map...'
+
+     brm = BrandedRouteMap.branded(@brand)
+     if brm.blank?
+       redirect_to :back, alert: 'No route map is built.  Build a Route map or wait!'
      else
-       redirect_to :back, alert: 'In Progress! - Already exporting route map (this may take a while)'
+        unless @brand.processing_route_map_export?
+          report = ExportSmartRouteReport.create(brand: @brand)
+          report.finalize!
+          redirect_to :back, notice: 'Beginning to Export route map...'
+        else
+          redirect_to :back, alert: 'In Progress! - Already exporting route map (this may take a while)'
+        end
      end
+
    end
   member_action :reset_data_states do
     @brand = Brand.friendly.find(params[:id])

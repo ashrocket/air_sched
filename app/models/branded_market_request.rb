@@ -2,12 +2,15 @@ class BrandedMarketRequest < ActiveRecord::Base
   include ArelHelpers::ArelTable
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
-  has_many :branded_market_route_request, :dependent => :destroy
-  has_many :branded_route_requests, through: :branded_market_route_request
+
+  has_many :branded_market_route_requests, -> { order(:position) }, :dependent => :destroy
+  has_many :branded_route_requests, through: :branded_market_route_requests
+
+
 
   scope :branded,      lambda {|brand|    where(brand:  brand)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
-
+  scope :segments,  lambda {|segs|      where(seg_count: segs)}
 
   def shrink_ray brr_list
     shrunk_list = brr_list
@@ -90,7 +93,8 @@ class BrandedMarketRequest < ActiveRecord::Base
                required_currency: airport_currency(brand, origin),
                origin: origin,
                destination: dest,
-               order: 1,
+               leg_count: branded_route_requests.count,
+               order: order,
                journey_legs:  brrs_to_journey
              }
        ]

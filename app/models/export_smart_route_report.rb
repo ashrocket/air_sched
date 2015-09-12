@@ -60,7 +60,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
 
    
     on_transition do |from, to, triggering_event, *event_args|
-         Rails.logger.info "#{self.id}: #{self.brand.name} #{triggering_event} transitioning FROM #{from} -> #{to}"
+         Rails.logger.info "#{self.id}: #{self.brand.name} Brand: Event #{triggering_event} transitioning FROM #{from} -> #{to}"
     end
   end
 
@@ -86,28 +86,42 @@ class ExportSmartRouteReport < ActiveRecord::Base
       end
     end
 
+
+    # TODO: Add Waiting for ReportKey Reports to Complete State, to provide more visibility into the process
     def confirm_report_keys
       brand.data_states['route_maps_export'] = 'processing'
       brand.save
-      Rails.logger.info "#{brand.name}  -> confirm Import Reports are finished."
+      Rails.logger.info "#{brand.name}  Brand: -> confirming Import Reports are finished."
 
       # Kick of the Next Check or Transition
       brand.report_keys.each do |report_key|
         report = report_key.latest_report
-        if not report
-          Rails.logger.info "#{brand.name} #{report_key_code} :  -> No Import Report exists !!!"
+        if report.blank?
+          self.details['rejection_reason'] = "#{brand.name} Brand: #{report_key_code(report_key)} Report Key :  -> No Import Report exists !!!"
+          save
+          Rails.logger.info  self.details['rejection_reason']
+
           reject!
-        end
-        unless  report.finished?
-          Rails.logger.info "#{brand.name} #{report_key_code} :  -> Waiting for Import Report #{report.id} to complete ..."
-          ExportBrandRouteMapsWorker.delay_for(7.minute).perform_async(brand.brand_key, self.id)
           halt
+          return
+        else
+          unless  report.finished?
+            Rails.logger.info "#{brand.name} Brand:  #{report_key_code(report_key)} Report Key  -> Waiting for Import Report #{report.id} to complete ..."
+            dly  = (120..300).to_a.sample
+            ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key, self.id)
+            halt
+            return
+          end
+          Rails.logger.info "#{brand.name} Brand:  #{report_key_code(report_key)} Report Key  -> Import Report #{report.id} ready ..."
+
         end
+
       end
-      Rails.logger.info "#{brand.name} :  -> Import Reports  complete."
-      ExportBrandRouteMapsWorker.delay_for(30).perform_async(brand.brand_key, self.id)
-      
+
       # If all latest reports from each report_key are in finished state, go ahead and transition 
+      Rails.logger.info "#{brand.name} Brand:  -> Import Reports  complete."
+      ExportBrandRouteMapsWorker.delay_for(30).perform_async(brand.brand_key, self.id)
+
     end
   
     def confirm_connections
@@ -152,7 +166,8 @@ class ExportSmartRouteReport < ActiveRecord::Base
        else
          UpdateBrandConnectionsWorker.delay_for(30).perform_async(brand.brand_key)
          # Transtion to the waiting for connections state
-         ExportBrandRouteMapsWorker.delay_for(5.minutes).perform_async(brand.brand_key,id)
+         dly = (120..300).to_a.sample
+         ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key,id)
 
         end
     end
@@ -166,7 +181,8 @@ class ExportSmartRouteReport < ActiveRecord::Base
       else
         UpdateSmartRoutesWorker.delay_for(30).perform_async(brand.brand_key)
         # Transtion to the waiting for connections state
-        ExportBrandRouteMapsWorker.delay_for(5.minutes).perform_async(brand.brand_key,id)
+        dly = (120..300).to_a.sample
+        ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key,id)
 
        end
     end
@@ -179,7 +195,8 @@ class ExportSmartRouteReport < ActiveRecord::Base
         halt
       else
         UpdateRouteMapsWorker.delay_for(30).perform_async(brand.brand_key)
-        ExportBrandRouteMapsWorker.delay_for(5.minutes).perform_async(brand.brand_key,id)
+        dly = (120..300).to_a.sample
+        ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key,id)
 
         # Transtion to the waiting for connections state  
        end      
@@ -198,8 +215,13 @@ class ExportSmartRouteReport < ActiveRecord::Base
 
     end
 
+    def reject
+      brand.data_states['route_maps_export'] = 'idle'
+      brand.save
+    end
+
     #Helper Methods
-    def report_key_code
+    def report_key_code(report_key)
      report_key ? report_key.code : 'No Report Key Matched'
     end
 

@@ -6,6 +6,7 @@ gem 'pg', '~> 0.18.2'
 gem 'postgres_ext', '~> 2.4.1'
 gem 'arel-helpers', '~> 2.1.0'
 gem 'acts_as_singleton'
+gem 'acts_as_list', '~> 0.7.2'
 gem 'workflow'
 # gem 'transitions', :require => ['transitions', 'active_model/transitions']
 

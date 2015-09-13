@@ -283,12 +283,11 @@ COPY airlines_hosts (id, airline_id, host_id) FROM stdin;
 3	4445	2
 5	3011	5
 7	4290	1
-13	4445	11
-14	3011	12
-15	4212	13
-16	4445	14
-17	3011	15
-18	4212	16
+8	3011	7
+9	4445	9
+10	4183	10
+11	4212	10
+12	4290	10
 \.
 
 
@@ -296,7 +295,7 @@ COPY airlines_hosts (id, airline_id, host_id) FROM stdin;
 -- Name: airlines_hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('airlines_hosts_id_seq', 18, true);
+SELECT pg_catalog.setval('airlines_hosts_id_seq', 12, true);
 
 
 --
@@ -306,6 +305,9 @@ SELECT pg_catalog.setval('airlines_hosts_id_seq', 18, true);
 COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
 13	1	51
 14	1	52
+15	1	53
+16	1	50
+17	1	11
 \.
 
 
@@ -313,7 +315,7 @@ COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brand_report_keys_id_seq', 14, true);
+SELECT pg_catalog.setval('brand_report_keys_id_seq', 17, true);
 
 
 --
@@ -321,7 +323,7 @@ SELECT pg_catalog.setval('brand_report_keys_id_seq', 14, true);
 --
 
 COPY brands (id, brand_key, name, report_keys, description, default_currency, active, slug, created_at, updated_at, data_states, max_segments) FROM stdin;
-1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-09 02:51:57.159447	{}	3
+1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-13 06:27:52.10219	{"route_maps":{"state":"idle","updated_at":"2015-09-13T02:27:52.100-04:00","markets":1476},"smart_routes":{"state":"idle","count":[{"segs":2,"count":1372},{"segs":1,"count":144}],"updated_at":"2015-09-13T02:16:48.816-04:00"},"route_maps_export":"idle"}	3
 \.
 
 
@@ -337,15 +339,12 @@ SELECT pg_catalog.setval('brands_id_seq', 6, true);
 --
 
 COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
-5	1	SCOOT NOKAIR HOST NOK	DD	2015-08-24 16:02:25.758282	2015-09-09 02:38:06.436689
-2	1	SCOOT NOKSCOOT HOST	XW	2015-08-24 15:45:01.123549	2015-09-09 02:38:21.643041
-1	1	SCOOT SCOOT OWN HOST	TZ	2015-08-24 04:39:35.051448	2015-09-09 02:38:39.69726
-11	\N	NOKSCOOT OWN HOST	XW	2015-09-09 02:39:09.057972	2015-09-09 02:39:09.057972
-12	\N	NOKAIR OWN HOST	DD	2015-09-09 02:39:52.10576	2015-09-09 02:39:52.10576
-13	\N	NOKAIR SCOOT HOST	TZ	2015-09-09 02:40:49.02952	2015-09-09 02:40:49.02952
-14	\N	NOAIR NOKSCOOT HOST	XW	2015-09-09 02:41:09.95503	2015-09-09 02:41:09.95503
-15	\N	NOKSCOOT NOKAIR HOST	DD	2015-09-09 02:41:40.32594	2015-09-09 02:41:40.32594
-16	\N	NOKSCOOT SCOOT HOST	TZ	2015-09-09 02:41:59.662666	2015-09-09 02:41:59.662666
+1	1	Scoot Navitaire	TZ	2015-08-24 04:39:35.051448	2015-08-24 04:39:35.051448
+2	1	NokScoot Navitaire	XW	2015-08-24 15:45:01.123549	2015-08-24 15:45:01.123549
+5	1	Nok Navitaire	DD	2015-08-24 16:02:25.758282	2015-08-24 16:02:25.758282
+7	2	Nok Navitaire	DD	2015-08-31 09:07:40.218443	2015-08-31 09:07:40.218443
+9	2	NokScoot Navitaire	XW	2015-08-31 09:11:15.761392	2015-08-31 09:11:15.761392
+10	2	Scoot Navitaire	TZ	2015-08-31 09:11:58.301918	2015-08-31 09:11:58.301918
 \.
 
 
@@ -353,7 +352,7 @@ COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
 -- Name: hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hosts_id_seq', 16, true);
+SELECT pg_catalog.setval('hosts_id_seq', 10, true);
 
 
 --
@@ -363,16 +362,18 @@ SELECT pg_catalog.setval('hosts_id_seq', 16, true);
 COPY report_keys (id, report_key, name, file_pattern, comment, active, slug, created_at, updated_at, state) FROM stdin;
 2	SIN	Changi Airport	(HUBSIN)_\\d+	Sinagpore, SG	t	sin	2014-08-21 04:18:19	2015-06-05 05:15:27.553249	idle
 1	MXP	Milan Airport	HUB(MXP)_\\d+	Milan, IT	t	mxp	2014-08-21 04:18:04	2015-06-09 18:10:49.073466	idle
+13	TZBRANDMI	Silk Air	TZBRAND_MI_\\d+	LCC Alliance	t	tzbrandmi	2015-08-04 02:37:28.328034	2015-08-04 02:40:01.532276	idle
 16	SINCXX5JTZ	Singapore Cebu And Scoot	HUB(SIN_CXX5JTZ)_\\d+	Singapore	t	sin-cxx5jtz	2015-06-04 19:55:40.431811	2015-06-05 05:13:39.380934	idle
 3	MAN	Manchester Airport	HUB(MAN)_\\d+	Manchester, UK	t	man	2014-08-21 04:19:04	2015-06-05 05:15:46.961036	idle
-6	SNN	Shannon Airport	HUB(SNN)_\\d+	Shannon, Ireland	t	snn	2014-08-21 20:56:20	2015-06-05 05:15:16.688462	idle
-4	FR	Ryan Air	CXX(FR)_\\d+	All Cities	t	fr	2014-08-21 04:29:52	2015-06-05 05:16:41.494787	idle
-11	TZBRANDVA	Virgina Australia	(TZBRAND_VA)_\\d+	LCC Alliance	t	tzbrandva	2015-08-04 02:40:23.300228	2015-09-03 00:14:36.502521	idle
-10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-08 18:19:44.454567	idle
-53	TR	Tiger Singapore OAG Schedule	(TZBRAND_TR).*	LCC Alliance	t	tr	2015-09-08 18:22:24.379082	2015-09-08 18:31:07.046253	idle
-50	TZ	Scoot OAG Schedules	(TZBRAND_TZ).*		t	tz	2015-09-08 18:08:53.135762	2015-09-09 02:15:24.09684	processing
-52	DD	NokAir Oag Schedules	(DD_BRAND).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-09 02:50:40.800111	idle
-51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-09 02:50:55.774008	idle
+12	TZBRANDSG	Singapore Airlines	(TZBRAND_SQ)_\\d+	LCC Alliance	t	tzbrandsg	2015-08-04 02:39:15.01327	2015-09-09 02:12:03.12	processing
+6	SNN	Shannon Airport	HUB(SNN)_\\d+	Shannon, Ireland	t	snn	2014-08-21 20:56:20	2015-09-13 02:10:53.853028	processing
+10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-13 02:11:23.793702	processing
+51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-13 02:11:53.899759	processing
+53	TR	Tiger Singapore OAG Schedule	(TZBRAND_TR).*	LCC Alliance	t	tr	2015-09-08 18:22:24.379082	2015-09-13 02:21:25.013872	processing
+11	TZBRANDVA	Virgina Australia	(TZBRAND_VA)_\\d+	LCC Alliance	t	tzbrandva	2015-08-04 02:40:23.300228	2015-09-13 02:48:07.83485	idle
+52	DD	NokAir Oag Schedules	(DDBRAND_DD).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-13 03:07:55.686591	idle
+4	FR	Ryan Air	CXX(FR)_\\d+	All Cities	t	fr	2014-08-21 04:29:52	2015-09-13 03:20:47.661166	idle
+50	TZ	Scoot OAG Schedules	(TZBRAND_TZ).*		t	tz	2015-09-08 18:08:53.135762	2015-09-13 03:22:17.043978	idle
 \.
 
 

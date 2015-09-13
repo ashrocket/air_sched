@@ -15,12 +15,14 @@
   %dt Seg Count:
   %dd= @branded_market_request.seg_count
   %br
-  %dt Route Requests:
+  %dt LEGEND:
+  %dd BRAND:HOST/ORIGIN-DEST-CARRIERS  (ID))
+  %dt Route Requests
   %dd
     %ul#sorted_hosts.list-group
       - @branded_market_request.branded_route_requests.each do |brr|
         %li.list-group-item.col-sm-4
-          = link_to("#{brr.key} - #{brr.id}", [:admin,brr])
+          = link_to("#{brr.key}  (#{brr.id})", [:admin,brr])
 
 
   %br

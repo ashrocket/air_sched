@@ -219,9 +219,10 @@ module Oag
        three_segment_mkt_connects = Hash.new([])
 
 
-       Parallel.each_with_index(existing_markets, in_threads: 8) do |e_mkt, emkt_index|
 
-       # existing_markets.each_with_index do |e_mkt, emkt_index|
+       # Parallel.each_with_index(existing_markets, in_threads: 4) do |e_mkt, emkt_index|
+
+       existing_markets.each_with_index do |e_mkt, emkt_index|
          e_origin, e_dest = e_mkt
 
 
@@ -321,7 +322,11 @@ module Oag
          end
 
        end
-    end
+
+
+      #TODO Check each direct flight and see if it could be added on to the end of two segment conncetion
+
+   end
 
 
 
@@ -480,7 +485,7 @@ module Oag
 
       bmrm.route_map = {
         oneway: one_way,
-        # TODO:  Richard says he doesn't want the RoundTrip Calculations.
+        # TODO:  Richard says he doens't want the RoundTrip Calculations.
         # This should be set to an switch on the Brand, but we need to make the APP SWITCH model capable of using
         # scopes.  AKA an APP SWITCH per Brand.  Then we can enable or disable via APP SWITCH, for now it's just
         # hard commented out.

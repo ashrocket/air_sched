@@ -7,6 +7,8 @@ class Brand < ActiveRecord::Base
 
   has_many :hosts, -> { order(name: :asc) }
 
+  has_many :export_smart_route_reports, -> {order('export_smart_route_reports.updated_at DESC')}
+
   scope :keyed,     lambda {|brand_key| find_by(brand_key: brand_key)}
 
   # Class Methods

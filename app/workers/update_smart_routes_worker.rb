@@ -19,9 +19,10 @@ class UpdateSmartRoutesWorker
         seg_counts_array = [*1..brand.max_segments]
 
         r = Oag::Report.new
-        # r.build_brand_market_smart_routes(brand, seg_counts_array)
-        r.build_brand_market_smart_routes(brand, [3])
-      #
+        r.build_brand_market_smart_routes(brand, seg_counts_array)
+        # For debugging Three Segment Routes, this is faster
+        # r.build_brand_market_smart_routes(brand, [3])
+        #
 
       ensure
         lock.release!

@@ -525,7 +525,7 @@ module Oag
         # if mkt_key.eql? "CNX-BFV"
         #      byebug
         # end
-
+        byebug
         bmrm = branded_market_route_map( brand, origin, dest, seg_counts)
 
 

@@ -323,7 +323,7 @@ module Oag
         total_three_seg_markets =  three_seg_branded_market_requests.keys.count
         three_seg_branded_market_requests.keys.each_with_index do |k, three_seg_mkt_idx|
 
-          Rails.logger.info "(#{brand.brand_key}) Saving 3 Segment Routes for #{k.first}-#{k.last}, #{three_seg_mkt_idx} of (#{total_three_seg_markets}) "
+          Rails.logger.info "(#{brand.brand_key}) Saving 3 Segment Routes for #{k.first}-#{k.last}, #{three_seg_mkt_idx+1} of (#{total_three_seg_markets}) "
           bmr_set = three_seg_branded_market_requests[k]
           BrandedMarketSegmentsRequest.create(brand: brand,
                     origin: k.first, dest:k.last, segment_count: 3,
@@ -505,23 +505,6 @@ module Oag
     end
 
 
-    def market_route_map(brand, origin, dest, seg_counts)
-          requests = []
-          seg_counts.each do |seg_count|
-                bmr =   BrandedMarketSegmentsRequest.branded(brand)
-                        .market(origin, dest)
-                        .where(segment_count: seg_count).first
-
-
-                requests = (requests + bmr.branded_market_requests) if bmr and not bmr.branded_market_requests.blank?
-
-          end
-
-          requests.uniq
-          requests
-    end
-
-
     def build_brand_route_maps(brand, seg_counts)
       
       brand.data_states['route_maps'] = {'state': 'processing'}
@@ -537,7 +520,7 @@ module Oag
 
         origin, dest = mkt
         mkt_key = "#{origin}-#{dest}"
-        Rails.logger.info "(#{brand.brand_key}) Building routemap for market  #{mkt_key} #{mkt_index} of (#{markets.count})"
+        Rails.logger.info "(#{brand.brand_key}) Building rout emap for market  #{mkt_key} #{mkt_index+1} of (#{markets.count})"
 
         # if mkt_key.eql? "CNX-BFV"
         #      byebug
@@ -545,38 +528,7 @@ module Oag
 
         bmrm = branded_market_route_map( brand, origin, dest, seg_counts)
 
-        # mkt_requests        = market_route_map(brand, origin, dest, seg_counts)
-        # reverse_mkt_request = market_route_map(brand, dest, origin, seg_counts)
-        # return_mkt_request = mkt_requests.product reverse_mkt_request
-        #
-        # one_way = []
-        # mkt_requests.each do |mkt_request|
-        #        one_way <<
-        #        {
-        #        	type: 'oneway',
-        #            journeys: [
-        #                mkt_request.to_journey(1, 'outbound')
-        #            ]
-        #        }
-        # end
-        #
-        # roundtrip = []
-        #
-        # return_mkt_request.each do |return_mkt_req|
-        #   roundtrip <<
-        #       {
-        #         type: 'return',
-        #            journeys: [
-        #                return_mkt_req[0].to_journey(1, 'outbound'),
-        #                return_mkt_req[1].to_journey(2, 'inbound')
-        #            ]
-        #       }
-        # end
-        # market_map = {
-        #     "#{mkt_key}" => {
-        #         oneway: one_way,
-        #         roundtrip: roundtrip
-        # }}
+
 
 
         #TODO:  Don't store the market route maps in the total route_map, instead store a reference to market_route map

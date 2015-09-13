@@ -21,9 +21,9 @@
   %dt Market Requests:
   %dd
     %ul#sorted_hosts.list-group
-      - @branded_route_request.branded_market_requests.each do |bmr|
+      - @branded_route_request.branded_market_requests.sort_by{|bmr| [bmr.origin, bmr.dest, bmr.seg_count]}.each do |bmr|
         %li.list-group-item
-          = link_to("Market Req - segs: #{bmr.seg_count} - #{bmr.id}", [:admin,bmr])
+          = link_to("#{bmr.origin} #{bmr.dest}  #{bmr.seg_count} segs - #{bmr.id}", [:admin,bmr])
 
 
   %br

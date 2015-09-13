@@ -238,27 +238,13 @@ module Oag
         Rails.logger.info "(#{brand.brand_key}) Connections with Possible Connections =  #{conn_pairs.keys.count} "
 
 
-        # # Unique the Keys into a raw params needed to build a route request.
-        # three_seg_routes = Hash.new { |h, k| h[k] = Set.new }
-        # total = conn_pairs.keys.count
-        # # conn_pairs.keys.each_with_index do |uniq_conn, idx|
-        # #
-        # #   Rails.logger.info "(#{brand.brand_key}) Transforming connection List #{idx} of  #{total}"
-        # #   three_seg_routes[uniq_conn.route_cxrs_hash_key] <<  conn_pairs[uniq_conn]
-        # #
-        # # end
-        #
-        # # # Transform the keys in to Route Templates
-        # # conn_pairs.transform_keys{ |key| key.to_s.upcase }
 
 
-         by_markets = Hash.new { |h, k| h[k] = Set.new }
-         #Now convert the connections into raw params needed for Route Request.
+        by_markets = Hash.new { |h, k| h[k] = Set.new }
+        #Now convert the connections into raw params needed for Route Request.
         conn_pairs.keys.each_with_index do |uniq_conn_route_key, idx|
-         # three_seg_routes.keys.each_with_index do |uniq_conn_route_key, idx|
 
             branded_route_templates = conn_pairs[uniq_conn_route_key].map{|bc| bc.route_cxrs_hash_key}.uniq
-          # branded_route_templates = three_seg_routes[uniq_conn_route_key].map{|bc| bc.route_cxrs_hash_key}.uniq
             origin = uniq_conn_route_key[:o]
 
             branded_route_templates.each do |brt|
@@ -332,11 +318,16 @@ module Oag
             end
 
         end
-        byebug
-        three_seg_branded_market_requests.each do |k, bmr_list|
-              BrandedMarketSegmentsRequest.create(brand: brand,
-                             origin: k.first, dest:k.last, segment_count: 3,
-                            branded_market_request_ids: bmr_list.map{|bmr| bmr.id} )
+
+
+        total_three_seg_markets =  three_seg_branded_market_requests.keys.count
+        three_seg_branded_market_requests.keys.each_with_index do |k, three_seg_mkt_idx|
+
+          Rails.logger.info "(#{brand.brand_key}) Saving 3 Segment Routes for #{k.first}-#{k.last}, #{three_seg_mkt_idx} of (#{total_three_seg_markets}) "
+          bmr_set = three_seg_branded_market_requests[k]
+          BrandedMarketSegmentsRequest.create(brand: brand,
+                    origin: k.first, dest:k.last, segment_count: 3,
+                    branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
         end
 
 

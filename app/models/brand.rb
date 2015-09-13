@@ -22,6 +22,15 @@ class Brand < ActiveRecord::Base
     hosts.includes(:airlines).where(Airline[:code].in(cxrs)).references(:airlines)
   end
 
+  def hostcodes_map
+    h_m = {}
+    hosts.each do |h|
+      h.carrier_codes.each do |cxr_code|
+        h_m[cxr_code] = ([h.code] | [h_m[cxr_code]].flatten.compact).uniq
+      end
+    end
+    h_m
+  end
 
   def report_key_strings
     if  report_keys and report_keys.respond_to?(:first) and report_keys.first.is_a?(ReportKey)

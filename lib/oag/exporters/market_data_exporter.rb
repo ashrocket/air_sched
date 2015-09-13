@@ -31,7 +31,7 @@ class MarketDataExporter
           end
       end
 
-      csv_files["abb_via_#{report_key.parameterize.underscore.downcase}_markets.csv"] = csv_string
+      csv_files["abb_via_#{report_key.name.parameterize.underscore.downcase}_markets.csv"] = csv_string
 
 
 

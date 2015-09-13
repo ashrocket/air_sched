@@ -63,7 +63,7 @@ spec/dummy/tmp/
 
 # Ignore application configuration
 /config/application.yml
-
+/config/application.mastiff.yml
 .env.web
 
 # Elastic Beanstalk Files

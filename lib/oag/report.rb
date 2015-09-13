@@ -236,8 +236,8 @@ module Oag
         conn_pairs = Hash.new { |h, k| h[k] = Set.new }
         branded_connections = BrandConnection.branded(brand)
         total = branded_connections.count
-        Parallel.each_with_index(branded_connections, in_threads:6) do |bc, idx|
-        # branded_connections.each_with_index do |bc, idx|
+        # Parallel.each_with_index(branded_connections, in_threads:6) do |bc, idx|
+        branded_connections.each_with_index do |bc, idx|
 
           bc_list = BrandConnection.branded(brand).connecting_brand_connections(bc)
           unless bc_list.blank?
@@ -285,7 +285,7 @@ module Oag
               tsr_1 = tsr[0]
               tsr_2 = tsr[1]
 
-              # if mkt.eql? ['BFV','CNX']
+              # if mkt.eql? ['TPE','CNX']
               #   byebug
               # end
 

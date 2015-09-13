@@ -30,6 +30,6 @@ ActiveAdmin.register BrandConnection, :as => "Connections Summary"  do
          column :operating_window
 
          actions
-     end
+   end
 
 end

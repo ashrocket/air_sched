@@ -52,7 +52,7 @@ class BrandConnection < ActiveRecord::Base
    end
 
    def route_cxrs_hash_key
-     {o: origin, v: via, d: dest , c1: sched1_cxr, c2: sched1_cxr}
+     {o: origin, v: via, d: dest , c1: sched1_cxr, c2: sched2_cxr}
    end
    def to_pricing_requests
 

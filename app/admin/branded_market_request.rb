@@ -3,7 +3,7 @@ ActiveAdmin.register BrandedMarketRequest do
 
   filter :origin, filters: [:cont, :eq, :start, :end]
   filter :dest, filters: [:cont, :eq, :start, :end]
-  filter :seg_count, filters: [:cont, :eq, :start, :end]
+  filter :seg_count
   filter :brand
 
   # See permitted parameters documentation:
@@ -18,6 +18,18 @@ ActiveAdmin.register BrandedMarketRequest do
   #   permitted << :other if resource.something?
   #   permitted
   # end
+
+  index do
+         column :brand
+         column :id
+         column :origin
+         column :dest
+         column :seg_count
+
+         actions
+   end
+
+
   controller do
        # def index
        #   @hosts = Host.all

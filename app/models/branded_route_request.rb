@@ -11,6 +11,9 @@ class BrandedRouteRequest < ActiveRecord::Base
   scope :branded,    lambda {|brand|    where(brand:  brand)}
   scope :market,    lambda {|o,d|       where(:origin =>  o, :dest => d)}
 
+  validates_uniqueness_of :brand_id, scope: [:origin, :dest, :cxrs, :host]
+
+
   after_initialize do |rr|
      self.cxrs =  cxrs.sort.uniq
      self.key  = "#{brand.brand_key}:#{host}/#{origin}-#{dest}-#{cxrs.sort.join(',')}"

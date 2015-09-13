@@ -5,7 +5,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :brand_key, :report_keys, :name,  :description,
+  permit_params :brand_key, :report_keys, :name,  :description, :data_states,
                 :default_currency, :max_segments,  :active, report_key_ids: [], host_ids: []
   #
   # or
@@ -171,8 +171,10 @@ ActiveAdmin.register Brand, as: 'Brands' do
       end
 
       # def update
+      #   byebug
       #   @brand = Brand.friendly.find(params[:id])
       #   @brand.update(permitted_params[:brand])
+      #
       # end
 
      #  def create

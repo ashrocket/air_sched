@@ -21,7 +21,7 @@ class UpdateSmartRoutesWorker
         r = Oag::Report.new
         # r.build_brand_market_smart_routes(brand, seg_counts_array)
         r.build_brand_market_smart_routes(brand, [3])
-
+      #
 
       ensure
         lock.release!

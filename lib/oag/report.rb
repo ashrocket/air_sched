@@ -202,131 +202,146 @@ module Oag
       market_route_map.compact
    end
 
-   def two_stop_routes(brand)
+    def two_stop_routes(brand)
 
-       #  2 Stops
-       markets = []
+        #  2 Stops
+        markets = []
 
-       one_seg_markets = DirectFlight.keyed(brand.report_keys).pluck(:origin, :dest).uniq
-       two_seg_markets = BrandConnection.branded(brand).pluck(:origin, :dest).sort.uniq
+        one_seg_markets = DirectFlight.keyed(brand.report_keys).pluck(:origin, :dest).uniq
+        two_seg_markets = BrandConnection.branded(brand).pluck(:origin, :dest).sort.uniq
 
-       Rails.logger.info "(#{brand.brand_key}) There are  #{one_seg_markets.count} one segment markets"
-       Rails.logger.info "(#{brand.brand_key}) There are  #{two_seg_markets.count} two segment markets"
+        Rails.logger.info "(#{brand.brand_key}) There are  #{one_seg_markets.count} one segment markets"
+        Rails.logger.info "(#{brand.brand_key}) There are  #{two_seg_markets.count} two segment markets"
 
-       existing_markets = one_seg_markets | two_seg_markets
-       Rails.logger.info "(#{brand.brand_key}) There are  #{existing_markets.count} combined one/two segment markets"
-
-       three_segment_mkt_connects = Hash.new([])
+        existing_markets = one_seg_markets | two_seg_markets
+        Rails.logger.info "(#{brand.brand_key}) There are  #{existing_markets.count} combined one/two segment markets"
 
 
 
-       # Parallel.each_with_index(existing_markets, in_threads: 4) do |e_mkt, emkt_index|
+        conn_pairs = Hash.new { |h, k| h[k] = Set.new }
+        branded_connections = BrandConnection.branded(brand)
+        total = branded_connections.count
+        Parallel.each_with_index(branded_connections, in_threads:6) do |bc, idx|
+        # branded_connections.each_with_index do |bc, idx|
 
-       existing_markets.each_with_index do |e_mkt, emkt_index|
-         e_origin, e_dest = e_mkt
+          bc_list = BrandConnection.branded(brand).connecting_brand_connections(bc)
+          unless bc_list.blank?
+
+            Rails.logger.info "(#{brand.brand_key}) Checking Connections on connection  #{idx} of #{total} posible branded connections"
+            #  Merge any list for duplicate key
+            conn_pairs[bc.route_cxrs_hash_key].merge  bc_list
+          else
+            Rails.logger.info "(#{brand.brand_key}) Skipping Connections (No connection)  #{idx} of #{total} posible branded connections"
+
+          end
+        end
+        Rails.logger.info "(#{brand.brand_key}) Connections with Possible Connections =  #{conn_pairs.keys.count} "
 
 
-         bc_list = BrandConnection.branded(brand).market(e_origin, e_dest)
-         if bc_list.count == 0
-           Rails.logger.info "(#{brand.brand_key}) Building connections - Skip  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets, no connections exist"
-         else
-            Rails.logger.info "(#{brand.brand_key}) Building connections  #{e_origin} #{e_dest} for #{emkt_index} of (#{existing_markets.count}) one/two seg markets"
+        # # Unique the Keys into a raw params needed to build a route request.
+        # three_seg_routes = Hash.new { |h, k| h[k] = Set.new }
+        # total = conn_pairs.keys.count
+        # # conn_pairs.keys.each_with_index do |uniq_conn, idx|
+        # #
+        # #   Rails.logger.info "(#{brand.brand_key}) Transforming connection List #{idx} of  #{total}"
+        # #   three_seg_routes[uniq_conn.route_cxrs_hash_key] <<  conn_pairs[uniq_conn]
+        # #
+        # # end
+        #
+        # # # Transform the keys in to Route Templates
+        # # conn_pairs.transform_keys{ |key| key.to_s.upcase }
+
+
+         by_markets = Hash.new { |h, k| h[k] = Set.new }
+         #Now convert the connections into raw params needed for Route Request.
+        conn_pairs.keys.each_with_index do |uniq_conn_route_key, idx|
+         # three_seg_routes.keys.each_with_index do |uniq_conn_route_key, idx|
+
+            branded_route_templates = conn_pairs[uniq_conn_route_key].map{|bc| bc.route_cxrs_hash_key}.uniq
+          # branded_route_templates = three_seg_routes[uniq_conn_route_key].map{|bc| bc.route_cxrs_hash_key}.uniq
+            origin = uniq_conn_route_key[:o]
+
+            branded_route_templates.each do |brt|
+               by_markets[[origin,brt[:d]]] << [uniq_conn_route_key,brt]
+            end
+
+
          end
 
 
-         three_segment_arrays = Parallel.map_with_index(bc_list, in_threads:12) do |bc, bc_index|
-           results_arr = []
+
+        hostcodes = brand.hostcodes_map
+
+        total_markets = by_markets.keys.count
+        three_seg_branded_market_requests = Hash.new { |h, k| h[k] = Set.new }
+        # Parallel.map_with_index(by_markets.keys, in_threads:6) do |mkt, mkt_index|
+        by_markets.keys.each_with_index do |mkt, mkt_index|
+            Rails.logger.info "(#{brand.brand_key}) Build 3 Segment Routes for #{mkt}, #{mkt_index} of (#{total_markets}) "
+
+            tsr_list = by_markets[mkt]
+            tsr_list.each do |tsr|
+
+              tsr_1 = tsr[0]
+              tsr_2 = tsr[1]
 
 
-           Rails.logger.info " ==== (#{brand.brand_key}) Building Three Seg connects from #{bc.origin} #{bc.via} #{bc.dest} " +
-                                 " id:#{bc.id} #{bc_index} of (#{bc_list.count}) - #{emkt_index} of (#{existing_markets.count}) markets "
-           origin = bc.origin
+              # Do the first  legs
+              host_codes = hostcodes[tsr_1[:c1]]
+              rr1_s = host_codes.map{ |host_code|
+                    BrandedRouteRequest.where(brand: brand, origin: tsr_1[:o],  dest: tsr_1[:v],
+                            cxrs: [tsr_1[:c1]], host: host_code).first_or_create!
+                }
+              host_codes = hostcodes[tsr_1[:c2]]
+              rr2_s = host_codes.map{ |host_code|
+                    BrandedRouteRequest.where(brand: brand, origin: tsr_1[:v],  dest: tsr_1[:d],
+                            cxrs: [tsr_1[:c1]], host: host_code).first_or_create!
+              }
+              host_codes = hostcodes[tsr_2[:c2]]
+              rr3_s = host_codes.map{ |host_code|
+                    BrandedRouteRequest.where(brand: brand, origin: tsr_1[:v],  dest: tsr_1[:d],
+                            cxrs: [tsr_1[:c1]], host: host_code).first_or_create!
+              }
+              rr1_s.uniq!
+              rr2_s.uniq!
+              rr3_s.uniq!
 
+              combinations = (rr1_s.product rr2_s).uniq.product rr3_s
+              host_rrs = combinations.map{|j| j[0] +[ j[1]]}
 
-
-           connecting_bcs = BrandConnection.connecting_scheds(bc)
-
-           destinations = connecting_bcs.pluck(:dest).sort.uniq
-           destinations.each_with_index do |dest, index|
-
-             mkt = "#{origin}-#{dest}"
-             Rails.logger.info " ==== (#{brand.brand_key}) Building Three Segment mkt requests  for #{mkt}  "  +
-                               "  #{index} of (#{destinations.count}) #{emkt_index} of (#{existing_markets.count})"
-
-
-             markets = markets | [[origin, dest]]
-
-
-             c1 = ConnRef.new(id: bc.id, key: bc.key)
-             cb_list = connecting_bcs.select{|cbc| cbc.dest == dest}
-             uniq_cb_list = cb_list.map{|other| ConnRef.new(id: other.id, key: other.key)}.uniq{|cr| cr.key}
-
-             multi_connections = uniq_cb_list.map{|c2| MultiConnRef.new(conns: [c1,c2])}.uniq{|mc| mc.key}
-             results_arr << [mkt,  multi_connections]
-
-           end
-           results_arr
-
-         end
-         three_segment_arrays = three_segment_arrays.flatten(1)
-         three_segment_arrays.each do |mkt, multi_connections|
-           three_segment_mkt_connects[mkt] = multi_connections
-         end
-
-       end
-       # pp  three_segment_mkt_connects.keys.map{|k| [k,three_segment_mkt_connects[k].count]}
-
-       brand_market_reqs = Hash.new([])
-
-       three_segment_mkt_connects.each do |mkt, mkt_conns|
-         origin, dest = mkt.split('-')
-         mkt_connections = []
-
-         mkt_conns.each do |mcr|
-           bcs = mcr.conns.map{|c| BrandConnection.find(c.id)}
-           rrs = bcs.map{|c| c.to_route_requests}.flatten.uniq
-           rr_ids = rrs.map{|rr| rr.id}
-
-           all_branded_market_requests = rrs.map{|rr| rr.branded_market_requests.where(seg_count: 3)}
+              host_rrs.each do |rrs|
+                  all_branded_market_requests = rrs.map{|rr| rr.branded_market_requests.where(seg_count: 3)}
+                  bmrrs_intersection = all_branded_market_requests.inject(:&)
 
 
 
-           bmrrs_intersection = all_branded_market_requests.inject(:&)
+                  raise("There should only be 1 Branded Market Request for brrs #{rrs.map{|rr| rr.id}}") if bmrrs_intersection.count > 1
 
 
-           if bmrrs_intersection.count > 1
-             raise("There should only be 1 Branded Market Request for brrs #{rrs.map{|rr| rr.id}}")
+                  if bmrrs_intersection.blank?
+                    bmr =  BrandedMarketRequest.create(brand: brand, origin: tsr_1[:o], dest: tsr_2[:d], seg_count: 3)
+                    bmr.branded_route_requests << rrs
+                    bmr.save
 
-           end
+                  else
+                    bmr = bmrrs_intersection.first
+                  end
 
+                  three_seg_branded_market_requests[mkt] << bmr
 
-           if bmrrs_intersection.blank?
-             bmr =  BrandedMarketRequest.create(brand: brand, origin: origin, dest: dest, seg_count: 3)
-             bmr.branded_route_requests << rrs
-             bmr.save
+              end
+            end
 
-           else
-             bmr = bmrrs_intersection.first
-           end
-
-           mkt_connections << bmr
-
-         end
-
-         # TODO:  Generate Through Requests
-         
-         unless  mkt_connections.blank?
-            BrandedMarketSegmentsRequest.create(brand: brand,
-                           origin: origin, dest:dest, segment_count: 3,
-                           branded_market_request_ids: mkt_connections.map{|bmr| bmr.id} )
-         end
-
-       end
+        end
+        byebug
+        three_seg_branded_market_requests.each do |k, bmr_list|
+              BrandedMarketSegmentsRequest.create(brand: brand,
+                             origin: k.first, dest:k.last, segment_count: 3,
+                            branded_market_request_ids: bmr_list.map{|bmr| bmr.id} )
+        end
 
 
-      #TODO Check each direct flight and see if it could be added on to the end of two segment conncetion
 
-   end
+    end
 
 
 
@@ -583,7 +598,12 @@ module Oag
       end
 
       branded_route_map = BrandedRouteMap.where(brand: brand).first_or_create!
-      branded_route_map.route_map = market_maps
+      #  Let's set an insert order for better JSON exprting
+      sorted_hash = {}
+      market_maps.keys.sort.each do |k,v|
+        sorted_hash[k] = v
+      end
+      branded_route_map.route_map = sorted_hash
       branded_route_map.save
 
       brand.data_states['route_maps'] = {'state': 'idle',  'updated_at': Time.now, 'markets': market_maps.keys.count}

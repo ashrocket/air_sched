@@ -35,6 +35,11 @@
       = f.association :hosts, as: :check_boxes, label_method: lambda {|host| host.brand ? "#{host.name} (Brand:#{host.brand.brand_key})" : host.name}
       = f.input :active
 
+      = f.input :data_states, as: :text
+      -#= f.simple_fields_for :data_states do |s|
+      -#  = s.input 'branded_connections'
+      -#  = s.input 'smart_routes'
+      -#  = s.input 'route_maps'
     %br
     .form-actions.col-sm-offset-1
       = f.button :submit, class: 'btn btn-primary'

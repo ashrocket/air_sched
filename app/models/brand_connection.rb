@@ -12,11 +12,19 @@ class BrandConnection < ActiveRecord::Base
   scope :departing,       lambda {|origin| where(:origin =>  origin)       }
   scope :via,             lambda {|via| where(:via =>  via)       }
 
+
+  validates_uniqueness_of :brand_id, scope: [:sched1_id, :sched2_id]
+
   # class method
 
   def self.connecting_scheds(connection)
     where(sched1: connection.sched2).to_a
         .delete_if{|other| other.sched2_id == connection.sched1_id or other.dest == connection.origin}
+  end
+
+  def self.connecting_brand_connections(connection)
+    where("sched1_id = ? and sched2_id != ? and dest != ?",
+          connection.sched2_id,  connection.sched1_id, connection.origin)
   end
   # instance methods
   # connects_with (sched1_id, sched2_id, origin) Could Imporve =>

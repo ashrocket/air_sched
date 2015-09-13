@@ -70,7 +70,7 @@ class BrandedMarketRequest < ActiveRecord::Base
     end
   end
 
-  def brrs_to_journey
+  def brrs_to_journey_leg
     journeys = []
     branded_route_requests.each_with_index do |brr, i|
 
@@ -95,7 +95,7 @@ class BrandedMarketRequest < ActiveRecord::Base
                destination: dest,
                leg_count: branded_route_requests.count,
                order: order,
-               journey_legs:  brrs_to_journey
+               journey_legs:  brrs_to_journey_leg
              }
        ]
   end

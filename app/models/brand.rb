@@ -52,10 +52,10 @@ class Brand < ActiveRecord::Base
    end
 
    def hostcodes_map
-     h_m = {}
+     h_m = Hash.new { |h, k| h[k] = Set.new }
      hosts.each do |h|
        h.carrier_codes.each do |cxr_code|
-         h_m[cxr_code] = ([h.code] | [h_m[cxr_code]].flatten.compact).uniq
+         h_m[cxr_code] <<  h.code
        end
      end
      h_m

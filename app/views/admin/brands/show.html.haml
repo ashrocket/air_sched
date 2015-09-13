@@ -43,7 +43,7 @@
   %dt Latest Route Maps :
   %dd
     %ul#sorted_hosts.list-group
-      - @brand.export_smart_route_reports.each do |rpt|
+      - @brand.export_smart_route_reports.limit(2).each do |rpt|
         %li.list-group-item.col-sm-4
           = link_to("#{rpt.workflow_state} #{rpt.location}", [:admin,rpt])
           %div= rpt.updated_at

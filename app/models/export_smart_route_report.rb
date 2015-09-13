@@ -105,9 +105,12 @@ class ExportSmartRouteReport < ActiveRecord::Base
           halt
           return
         else
+          # TODO:  Add Recovery Logic here.  What if it's a bad schedule load, check for earlier ones, or newer ones.
+          #  At a minimum it should time out and die after an hour or two of waiting
+
           unless  report.finished?
             Rails.logger.info "#{brand.name} Brand:  #{report_key_code(report_key)} Report Key  -> Waiting for Import Report #{report.id} to complete ..."
-            dly  = (120..300).to_a.sample
+            dly  = (30..120).to_a.sample
             ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key, self.id)
             halt
             return
@@ -127,7 +130,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
     def confirm_connections
       if  brand.processing_connections?
          Rails.logger.info "#{brand.name} :  -> Waiting for branded connections to complete ..."
-         ExportBrandRouteMapsWorker.delay_for(7.minute).perform_async(brand.brand_key, self.id)
+         ExportBrandRouteMapsWorker.delay_for(2.minute).perform_async(brand.brand_key, self.id)
          halt
       else
          Rails.logger.info "#{brand.name} :  -> Branded connections  complete."
@@ -137,7 +140,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
     def confirm_smart_routes
       if  brand.processing_smart_routes?
          Rails.logger.info "#{brand.name} :  -> Waiting for Smart Routes to complete ..."
-         ExportBrandRouteMapsWorker.delay_for(7.minute).perform_async(brand.brand_key, self.id)
+         ExportBrandRouteMapsWorker.delay_for(2.minute).perform_async(brand.brand_key, self.id)
          halt
       else
          Rails.logger.info "#{brand.name} :  -> Smart Routes  complete."
@@ -147,7 +150,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
     def confirm_route_maps
       if  brand.processing_route_maps?
          Rails.logger.info "#{brand.name} :  -> Waiting for Route Maps to complete ..."
-         ExportBrandRouteMapsWorker.delay_for(7.minute).perform_async(brand.brand_key, self.id)
+         ExportBrandRouteMapsWorker.delay_for(2.minute).perform_async(brand.brand_key, self.id)
          halt
       else
          Rails.logger.info "#{brand.name} :  -> Route Maps complete."
@@ -161,12 +164,12 @@ class ExportSmartRouteReport < ActiveRecord::Base
     
        if  brand.processing_connections?
          Rails.logger.info "#{brand.name} :  -> Waiting for branded connections to complete ..."
-         ExportBrandRouteMapsWorker.delay_for(7.minutes).perform_async(brand.brand_key,id)
+         ExportBrandRouteMapsWorker.delay_for(2.minutes).perform_async(brand.brand_key,id)
          halt
        else
          UpdateBrandConnectionsWorker.delay_for(30).perform_async(brand.brand_key)
          # Transtion to the waiting for connections state
-         dly = (120..300).to_a.sample
+         dly = (30..120).to_a.sample
          ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key,id)
 
         end
@@ -176,12 +179,12 @@ class ExportSmartRouteReport < ActiveRecord::Base
       
       if  brand.processing_connections?
         Rails.logger.info "#{brand.name} :  -> Waiting for smart routes to complete ..."
-        ExportBrandRouteMapsWorker.delay_for(7.minutes).perform_async(brand.brand_key,id)
+        ExportBrandRouteMapsWorker.delay_for(2.minutes).perform_async(brand.brand_key,id)
         halt
       else
         UpdateSmartRoutesWorker.delay_for(30).perform_async(brand.brand_key)
         # Transtion to the waiting for connections state
-        dly = (120..300).to_a.sample
+        dly = (30..120).to_a.sample
         ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key,id)
 
        end
@@ -191,11 +194,11 @@ class ExportSmartRouteReport < ActiveRecord::Base
       
       if  brand.processing_route_maps?
         Rails.logger.info "#{brand.name} :  -> Waiting for Route Maps to complete ..."
-        ExportBrandRouteMapsWorker.delay_for(7.minutes).perform_async(brand.brand_key,id)
+        ExportBrandRouteMapsWorker.delay_for(2.minutes).perform_async(brand.brand_key,id)
         halt
       else
         UpdateRouteMapsWorker.delay_for(30).perform_async(brand.brand_key)
-        dly = (120..300).to_a.sample
+        dly = (30..120).to_a.sample
         ExportBrandRouteMapsWorker.delay_for(dly).perform_async(brand.brand_key,id)
 
         # Transtion to the waiting for connections state  

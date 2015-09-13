@@ -109,39 +109,54 @@ module Oag
 
 
 
-   def direct_market_routes(brand, origin, dest)
+   def direct_market_routes(brand)
      #  No Stops
+      one_segment_markets = DirectFlight.branded(brand).pluck(:origin, :dest).uniq
+      direct_route_requests = Hash.new { |h, k| h[k] = Set.new }
 
-      direct_route_requests = []
-      direct_flight_markets = DirectFlight.pair(origin ,dest).keyed(brand.report_keys)
-                                  # .compact
-
-      direct_flight_markets.each do |df|
-        hosts = brand.hosts_for(df.carriers).uniq
-        # direct_host_templates = df.carriers.map{|cxr| {cxr: cxr, hosts: brand.hosts_for(df.carriers)}}.uniq
-        # dht_by_host = direct_host_templates.group_by{|ht| ht[:host]}
-
-        # dht_by_host.each do |host, cxr_host_list |
-        hosts.each do |host|
-          carriers = host.carrier_codes & df.carriers
-
-          brr = BrandedRouteRequest.where( brand: brand, origin: origin, dest: dest,
-                                           host: host.code, cxrs: carriers  ).first_or_create!
-
-          bmr = BrandedMarketRequest.joins(:branded_route_requests)
-                    .where(BrandedRouteRequest[:id].in [brr.id])
-                    .where(brand: brand, origin: origin, dest: dest, seg_count: 1)
-                    .first_or_create!
-
-          # What is this doing?  Are we keeping the values uniq?  If so this may not be the way to do it.
-          bmr.branded_route_requests << brr if  bmr.branded_route_requests.blank?
-
-          direct_route_requests << bmr
+      one_segment_markets.each_with_index do |mkt, index|
+          origin, dest = mkt
+          Rails.logger.info " ==== (#{brand.brand_key}) Building One Segment mkt requests  for #{origin} #{dest} "
+          Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{one_segment_markets.count}) "
 
 
-        end
+
+          mkt_operating_carriers = OagSchedule.branded(brand).market(origin, dest).pluck(:airline_code).uniq
+
+          hostcodes = brand.hostcodes_map
+
+          #  TODO:  Possbily Group Common Host with Multiple Carriers into the same RouteRequest
+          mkt_operating_carriers.each do |cxr|
+              host_codes = hostcodes[cxr]
+              host_codes.to_a.each do |host_code|
+                  brr = BrandedRouteRequest.find_or_create_by( brand: brand, origin: origin, dest: dest, host: host_code, cxrs: [cxr]  )
+                  #   There should be only 1 BrandedMarketRequest for this BrandedRouteRequest
+                  bmrrs = brr.branded_market_requests.where(seg_count: 1)
+
+                  if bmrrs.blank?
+                     bmr =  BrandedMarketRequest.create(brand: brand, origin: origin, dest: dest, seg_count: 1)
+                     bmr.branded_route_requests << brr
+                     bmr.save
+                     direct_route_requests[mkt] << bmr
+                  else
+                    direct_route_requests[mkt] << bmrrs.first
+                  end
+              end
+
+          end
       end
-      direct_route_requests
+
+      total_direct_markets =  direct_route_requests.keys.count
+      direct_route_requests.keys.each_with_index do |k, direct_mkt_idx|
+
+              Rails.logger.info "(#{brand.brand_key}) Saving 1 Segment Routes for #{k.first}-#{k.last}, #{direct_mkt_idx+1} of (#{total_direct_markets}) "
+              bmr_set = direct_route_requests[k]
+              BrandedMarketSegmentsRequest.create(brand: brand,
+                        origin: k.first, dest:k.last, segment_count: 1,
+                        branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
+      end
+
+
 
    end
 
@@ -270,6 +285,9 @@ module Oag
               tsr_1 = tsr[0]
               tsr_2 = tsr[1]
 
+              # if mkt.eql? ['BFV','CNX']
+              #   byebug
+              # end
 
               # Do the first  legs
               host_codes = hostcodes[tsr_1[:c1]]
@@ -280,12 +298,12 @@ module Oag
               host_codes = hostcodes[tsr_1[:c2]]
               rr2_s = host_codes.map{ |host_code|
                     BrandedRouteRequest.where(brand: brand, origin: tsr_1[:v],  dest: tsr_1[:d],
-                            cxrs: [tsr_1[:c1]], host: host_code).first_or_create!
+                            cxrs: [tsr_1[:c2]], host: host_code).first_or_create!
               }
               host_codes = hostcodes[tsr_2[:c2]]
               rr3_s = host_codes.map{ |host_code|
-                    BrandedRouteRequest.where(brand: brand, origin: tsr_1[:v],  dest: tsr_1[:d],
-                            cxrs: [tsr_1[:c1]], host: host_code).first_or_create!
+                    BrandedRouteRequest.where(brand: brand, origin: tsr_2[:v],  dest: tsr_2[:d],
+                            cxrs: [tsr_2[:c2]], host: host_code).first_or_create!
               }
               rr1_s.uniq!
               rr2_s.uniq!
@@ -345,23 +363,9 @@ module Oag
          when 1
            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 1)
 
-           one_segment_markets = DirectFlight.keyed(brand.report_keys).pluck(:origin, :dest).uniq
-           one_segment_markets.each_with_index do |pair, index|
-             origin, dest = pair
-             Rails.logger.info " ==== (#{brand.brand_key}) Building One Segment mkt requests  for #{origin} #{dest} "
-             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{one_segment_markets.count}) "
+           market_requests = direct_market_routes(brand)
 
 
-             market_requests = direct_market_routes(brand, origin, dest)
-
-             unless  market_requests.blank?
-                    BrandedMarketSegmentsRequest.create(brand: brand, origin: origin, dest:dest,
-                                   segment_count: segment_count,
-                                   branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
-             end
-           end
-
-           # market_requests = direct_market_routes(brand, origin, dest)
          when 2
            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 2)
 
@@ -395,11 +399,7 @@ module Oag
 
        end
 
-       # unless  market_requests.blank?
-       # BrandedMarketSegmentsRequest.create(brand: brand,
-       #                origin: origin, dest:dest, segment_count: segment_count,
-       #                branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
-       # end
+
 
 
    end
@@ -434,38 +434,36 @@ module Oag
 
       bmrm = BrandedMarketRouteMap.find_or_create_by(brand: brand, origin: origin, dest: dest)
 
-      requests = []
-      reverse_requests = []
+      requests = Set.new
+      reverse_requests = Set.new
 
 
       seg_counts.each do |seg_count|
-            bmr =   BrandedMarketSegmentsRequest.branded(brand)
-                    .market(origin, dest)
-                    .where(segment_count: seg_count).first
+            bmsr = BrandedMarketSegmentsRequest.find_by(brand: brand, origin: origin, dest: dest, segment_count: seg_count)
 
-
-            requests = (requests + bmr.branded_market_requests) if bmr and not bmr.branded_market_requests.blank?
+            bmsr.branded_market_requests.each{|bmr| requests << bmr} if bmsr
 
       end
 
-      requests.uniq!
 
       seg_counts.each do |seg_count|
-            bmr =   BrandedMarketSegmentsRequest.branded(brand)
-                    .market(dest, origin)
-                    .where(segment_count: seg_count).first
+            bmsr =   BrandedMarketSegmentsRequest.find_by(brand: brand, origin: dest, dest: origin, segment_count: seg_count)
 
+            bmsr.branded_market_requests.each{|bmr| reverse_requests << bmr} if bmsr
 
-            reverse_requests = (reverse_requests + bmr.branded_market_requests) if bmr and not bmr.branded_market_requests.blank?
 
       end
 
-      reverse_requests.uniq!
 
 
-      roundtrip_requests = requests.product reverse_requests
+      roundtrip_requests = requests.to_a.product reverse_requests.to_a
 
       one_way = []
+      # if requests.count > 1
+      #   byebug
+      # end
+      # TODO: Maybe the 'journeys' object should be created outside of the requests.each. loop
+
       requests.each do |mkt_request|
         one_way <<
         {
@@ -498,7 +496,6 @@ module Oag
         # roundtrip: roundtrip
         roundtrip: []
       }
-
       bmrm.save
       bmrm
 
@@ -520,12 +517,11 @@ module Oag
 
         origin, dest = mkt
         mkt_key = "#{origin}-#{dest}"
-        Rails.logger.info "(#{brand.brand_key}) Building rout emap for market  #{mkt_key} #{mkt_index+1} of (#{markets.count})"
+        Rails.logger.info "(#{brand.brand_key}) Building route map for market  #{mkt_key} #{mkt_index+1} of (#{markets.count})"
 
         # if mkt_key.eql? "CNX-BFV"
         #      byebug
         # end
-        byebug
         bmrm = branded_market_route_map( brand, origin, dest, seg_counts)
 
 
@@ -543,8 +539,8 @@ module Oag
       branded_route_map = BrandedRouteMap.where(brand: brand).first_or_create!
       #  Let's set an insert order for better JSON exprting
       sorted_hash = {}
-      market_maps.keys.sort.each do |k,v|
-        sorted_hash[k] = v
+      market_maps.keys.sort.each do |k|
+        sorted_hash[k] = market_maps[k]
       end
       branded_route_map.route_map = sorted_hash
       branded_route_map.save

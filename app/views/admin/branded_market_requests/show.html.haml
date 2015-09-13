@@ -1,0 +1,26 @@
+%p#notice= notice
+%p#alert= alert
+
+%dl.dl-horizontal
+  %dt ID:
+  %dd= @branded_market_request.id
+  %dt Brand:
+  %dd= link_to(@branded_market_request.brand.name, admin_brand_path(@branded_market_request.brand))
+  %dt Key:
+  %dd= @branded_market_request.key
+  %dt Origin:
+  %dd= @branded_market_request.origin
+  %dt Dest:
+  %dd= @branded_market_request.dest
+  %dt Seg Count:
+  %dd= @branded_market_request.seg_count
+  %br
+  %dt Route Requests:
+  %dd
+    %ul#sorted_hosts.list-group
+      - @branded_market_request.branded_route_requests.each do |brr|
+        %li.list-group-item.col-sm-4
+          = link_to("#{brr.key} - #{brr.id}", [:admin,brr])
+
+
+  %br

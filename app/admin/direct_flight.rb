@@ -1,7 +1,12 @@
-ActiveAdmin.register DirectFlight, :as => "Directs" do
-  menu priority: 0,  :parent => "Data"
+ActiveAdmin.register DirectFlight do
+  menu priority: 0, label: 'Directs', :parent => 'Data'
 
-  
+
+  filter :report_key
+  filter :origin, filters: [:cont, :eq, :start, :end]
+  filter :dest, filters: [:cont, :eq, :start, :end]
+  filter :carriers, filters: [:cont, :eq, :start, :end]
+
   # See permitted parameters documentation:
   # https://github.com/gregbell/admin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #

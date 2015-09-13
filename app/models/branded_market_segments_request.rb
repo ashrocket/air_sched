@@ -9,6 +9,9 @@ class BrandedMarketSegmentsRequest < ActiveRecord::Base
   scope :with_segs,    lambda {|seg_count|       where(:segment_count => seg_count) }
 
 
+  validates_uniqueness_of :brand_id, scope: [:origin, :dest, :segment_count]
+
+
   def branded_market_requests
     BrandedMarketRequest.where(id: branded_market_request_ids)
   end

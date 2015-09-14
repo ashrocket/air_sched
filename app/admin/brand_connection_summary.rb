@@ -6,6 +6,9 @@ ActiveAdmin.register BrandConnection, :as => "Connections Summary"  do
   filter :origin, filters: [:cont, :eq, :start, :end]
   filter :via, filters: [:cont, :eq, :start, :end]
   filter :dest, filters: [:cont, :eq, :start, :end]
+  filter :sched1_cxr, filters: [:cont, :eq, :start, :end]
+  filter :sched2_cxr, filters: [:cont, :eq, :start, :end]
+
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #

@@ -3,7 +3,7 @@ ActiveAdmin.register BrandedRouteRequest do
 
   filter :origin, filters: [:cont, :eq, :start, :end]
   filter :dest, filters: [:cont, :eq, :start, :end]
-  filter :cxrs, filters: [:cont, :eq, :start, :end]
+  filter :key, filters: [:cont, :eq, :start, :end]
   filter :host, filters: [:cont, :eq, :start, :end]
   filter :brand
 

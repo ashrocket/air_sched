@@ -5,7 +5,7 @@ ActiveAdmin.register DirectFlight do
   filter :report_key
   filter :origin, filters: [:cont, :eq, :start, :end]
   filter :dest, filters: [:cont, :eq, :start, :end]
-  filter :carriers, filters: [:cont, :eq, :start, :end]
+  filter :carriers
 
   # See permitted parameters documentation:
   # https://github.com/gregbell/admin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters

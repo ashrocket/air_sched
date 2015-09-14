@@ -22,6 +22,8 @@ class Brand < ActiveRecord::Base
   #
 
   # Psuedo State Machine
+  # TODO: Add a seperate StateMachine object for Sub State Machines,
+  # Can't add state machine to Brand since state machien doesn't support sub-states
   def processing_connections?
     data_states['branded_connections'] and
     data_states['branded_connections']['state'] and
@@ -41,6 +43,26 @@ class Brand < ActiveRecord::Base
     data_states['route_maps_export'] and
     data_states['route_maps_export']['state'] and
     data_states['route_maps_export']['state'].eql? 'processing'
+  end
+  def processing_route_map_validator_export?
+    data_states['route_map_validator_export'] and
+    data_states['route_map_validator_export']['state'] and
+    data_states['route_map_validator_export']['state'].eql? 'processing'
+  end
+  def processing_potential_markets?
+    data_states['potential_markets'] and
+    data_states['potential_markets']['state'] and
+    data_states['potential_markets']['state'].eql? 'processing'
+  end
+  def processing_potential_carriers?
+    data_states['potential_carriers'] and
+    data_states['potential_carriers']['state'] and
+    data_states['potential_carriers']['state'].eql? 'processing'
+  end
+  def processing_potential_routes?
+    data_states['potential_routes'] and
+    data_states['potential_routes']['state'] and
+    data_states['potential_routes']['state'].eql? 'processing'
   end
 
   def build_connections
@@ -70,9 +92,13 @@ class Brand < ActiveRecord::Base
    end
 
    def all_possible_markets
-     origins     = DirectFlight.keyed(brand.report_keys).pluck(:origin).uniq
-     destination = DirectFlight.keyed(brand.report_keys).pluck(:origin).uniq
+     origins     = DirectFlight.branded(self).distinct(:origin).pluck(:origin)
+     destination = DirectFlight.branded(self).distinct(:dest).pluck(:dest)
      origins.product destinations
+   end
+   def all_possible_carriers
+     carrier_codes = OagSChedule.branded(self).distinct(:airline_code).distinct(:airline_code)
+     carriers = Airline.where(code: carrier_codes)
    end
 
 end

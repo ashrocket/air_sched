@@ -15,7 +15,7 @@ module Oag
     def filter_destinations(report)
       dests = Destination.keyed(report.report_key)
 
-      group_size = 300
+      group_size = 1000
       tot = dests.count
       dests.in_groups_of(group_size) do |dest_group|
 
@@ -23,6 +23,7 @@ module Oag
         # dest_group.compact.each do  |dest|
         report.stash_log "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key_code}"
 
+        filtered_destinations = []
         Parallel.each_with_index(dest_group, in_threads:4) do |dest, index|
           # Oag::Util.refresh_forked_process_postgres_db_connection
           if dest
@@ -58,10 +59,16 @@ module Oag
                                                         }
                eff_days.uniq!
                dest.eff_days = eff_days || []
-               dest.save
+               filtered_destinations << dest
           end #If Dest, protection against leftover nil values in parallel.
         end # End parallel
         # Oag::Util.refresh_forked_process_postgres_db_connection
+
+        # Faster to save them in bulk
+        ActiveRecord::Base.transaction do
+            filtered_destinations.each{ |dest| dest.save!}
+        end
+
 
         tot = tot - dest_group.compact.count
       end

@@ -15,7 +15,7 @@ module Oag
     def filter_destinations(report)
       dests = Destination.keyed(report.report_key)
 
-      group_size = 1000
+      group_size = 5000
       tot = dests.count
       dests.in_groups_of(group_size) do |dest_group|
 
@@ -170,26 +170,34 @@ module Oag
         end
 
         tot = cnx.count
-        cnx.in_groups_of(1000) do |cnx_group|
+        cnx.in_groups_of(5000) do |cnx_group|
           report.stash_log "Building #{cnx_group.count} destination connections out of #{tot} remaining for #{report.report_key_code}"
           tot -= 1000
           cnx_group.compact.each do |row|
            o_name = Airport.cached_name(row[0])
            h_name = Airport.cached_name(row[1])
            d_name = Airport.cached_name(row[2])
-           connections << Destination.new(report_key: report.report_key, origin: o_name, origin_code: row[0],
-                                          hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2],
-                                          cxrs1: row[3], cxrs2: row[4]
-           )
+           # connections << Destination.new(report_key: report.report_key, origin: o_name, origin_code: row[0],
+           #                                hub_name: h_name, hub_code: row[1], dest: d_name,dest_code: row[2],
+           #                                cxrs1: row[3], cxrs2: row[4]
+           # )
+           connections << [ report.report_key.id,  o_name,  row[0],  h_name,  row[1],  d_name, row[2],  row[3],  row[4]]
+
           end
 
-          rules = InterlineCxrRule.keyed(report.report_key)
-          unless rules.blank?
-            rules.sort_by(&:sequence).each do |rule|
-              connections = rule.apply(connections)
-            end
-          end
-          Destination.import connections
+
+          # TODO: Verify this will still work without a Destination Object - changed this to do faster columns import method
+          # will probably need to apply the rules AFTER inserting the records.
+          #  rules = InterlineCxrRule.keyed(report.report_key)
+          #
+          # unless rules.blank?
+          #   rules.sort_by(&:sequence).each do |rule|
+          #     connections = rule.apply(connections)
+          #   end
+          # end
+
+          columns = [:report_key_id, :origin, :origin_code, :hub_name, :hub_code, :dest,:dest_code, :cxrs1, :cxrs2]
+          Destination.import columns, connections
           connections = []
         end
       report.load_status['destinations_map_status'] = 'refreshed'
@@ -209,16 +217,18 @@ module Oag
 
           pairs =  Destination.keyed(report.report_key).pluck(:origin_code, :dest_code).uniq
           tot = pairs.count
-          group_size = 1000
+          group_size = 5000
           pairs.in_groups_of(group_size) do |pair_group|
             report.stash_log "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key_code}"
             tot -= group_size
             pair_group.compact.each do |pair|
                o_name =  Airport.cached_name(pair[0])
                d_name = Airport.cached_name(pair[1])
-               connections << CnxPair.new(report_key: report.report_key, origin: pair[0], origin_name: o_name, dest: pair[1], dest_name: d_name)
+               # connections << CnxPair.new(report_key: report.report_key, origin: pair[0], origin_name: o_name, dest: pair[1], dest_name: d_name)
+               connections << [report.report_key.id, pair[0], o_name, pair[1],  d_name]
             end
-            CnxPair.import connections
+            columns = [:report_key_id,:origin,:origin_name,:dest,:dest_name]
+            CnxPair.import columns, connections
             connections = []
           end
 

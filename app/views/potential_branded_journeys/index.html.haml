@@ -1,0 +1,28 @@
+- page_title
+
+.page-header
+  = link_to new_potential_branded_journey_path, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-plus
+    New Potential branded journey
+  %h2 Listing Potential Branded Journeys
+
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Journey
+        %th Segments
+        %th Potential branded market
+        %th
+        %th
+        %th
+
+    %tbody
+      - @potential_branded_journeys.each do |potential_branded_journey|
+        %tr
+          %td= potential_branded_journey.journey
+          %td= potential_branded_journey.segments
+          %td= potential_branded_journey.potential_branded_market.name
+          %td= link_to 'Show', potential_branded_journey
+          %td= link_to 'Edit', edit_potential_branded_journey_path(potential_branded_journey)
+          %td= link_to 'Destroy', potential_branded_journey, data: { confirm: 'Are you sure?' }, method: :delete

@@ -1,0 +1,12 @@
+- page_title
+
+.page-header
+  = link_to potential_branded_journeys_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to @potential_branded_journey, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-info-sign
+    Show
+  %h2 Editing Potential Branded Journey
+
+= render 'form'

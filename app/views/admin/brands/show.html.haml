@@ -31,7 +31,24 @@
 
   %br
   %dt Data States:
-  %dd= @brand.data_states
+  -#%dd= @brand.data_states
+  %dd
+    - sorted_data_states = @brand.data_states.sort_by { |k,v| v["updated_at"] or Time.now }.reverse
+    %ul#sorted_hosts.list-group
+      - sorted_data_states.each do |k,v|
+        - if v.is_a? Hash
+          - state_class = (v["state"] and v["state"].eql? 'processing') ? 'list-group-item-warning' : 'list-group-item-info'
+          %li.list-group-item.col-sm-8{class: state_class}
+            %div= "#{k}: #{v["state"]}"
+            %div= v.except("updated_at", "state")
+            %div= v["updated_at"] or nil
+            = link_to("reset", reset_data_states_admin_brand_path(data_state:k))
+        - else
+          %li.list-group-item.list-group-item-info.col-sm-8
+            %div= "#{k}"
+            %div= v
+            = link_to("reset", reset_data_states_admin_brand_path(data_state:k))
+
   %br
 
   %dt Active:

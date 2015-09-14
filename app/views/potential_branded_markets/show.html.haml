@@ -1,0 +1,17 @@
+- page_title
+.page-header
+  = link_to potential_branded_markets_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_potential_branded_market_path(@potential_branded_market), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Potential Branded Market
+
+%dl.dl-horizontal
+  %dt Origin:
+  %dd= @potential_branded_market.origin
+  %dt Dest:
+  %dd= @potential_branded_market.dest
+  %dt Brand:
+  %dd= @potential_branded_market.brand.name

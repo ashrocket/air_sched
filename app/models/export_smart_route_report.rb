@@ -89,7 +89,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
 
     # TODO: Add Waiting for ReportKey Reports to Complete State, to provide more visibility into the process
     def confirm_report_keys
-      brand.data_states['route_maps_export'] = 'processing'
+      brand.data_states['route_maps_export'] = {'state': 'processing'}
       brand.save
       Rails.logger.info "#{brand.name}  Brand: -> confirming Import Reports are finished."
 
@@ -213,13 +213,13 @@ class ExportSmartRouteReport < ActiveRecord::Base
       url = exporter.export_to_s3(brand)
       self.location = url.to_s
       save
-      brand.data_states['route_maps_export'] = 'idle'
+      brand.data_states['route_maps_export'] = {'state':'idle', 'location': self.location, 'updated_at': Time.now}
       brand.save
 
     end
 
     def reject
-      brand.data_states['route_maps_export'] = 'idle'
+      brand.data_states['route_maps_export'] = {'state':'idle', 'error':'rejected', 'updated_at': Time.now}
       brand.save
     end
 

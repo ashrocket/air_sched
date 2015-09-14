@@ -1,0 +1,28 @@
+- page_title
+
+.page-header
+  = link_to new_potential_branded_carrier_path, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-plus
+    New Potential branded carrier
+  %h2 Listing Potential Branded Carriers
+
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Cxr
+        %th Carrier name
+        %th Brand
+        %th
+        %th
+        %th
+
+    %tbody
+      - @potential_branded_carriers.each do |potential_branded_carrier|
+        %tr
+          %td= potential_branded_carrier.cxr
+          %td= potential_branded_carrier.carrier_name
+          %td= potential_branded_carrier.brand.name
+          %td= link_to 'Show', potential_branded_carrier
+          %td= link_to 'Edit', edit_potential_branded_carrier_path(potential_branded_carrier)
+          %td= link_to 'Destroy', potential_branded_carrier, data: { confirm: 'Are you sure?' }, method: :delete

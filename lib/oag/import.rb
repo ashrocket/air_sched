@@ -177,7 +177,7 @@ module Oag
 
     schedule_records = []
     loaded = 0
-    group_size = 500
+    group_size = 2000
     schedule_count = schedules.count
 
     schedules.in_groups_of(group_size) do |schedule_group|

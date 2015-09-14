@@ -1,0 +1,17 @@
+- page_title
+.page-header
+  = link_to potential_branded_carriers_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_potential_branded_carrier_path(@potential_branded_carrier), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Potential Branded Carrier
+
+%dl.dl-horizontal
+  %dt Cxr:
+  %dd= @potential_branded_carrier.cxr
+  %dt Carrier name:
+  %dd= @potential_branded_carrier.carrier_name
+  %dt Brand:
+  %dd= @potential_branded_carrier.brand.name

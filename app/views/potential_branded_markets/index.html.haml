@@ -1,0 +1,28 @@
+- page_title
+
+.page-header
+  = link_to new_potential_branded_market_path, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-plus
+    New Potential branded market
+  %h2 Listing Potential Branded Markets
+
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Origin
+        %th Dest
+        %th Brand
+        %th
+        %th
+        %th
+
+    %tbody
+      - @potential_branded_markets.each do |potential_branded_market|
+        %tr
+          %td= potential_branded_market.origin
+          %td= potential_branded_market.dest
+          %td= potential_branded_market.brand.name
+          %td= link_to 'Show', potential_branded_market
+          %td= link_to 'Edit', edit_potential_branded_market_path(potential_branded_market)
+          %td= link_to 'Destroy', potential_branded_market, data: { confirm: 'Are you sure?' }, method: :delete

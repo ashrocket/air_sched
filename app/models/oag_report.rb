@@ -92,7 +92,7 @@ class OagReport < ActiveRecord::Base
         else
           stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
 
-          dly = (10..120).to_a.sample
+          dly = (5..10).to_a.sample
           ScheduleImportWorker.delay_for(dly).perform_async(id)
       end
     end

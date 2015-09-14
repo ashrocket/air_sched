@@ -507,6 +507,36 @@ ALTER SEQUENCE branded_market_segments_requests_id_seq OWNED BY branded_market_s
 
 
 --
+-- Name: branded_route_map_validators; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_route_map_validators (
+    id integer NOT NULL,
+    brand_id integer,
+    possible_route_map_rows character varying[] DEFAULT '{}'::character varying[]
+);
+
+
+--
+-- Name: branded_route_map_validators_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_route_map_validators_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_route_map_validators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_route_map_validators_id_seq OWNED BY branded_route_map_validators.id;
+
+
+--
 -- Name: branded_route_maps; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -816,6 +846,40 @@ ALTER SEQUENCE export_market_data_reports_id_seq OWNED BY export_market_data_rep
 
 
 --
+-- Name: export_route_validator_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE export_route_validator_reports (
+    id integer NOT NULL,
+    brand_id integer,
+    workflow_state character varying,
+    location character varying,
+    details json DEFAULT '{}'::json,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: export_route_validator_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE export_route_validator_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: export_route_validator_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE export_route_validator_reports_id_seq OWNED BY export_route_validator_reports.id;
+
+
+--
 -- Name: export_smart_route_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1122,6 +1186,105 @@ ALTER SEQUENCE possible_flights_id_seq OWNED BY possible_flights.id;
 
 
 --
+-- Name: potential_branded_carriers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE potential_branded_carriers (
+    id integer NOT NULL,
+    cxr character varying,
+    carrier_name character varying,
+    brand_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: potential_branded_carriers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE potential_branded_carriers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: potential_branded_carriers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE potential_branded_carriers_id_seq OWNED BY potential_branded_carriers.id;
+
+
+--
+-- Name: potential_branded_journeys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE potential_branded_journeys (
+    id integer NOT NULL,
+    journey character varying,
+    segments integer,
+    potential_branded_market_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: potential_branded_journeys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE potential_branded_journeys_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: potential_branded_journeys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE potential_branded_journeys_id_seq OWNED BY potential_branded_journeys.id;
+
+
+--
+-- Name: potential_branded_markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE potential_branded_markets (
+    id integer NOT NULL,
+    origin character varying,
+    dest character varying,
+    brand_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: potential_branded_markets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE potential_branded_markets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: potential_branded_markets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE potential_branded_markets_id_seq OWNED BY potential_branded_markets.id;
+
+
+--
 -- Name: report_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1304,6 +1467,13 @@ ALTER TABLE ONLY branded_market_segments_requests ALTER COLUMN id SET DEFAULT ne
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY branded_route_map_validators ALTER COLUMN id SET DEFAULT nextval('branded_route_map_validators_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY branded_route_maps ALTER COLUMN id SET DEFAULT nextval('branded_route_maps_id_seq'::regclass);
 
 
@@ -1367,6 +1537,13 @@ ALTER TABLE ONLY export_market_data_reports ALTER COLUMN id SET DEFAULT nextval(
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY export_route_validator_reports ALTER COLUMN id SET DEFAULT nextval('export_route_validator_reports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY export_smart_route_reports ALTER COLUMN id SET DEFAULT nextval('export_smart_route_reports_id_seq'::regclass);
 
 
@@ -1417,6 +1594,27 @@ ALTER TABLE ONLY oag_schedules ALTER COLUMN id SET DEFAULT nextval('oag_schedule
 --
 
 ALTER TABLE ONLY possible_flights ALTER COLUMN id SET DEFAULT nextval('possible_flights_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY potential_branded_carriers ALTER COLUMN id SET DEFAULT nextval('potential_branded_carriers_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY potential_branded_journeys ALTER COLUMN id SET DEFAULT nextval('potential_branded_journeys_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY potential_branded_markets ALTER COLUMN id SET DEFAULT nextval('potential_branded_markets_id_seq'::regclass);
 
 
 --
@@ -1546,6 +1744,14 @@ ALTER TABLE ONLY branded_market_segments_requests
 
 
 --
+-- Name: branded_route_map_validators_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_route_map_validators
+    ADD CONSTRAINT branded_route_map_validators_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: branded_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1618,6 +1824,14 @@ ALTER TABLE ONLY export_market_data_reports
 
 
 --
+-- Name: export_route_validator_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY export_route_validator_reports
+    ADD CONSTRAINT export_route_validator_reports_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: export_smart_route_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1679,6 +1893,30 @@ ALTER TABLE ONLY oag_schedules
 
 ALTER TABLE ONLY possible_flights
     ADD CONSTRAINT possible_flights_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: potential_branded_carriers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY potential_branded_carriers
+    ADD CONSTRAINT potential_branded_carriers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: potential_branded_journeys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY potential_branded_journeys
+    ADD CONSTRAINT potential_branded_journeys_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: potential_branded_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY potential_branded_markets
+    ADD CONSTRAINT potential_branded_markets_pkey PRIMARY KEY (id);
 
 
 --
@@ -1950,6 +2188,27 @@ CREATE INDEX index_possible_flights_on_hub_and_orig_and_dest ON possible_flights
 
 
 --
+-- Name: index_potential_branded_carriers_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_potential_branded_carriers_on_brand_id ON potential_branded_carriers USING btree (brand_id);
+
+
+--
+-- Name: index_potential_branded_journeys_on_potential_branded_market_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_potential_branded_journeys_on_potential_branded_market_id ON potential_branded_journeys USING btree (potential_branded_market_id);
+
+
+--
+-- Name: index_potential_branded_markets_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_potential_branded_markets_on_brand_id ON potential_branded_markets USING btree (brand_id);
+
+
+--
 -- Name: index_report_keys_on_report_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2027,6 +2286,14 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
+-- Name: fk_rails_3b3ff83546; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY potential_branded_journeys
+    ADD CONSTRAINT fk_rails_3b3ff83546 FOREIGN KEY (potential_branded_market_id) REFERENCES potential_branded_markets(id);
+
+
+--
 -- Name: fk_rails_3be8df1480; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2056,6 +2323,22 @@ ALTER TABLE ONLY airlines_hosts
 
 ALTER TABLE ONLY airlines_hosts
     ADD CONSTRAINT fk_rails_a8b0cd38f8 FOREIGN KEY (host_id) REFERENCES hosts(id);
+
+
+--
+-- Name: fk_rails_b591bed8c7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY potential_branded_markets
+    ADD CONSTRAINT fk_rails_b591bed8c7 FOREIGN KEY (brand_id) REFERENCES brands(id);
+
+
+--
+-- Name: fk_rails_f8f7da103e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY potential_branded_carriers
+    ADD CONSTRAINT fk_rails_f8f7da103e FOREIGN KEY (brand_id) REFERENCES brands(id);
 
 
 --
@@ -2114,6 +2397,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140103001000');
 
 INSERT INTO schema_migrations (version) VALUES ('20140940100000');
 
+INSERT INTO schema_migrations (version) VALUES ('20140940100010');
+
 INSERT INTO schema_migrations (version) VALUES ('20150727000000');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000030');
@@ -2129,4 +2414,12 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000200');
 INSERT INTO schema_migrations (version) VALUES ('20150727000500');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000520');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000530');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000600');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000610');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727000620');
 

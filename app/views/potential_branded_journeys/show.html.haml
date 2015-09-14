@@ -1,0 +1,17 @@
+- page_title
+.page-header
+  = link_to potential_branded_journeys_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_potential_branded_journey_path(@potential_branded_journey), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Potential Branded Journey
+
+%dl.dl-horizontal
+  %dt Journey:
+  %dd= @potential_branded_journey.journey
+  %dt Segments:
+  %dd= @potential_branded_journey.segments
+  %dt Potential branded market:
+  %dd= @potential_branded_journey.potential_branded_market.name

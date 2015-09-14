@@ -123,7 +123,16 @@ ActiveAdmin.register Brand, as: 'Brands' do
    end
   member_action :reset_data_states do
     @brand = Brand.friendly.find(params[:id])
-    @brand.data_states = {}
+    data_state_name = params[:data_state]
+    if data_state_name
+      if @brand.data_states[data_state_name] and @brand.data_states[data_state_name]['state']
+        @brand.data_states[data_state_name]['state'] = 'idle'
+      else
+        @brand.data_states[data_state_name] = {}
+      end
+    else
+      @brand.data_states = {}
+    end
     @brand.save
     redirect_to :back, notice: 'Data States reset'
 

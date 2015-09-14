@@ -11,6 +11,43 @@ module Oag
                         " #{via_index + 1} of (#{via_points.count})  - #{brand.brand_key}"
     end
 
+
+    def build_potential_markets(brand)
+
+       PotentialBrandedMarket.destroy_all(brand: brand)
+       all_markets = brand.all_possible_markets
+       all_markets.each do |origin, dest|
+         PotentialBrandedMarket.create(brand: brand, origin:origin, dest:dest)
+       end
+
+    end
+    def build_potential_carriers(brand)
+
+        PotentialBrandedMarket.destroy_all(brand: brand)
+        all_carriers = brand.all_possible_carriers
+        all_carriers.each do |carrier|
+          PotentialBrandedMarket.create(brand: brand, cxr: carrier.code, carrier_name: carrier.name)
+        end
+
+    end
+
+    def build_potential_routes(brand)
+      all_markets = PotentialBrandedMarket.brand(brand)
+      seg_counts_array = [*1..brand.max_segments]
+      market_solutions = Hash.new { |h, k| h[k] = Set.new }
+      # seg_counts_array.each do |seg_num|
+      #   solutions  =
+      #       case segment_count
+      #                when 1
+
+          # PotentialBrandedMarket.destroy_all(brand: brand)
+          # all_carriers = brand.all_possible_carriers
+          # all_carriers.each do |carrier|
+          #   PotentialBrandedMarket.create(brand: brand, cxr: carrier.code, carrier_name: carrier.name)
+          # end
+
+    end
+
     def build_brand_connections(brand)
 
       Rails.logger.info "Building Branded Connections for Schedules from Brand #{brand.brand_key} #{brand.name}"
@@ -26,7 +63,7 @@ module Oag
 
 
 
-      routes = []
+      routes = Set.new
       brand_connections = []
 
       origins.each_with_index do |origin_code, index|
@@ -37,8 +74,8 @@ module Oag
                 .pluck(:dest_apt).sort.uniq
 
 
-        # via_points.each_with_index do |via_code, via_index|
-        routes_for_origin = Parallel.map_with_index(via_points, in_threads:4) do |via_code, via_index|
+        via_points.each_with_index do |via_code, via_index|
+        # Parallel.each_with_index(via_points, in_threads:4) do |via_code, via_index|
 
 
            log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
@@ -51,36 +88,55 @@ module Oag
                                     .departing(via_code).stops(0)
                                     .reject{|sched| sched.dest_apt == origin_code}
 
-           possible_routes = []
+           possible_routes = Set.new
 
             leg1_scheds.each do |sched1|
               leg2_scheds.each do |sched2|
                 window    = sched1.effective_window(sched2)
                 op_window = sched1.connection_days_of_week(sched2,2)
                 if not window.blank? and not op_window.blank?
-                  possible_routes <<  BrandConnection.new(brand: brand,
-                            origin: origin_code, via: via_code, dest: sched2.dest_apt,
-                            sched1_cxr: sched1.airline_code, sched2_cxr: sched2.airline_code,
-                            sched1_id: sched1.id,
-                            sched1_eff_dates: sched1.effective_dates,
-                            sched1_operating: sched1.arr_op_days,
-                            sched2_id: sched2.id,
-                            sched2_eff_dates: sched2.effective_dates,
-                            sched2_operating: sched2.dep_op_days,
-                            eff: window[:eff].to_date,
-                            disc: window[:disc].to_date,
-                            operating_window: op_window )
-
+                  # possible_routes <<  BrandConnection.new(brand: brand,
+                  #           origin: origin_code, via: via_code, dest: sched2.dest_apt,
+                  #           sched1_cxr: sched1.airline_code, sched2_cxr: sched2.airline_code,
+                  #           sched1_id: sched1.id,
+                  #           sched1_eff_dates: sched1.effective_dates,
+                  #           sched1_operating: sched1.arr_op_days,
+                  #           sched2_id: sched2.id,
+                  #           sched2_eff_dates: sched2.effective_dates,
+                  #           sched2_operating: sched2.dep_op_days,
+                  #           eff: window[:eff].to_date,
+                  #           disc: window[:disc].to_date,
+                  #           operating_window: op_window )
+                  routes <<  [
+                                brand.id,  # brand
+                                origin_code,  # origin
+                                via_code,  # via
+                                sched2.dest_apt,  # dest
+                                sched1.airline_code,  # sched1_cxr
+                                sched2.airline_code,  # sched2_cxr
+                                sched1.id,  # sched1_id
+                                sched1.effective_dates,  # sched1_eff_dates
+                                sched1.arr_op_days,  # sched1_operating
+                                sched2.id,  # sched2_id
+                                sched2.effective_dates,  # sched2_eff_dates
+                                sched2.dep_op_days,  # sched2_operating
+                                window[:eff].to_date,  # eff
+                                window[:disc].to_date,  # disc
+                                op_window #operating_window
+                                ]
                 end
               end
             end
            # possible_routes.uniq!{|route| [route.dest, route.eff_window, route.operating_window]  }
-           possible_routes
+           # byebug
+           # routes << possible_routes
 
         end
-        routes = routes + routes_for_origin.compact.flatten(1)
+        # byebug
+        # routes < routes_for_origin.compact.flatten(1)
       end
-      routes = routes.compact.flatten
+      # byebug
+      # routes = routes.compact.flatten
 
       group_size = 5000
       total_branded_connections = routes.count
@@ -88,10 +144,27 @@ module Oag
 
 
       BrandConnection.branded(brand).delete_all
-
-      routes.in_groups_of(group_size) do |connection_group|
-
-          BrandConnection.import connection_group.compact
+      columns = [
+                  :brand_id,
+                  :origin,
+                  :via,
+                  :dest,
+                  :sched1_cxr,
+                  :sched2_cxr,
+                  :sched1_id,
+                  :sched1_eff_dates,
+                  :sched1_operating,
+                  :sched2_id,
+                  :sched2_eff_dates,
+                  :sched2_operating,
+                  :eff,
+                  :disc,
+                  :operating_window
+      ]
+      routes_array = routes.to_a
+      routes_array.in_groups_of(group_size) do |connection_group|
+          BrandConnection.import(columns, connection_group.compact, :validate => false)
+          # BrandConnection.import(connection_group.compact, :validate => false)
           Rails.logger.info "Saving brand connections #{connection_group.compact.count} " +
                             " of #{tot} remaining for #{brand.brand_key}"
           tot = tot - connection_group.compact.count
@@ -147,74 +220,98 @@ module Oag
       end
 
       total_direct_markets =  direct_route_requests.keys.count
-      direct_route_requests.keys.each_with_index do |k, direct_mkt_idx|
+      ActiveRecord::Base.transaction do
+        direct_route_requests.keys.each_with_index do |k, direct_mkt_idx|
 
-              Rails.logger.info "(#{brand.brand_key}) Saving 1 Segment Routes for #{k.first}-#{k.last}, #{direct_mkt_idx+1} of (#{total_direct_markets}) "
-              bmr_set = direct_route_requests[k]
-              BrandedMarketSegmentsRequest.create(brand: brand,
-                        origin: k.first, dest:k.last, segment_count: 1,
-                        branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
+                Rails.logger.info "(#{brand.brand_key}) Saving 1 Segment Routes for #{k.first}-#{k.last}, #{direct_mkt_idx+1} of (#{total_direct_markets}) "
+                bmr_set = direct_route_requests[k]
+                BrandedMarketSegmentsRequest.create(brand: brand,
+                          origin: k.first, dest:k.last, segment_count: 1,
+                          branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
+        end
       end
-
 
 
    end
 
-   def one_stop_market_routes(brand, origin, dest)
+   def one_stop_market_routes(brand)
 
-     #  1 Stops
+      #  1 Stops
+     one_stop_markets = BrandConnection.branded(brand).distinct(:origin,:dest).pluck(:origin, :dest).sort
 
-      mkt_connections = BrandConnection.branded(brand).market(origin,dest)
 
-      routes =  mkt_connections.to_a.uniq{|c| c.key}
+     Parallel.each_with_index(one_stop_markets, in_threads: 8) do |market, index|
+         # two_segment_markets.each_with_index do |market, index|
 
-      routes_requests = []
-      routes.each do |c|
-        routes_requests =  routes_requests + c.to_route_requests
-      end
+           origin, dest = market
 
-      grouped_rrs = routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
-      grouped_rrs.each do |keys, group|
-           brr1 =
-           BrandedRouteRequest.where(
-           group.first[0].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
-               .merge(cxrs: group.map{|rr_list| rr_list[0].cxrs}
-               .flatten.sort.uniq)
-           ).first_or_create!
-           brr2 =
-           BrandedRouteRequest.where(
-           group.first[1].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
-               .merge(cxrs: group.map{|rr_list| rr_list[1].cxrs}
-               .flatten.sort.uniq)
-           ).first_or_create!
-
-           bmrrs_intersection = brr1.branded_market_requests.where(seg_count: 2) & brr2.branded_market_requests.where(seg_count: 2)
-
-           if bmrrs_intersection.count > 1
-             raise("There should only be 1 Branded Market Request for brr1_id #{brr1.id} brr2_id #{brr2.id}")
-           end
-
-           if bmrrs_intersection.blank?
-            bmr =  BrandedMarketRequest.create(brand: brand, origin: origin, dest: dest, seg_count: 2)
-            bmr.branded_route_requests << [brr1,brr2]
-            bmr.save
-
-           else
-             bmr = bmrrs_intersection.first
-
-           end
+           Rails.logger.info " ==== (#{brand.brand_key}) Building Two Segment mkt requests  for #{origin} #{dest} "
+           Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{two_segment_markets.count}) "
 
 
 
-           grouped_rrs[keys] = bmr
 
-      end
-      mkt_route_requests = grouped_rrs.values
+            connections_for_market = BrandConnection.branded(brand).market(origin,dest)
 
-      through_requests = mkt_route_requests.map{|bmr| bmr.through_market_request}.compact
-      market_route_map = mkt_route_requests + through_requests
+            uniq_routes =  connections_for_market.to_a.uniq{|c| c.key}
 
-      market_route_map.compact
+            uniq_routes_requests = Set.new
+            uniq_routes.each do |c|
+              uniq_routes_requests <<  c.to_route_requests
+            end
+
+            grouped_rrs = uniq_routes_requests.to_a.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
+            branded_market_requests = Set.new
+            grouped_rrs.each do |host_market_key, group|
+                brr1 =
+                BrandedRouteRequest.where(
+                group.first[0].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
+                   .merge(cxrs: group.map{|rr_list| rr_list[0].cxrs}
+                   .flatten.sort.uniq)
+                ).first_or_create!
+                brr2 =
+                BrandedRouteRequest.where(
+                group.first[1].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
+                   .merge(cxrs: group.map{|rr_list| rr_list[1].cxrs}
+                   .flatten.sort.uniq)
+                ).first_or_create!
+
+                bmrrs_intersection = brr1.branded_market_requests.where(seg_count: 2) & brr2.branded_market_requests.where(seg_count: 2)
+
+                raise("There should only be 1 Branded Market Request for brr1_id #{brr1.id} brr2_id #{brr2.id}") if bmrrs_intersection.count > 1
+
+                if bmrrs_intersection.blank?
+                bmr =  BrandedMarketRequest.create(brand: brand, origin: origin, dest: dest, seg_count: 2)
+                bmr.branded_route_requests << [brr1,brr2]
+                bmr.save
+
+                else
+                 bmr = bmrrs_intersection.first
+
+                end
+
+
+                branded_market_requests << bmr
+                # grouped_rrs[keys] = bmr
+
+            end
+
+
+            # Currently through_market_request is returning nil and compacting into an empty array
+            through_requests = branded_market_requests.map{|bmr| bmr.through_market_request}.compact
+            market_requests = branded_market_requests.to_a + through_requests
+
+            market_requests.compact
+
+            unless  market_requests.blank?
+                BrandedMarketSegmentsRequest.create(brand: brand,
+                                                 origin: origin, dest:dest, segment_count: segment_count,
+                                                 branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
+            end
+       end
+
+
+
    end
 
     def two_stop_routes(brand)
@@ -368,27 +465,8 @@ module Oag
 
          when 2
            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 2)
+           market_requests = one_stop_market_routes(brand)
 
-           two_segment_markets = BrandConnection.branded(brand).pluck(:origin, :dest).sort.uniq
-
-
-           Parallel.each_with_index(two_segment_markets, in_threads: 8) do |market, index|
-           # two_segment_markets.each_with_index do |market, index|
-
-             origin, dest = market
-
-             Rails.logger.info " ==== (#{brand.brand_key}) Building Two Segment mkt requests  for #{origin} #{dest} "
-             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{two_segment_markets.count}) "
-
-             market_requests = one_stop_market_routes(brand, origin, dest)
-
-
-             unless  market_requests.blank?
-               BrandedMarketSegmentsRequest.create(brand: brand,
-                                                 origin: origin, dest:dest, segment_count: segment_count,
-                                                 branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
-             end
-           end
 
          when 3
            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 3)
@@ -559,6 +637,22 @@ module Oag
         JSON.pretty_generate({})
       end
     end
+
+    # def brand_route_map_validator_document(brand)
+    #   brmv = BrandedRouteMapValidator.branded(brand)
+    #   unless brmv.blank?
+    #
+    #     csv_string = CSV.generate do |csv|
+    #          possible_route_map_rows.each do |row|
+    #            csv << row.split (',')
+    #          end
+    #     end
+    #     csv_string
+    #   else
+    #     ''
+    #   end
+    # end
+
 
     def export_brand_route_maps(brand)
       File.open("#{brand.brand_key.downcase}_route_map.json", 'w') {|f| f.write(

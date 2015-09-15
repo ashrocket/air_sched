@@ -19,6 +19,7 @@ ActiveAdmin.register BrandedMarketRouteMap do
   #   permitted
   # end
   index do
+          column :id
           column :brand do |branded_market_route_map|
             content_tag :ul, class: 'list-group' do
               content_tag(:li, class: 'list-group-item') do
@@ -26,7 +27,8 @@ ActiveAdmin.register BrandedMarketRouteMap do
               end
             end
           end
-          column :id
+          column :origin
+          column :dest
           column :route_map
 
           actions

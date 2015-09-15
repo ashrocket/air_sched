@@ -1,0 +1,24 @@
+%p#notice= notice
+%p#alert= alert
+
+%dl.dl-horizontal
+  %dt ID:
+  %dd= @branded_route_map.id
+  %dt Brand:
+  %dd= link_to(@branded_route_map.brand.name, admin_brand_path(@branded_route_map.brand))
+
+  %br
+  %dt Route Map:
+  %dd
+  %br
+%pre
+  %code{class:'JSON'}= JSON.pretty_generate(@branded_route_map.route_map)
+  -#%dt Market Requests:
+  -#%dd
+  -#  %ul#sorted_hosts.list-group
+  -#    - @branded_route_map.branded_market_requests.sort_by{|bmr| [bmr.origin, bmr.dest, bmr.seg_count]}.each do |bmr|
+  -#      %li.list-group-item
+  -#        = link_to("#{bmr.origin} #{bmr.dest}  #{bmr.seg_count} segs - #{bmr.id}", [:admin,bmr])
+
+
+  %br

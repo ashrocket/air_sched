@@ -29,6 +29,7 @@
 #= require bootstrap-toggle/js/bootstrap-toggle
 
 #= require bootstrap_init
+#= require highlightjs/highlight.pack.js
 
 
 
@@ -91,4 +92,4 @@
 #  $('.js-remove-from-array-input').click (e) ->
 #    e.preventDefault
 #    removeFromArrayInput $(@)
-
+hljs.initHighlightingOnLoad();

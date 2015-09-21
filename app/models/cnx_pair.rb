@@ -8,6 +8,8 @@ class CnxPair < ActiveRecord::Base
   # :dest_name
   # :cxr
   belongs_to :report_key
+  belongs_to :origin_airport, class_name: 'Airport'
+  belongs_to :dest_airport, class_name: 'Airport'
 
   scope :from_airport,       lambda {|origin| where("origin = ?",  origin)}
   #scope :cxx,  lambda {|cxx| where("cxr = ?",  cxx)}

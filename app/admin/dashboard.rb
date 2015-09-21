@@ -1,7 +1,9 @@
 ActiveAdmin.register_page "Dashboard" do
 
   menu priority: 0, label: proc{ I18n.t("active_admin.dashboard") }
-
+  action_item :view_site do
+        link_to "View Site", "/"
+  end
   content title: proc{ I18n.t("active_admin.dashboard") } do
     div do
       @app_control =  AppControl.first

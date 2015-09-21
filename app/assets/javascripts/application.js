@@ -10,11 +10,6 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery/dist/jquery
-//= require jquery-ui/jquery-ui
-//= require jquery-ui/ui/core
-//= require jquery-ui/ui/progressbar
-//= require jquery-ui/ui/widget
 //= require js-routes
 //= require bootstrap
 //= require jasny-bootstrap/dist/js/jasny-bootstrap

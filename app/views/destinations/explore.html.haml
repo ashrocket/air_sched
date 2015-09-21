@@ -39,6 +39,14 @@
   .row
     .col-sm-12
       .panel#destinations_panel
+        - row_count = @origins.count/4
+        - rows = @origins.in_groups(row_count)
+        - rows.each_with_index do |columns, idx|
+          .row
+            .col-sm-12
+              - columns.each_with_index do |origin, col_idx|
+                .dest_airport.col-sm-3
+                  = link_to origin.name, search_path(origin_code: origin.code)
 
   .row
     %br

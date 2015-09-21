@@ -4,6 +4,12 @@ gem 'puma', '2.10.2'
 # ORM related gems
 gem 'pg', '~> 0.18.2'
 gem 'postgres_ext', '~> 2.4.1'
+
+# Pull from CDN or fallback
+gem 'jquery-rails-cdn', '~> 1.0.3'
+gem 'jquery-ui-rails-cdn', '~> 0.2.0'
+
+
 gem 'arel-helpers', '~> 2.1.0'
 gem 'acts_as_singleton'
 gem 'acts_as_list', '~> 0.7.2'
@@ -75,7 +81,7 @@ group :development, :test do
     gem 'byebug'
     gem 'rspec',  '~> 3.0.0.beta2'
     gem 'rspec-rails',  '~> 3.0.0.beta2'
-
+    gem 'rack-mini-profiler'
 
     gem 'cucumber'
     gem 'cucumber-rails', :require=>false

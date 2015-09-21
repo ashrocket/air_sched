@@ -1,6 +1,7 @@
 class OagSchedulesController < ApplicationController
 
   def mkt
+
     is_int = Integer(params[:origin]) rescue nil
     if is_int
       o = Airport.find(params[:origin]).code
@@ -9,15 +10,16 @@ class OagSchedulesController < ApplicationController
       o = params[:origin].upcase
       d = params[:dest].upcase
     end
-    @oag_schedules = OagSchedule.keyed(AppControl.report_key).market(o,d)
+    @oag_schedules = OagSchedule.keyed(AppControl.singleton.report_key).market(o,d)
 
   end
   def to_hub
+
     origin = params[:origin]
     if origin.eql?  ABBConfig.hub.upcase
       @oag_schedules = OagSchedule.none
     else
-      @oag_schedules = OagSchedule.keyed(AppControl.report_key).hub(ABBConfig.hub.upcase).departing(origin.upcase)
+      @oag_schedules = OagSchedule.keyed(AppControl.singleton.report_key).hub(ABBConfig.hub.upcase).departing(origin.upcase)
     end
 
     render :mkt
@@ -29,7 +31,7 @@ class OagSchedulesController < ApplicationController
       OagSchedule.none
       @oag_schedules = OagSchedule.none
     else
-      @oag_schedules = OagSchedule.keyed(AppControl.report_key).hub(ABBConfig.hub.upcase).arriving(dest.upcase)
+      @oag_schedules = OagSchedule.keyed(AppControl.singleton.report_key).hub(ABBConfig.hub.upcase).arriving(dest.upcase)
     end
     render :mkt
 

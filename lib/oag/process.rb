@@ -221,13 +221,18 @@ module Oag
           pairs.in_groups_of(group_size) do |pair_group|
             report.stash_log "Building #{pair_group.count} connection pairs out of #{tot} remaining #{report.report_key_code}"
             tot -= group_size
-            pair_group.compact.each do |pair|
-               o_name =  Airport.cached_name(pair[0])
-               d_name = Airport.cached_name(pair[1])
+            pair_group.compact.each do |origin_code, dest_code|
+              cached()
+               o_a =  Airport.cached(origin_code)
+               d_a = Airport.cached(dest_code)
+               o_name = o_a ? o_a.name : 'Unknown Airport'
+               d_name = d_a ? d_a.name : 'Unknown Airport'
                # connections << CnxPair.new(report_key: report.report_key, origin: pair[0], origin_name: o_name, dest: pair[1], dest_name: d_name)
-               connections << [report.report_key.id, pair[0], o_name, pair[1],  d_name]
+               connections << [report.report_key.id,
+                               origin_code,  o_name, d_a ? d_a.id : nil,
+                               dest_code,    d_name, d_a ? d_a.id : nil ]
             end
-            columns = [:report_key_id,:origin,:origin_name,:dest,:dest_name]
+            columns = [:report_key_id,:origin,:origin_name, :origin_airport_id, :dest,:dest_name, :dest_airport_id]
             CnxPair.import columns, connections
             connections = []
           end

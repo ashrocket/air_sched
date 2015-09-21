@@ -23,11 +23,9 @@
       = "connecting trips for #{ReportKey.current_report.name}"
   .row
     %br
-
   .row
     - href = "search"
     .panel#destinations_panel{data: {url: "#{href}"}}
-
     - @destinations.each do |dest|
       .row
         .col-sm-12

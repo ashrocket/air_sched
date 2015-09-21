@@ -4,7 +4,9 @@ class Airport < ActiveRecord::Base
   extend FriendlyId
   friendly_id :code, use: [:slugged, :finders]
 
-  scope :by_code,   lambda {|code| where(:code => code)}
+  scope :by_code,   lambda {|code| find_by(code: code)}
+
+  validates_uniqueness_of :code
 
   def correct_name
     name.sub(' 00', '')
@@ -18,7 +20,7 @@ class Airport < ActiveRecord::Base
 
   def cached code
     Rails.cache.fetch("airport_#{code}", :expires_in => 4.minutes) do
-      by_code(code).first
+      by_code(code)
     end
   end
   def cached_name(code)

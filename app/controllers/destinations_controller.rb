@@ -13,6 +13,9 @@ class DestinationsController < ApplicationController
   end
 
   def explore
+    # @destinations = Destination.keyed(ReportKey.current_key)
+    @origins =   Destination.origins
+    @origins =   @origins.to_a.sort_by!(&:name)
   end
 
   def hubs

@@ -13,7 +13,7 @@ module Oag
     
 
     def filter_destinations(report)
-      dests = Destination.keyed(report.report_key)
+      dests = Destination.keyed(report.report_key).unfiltered
 
       group_size = 5000
       tot = dests.count
@@ -24,7 +24,8 @@ module Oag
         report.stash_log "Filtering #{dest_group.compact.count} destinations from #{tot} remaining for #{report.report_key_code}"
 
         filtered_destinations = []
-        Parallel.each_with_index(dest_group, in_threads:4) do |dest, index|
+        # Parallel.each_with_index(dest_group, in_threads:4) do |dest, index|
+        dest_group.each_with_index do |dest, index|
           # Oag::Util.refresh_forked_process_postgres_db_connection
           if dest
 

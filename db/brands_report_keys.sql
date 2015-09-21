@@ -60,7 +60,7 @@ CREATE TABLE airlines_hosts (
 );
 
 
-ALTER TABLE airlines_hosts OWNER TO postgres;
+ALTER TABLE public.airlines_hosts OWNER TO postgres;
 
 --
 -- Name: airlines_hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -74,7 +74,7 @@ CREATE SEQUENCE airlines_hosts_id_seq
     CACHE 1;
 
 
-ALTER TABLE airlines_hosts_id_seq OWNER TO postgres;
+ALTER TABLE public.airlines_hosts_id_seq OWNER TO postgres;
 
 --
 -- Name: airlines_hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -94,7 +94,7 @@ CREATE TABLE brand_report_keys (
 );
 
 
-ALTER TABLE brand_report_keys OWNER TO postgres;
+ALTER TABLE public.brand_report_keys OWNER TO postgres;
 
 --
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -108,7 +108,7 @@ CREATE SEQUENCE brand_report_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE brand_report_keys_id_seq OWNER TO postgres;
+ALTER TABLE public.brand_report_keys_id_seq OWNER TO postgres;
 
 --
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -137,7 +137,7 @@ CREATE TABLE brands (
 );
 
 
-ALTER TABLE brands OWNER TO postgres;
+ALTER TABLE public.brands OWNER TO postgres;
 
 --
 -- Name: brands_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -151,7 +151,7 @@ CREATE SEQUENCE brands_id_seq
     CACHE 1;
 
 
-ALTER TABLE brands_id_seq OWNER TO postgres;
+ALTER TABLE public.brands_id_seq OWNER TO postgres;
 
 --
 -- Name: brands_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -174,7 +174,7 @@ CREATE TABLE hosts (
 );
 
 
-ALTER TABLE hosts OWNER TO postgres;
+ALTER TABLE public.hosts OWNER TO postgres;
 
 --
 -- Name: hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -188,7 +188,7 @@ CREATE SEQUENCE hosts_id_seq
     CACHE 1;
 
 
-ALTER TABLE hosts_id_seq OWNER TO postgres;
+ALTER TABLE public.hosts_id_seq OWNER TO postgres;
 
 --
 -- Name: hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -215,7 +215,7 @@ CREATE TABLE report_keys (
 );
 
 
-ALTER TABLE report_keys OWNER TO postgres;
+ALTER TABLE public.report_keys OWNER TO postgres;
 
 --
 -- Name: report_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -229,7 +229,7 @@ CREATE SEQUENCE report_keys_id_seq
     CACHE 1;
 
 
-ALTER TABLE report_keys_id_seq OWNER TO postgres;
+ALTER TABLE public.report_keys_id_seq OWNER TO postgres;
 
 --
 -- Name: report_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -285,9 +285,14 @@ COPY airlines_hosts (id, airline_id, host_id) FROM stdin;
 7	4290	1
 8	3011	7
 9	4445	9
-10	4183	10
 11	4212	10
-12	4290	10
+13	3011	11
+14	4445	12
+15	4212	13
+16	3629	1
+17	4083	1
+18	3437	14
+19	4212	15
 \.
 
 
@@ -295,7 +300,7 @@ COPY airlines_hosts (id, airline_id, host_id) FROM stdin;
 -- Name: airlines_hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('airlines_hosts_id_seq', 12, true);
+SELECT pg_catalog.setval('airlines_hosts_id_seq', 19, true);
 
 
 --
@@ -305,9 +310,19 @@ SELECT pg_catalog.setval('airlines_hosts_id_seq', 12, true);
 COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
 13	1	51
 14	1	52
-15	1	53
-16	1	50
-17	1	11
+18	1	50
+19	7	52
+20	7	51
+21	8	52
+22	8	50
+23	8	51
+24	1	53
+25	1	13
+26	1	11
+27	7	50
+28	1	12
+29	9	54
+30	9	50
 \.
 
 
@@ -315,7 +330,7 @@ COPY brand_report_keys (id, brand_id, report_key_id) FROM stdin;
 -- Name: brand_report_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brand_report_keys_id_seq', 17, true);
+SELECT pg_catalog.setval('brand_report_keys_id_seq', 30, true);
 
 
 --
@@ -323,7 +338,10 @@ SELECT pg_catalog.setval('brand_report_keys_id_seq', 17, true);
 --
 
 COPY brands (id, brand_key, name, report_keys, description, default_currency, active, slug, created_at, updated_at, data_states, max_segments) FROM stdin;
-1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-13 06:27:52.10219	{"route_maps":{"state":"idle","updated_at":"2015-09-13T02:27:52.100-04:00","markets":1476},"smart_routes":{"state":"idle","count":[{"segs":2,"count":1372},{"segs":1,"count":144}],"updated_at":"2015-09-13T02:16:48.816-04:00"},"route_maps_export":"idle"}	3
+9	JWBRAND	Vanilla Air	{}		JPY	t	jw	2015-09-17 14:49:33.891291	2015-09-21 00:29:00.358648	{"route_maps_export":{"state":"idle","location":"https://s3.amazonaws.com/ashr.airblackbox-routes/jwbrand_route_map.json.zip","updated_at":"2015-09-21T00:09:34.485+00:00"},"branded_connections":{"state":"idle","count":3758,"updated_at":"2015-09-21T00:24:08.403+00:00"},"smart_routes":{"state":"idle","count":[{"segs":1,"count":44},{"segs":2,"count":168},{"segs":3,"count":118}],"updated_at":"2015-09-21T00:26:47.406+00:00"},"route_maps":{"state":"idle","updated_at":"2015-09-21T00:29:00.357+00:00","markets":312}}	3
+7	DD	NokAir	{}	Nok Air Brand	THB	f	dd	2015-09-13 07:46:49.318517	2015-09-14 12:24:03.208322	{"smart_routes":{"state":"idle","count":[{"segs":1,"count":92},{"segs":2,"count":966},{"segs":3,"count":788}],"updated_at":"2015-09-14T12:17:16.137+00:00"},"route_maps":{"state":"idle","updated_at":"2015-09-14T12:21:48.310+00:00","markets":1540},"route_maps_export":{"state":"idle","location":"https://s3.amazonaws.com/ashr.airblackbox-routes/dd_route_map.json.zip","updated_at":"2015-09-14T12:24:03.207+00:00"},"branded_connections":{"state":"idle","count":12183,"updated_at":"2015-09-14T12:12:24.973+00:00"}}	3
+8	XW	NokScoot Brand	{}	NokScoot Brand	THB	t	xw	2015-09-13 19:05:04.889656	2015-09-21 00:33:02.252833	{"smart_routes":{"state":"idle","count":[{"segs":2,"count":966},{"segs":1,"count":92},{"segs":3,"count":788}],"updated_at":"2015-09-21T00:33:02.252+00:00"},"route_maps_export":{"state":"processing"},"branded_connections":{"state":"idle","count":11974,"updated_at":"2015-09-21T00:07:50.373+00:00"},"route_maps":{"state":"processing"}}	3
+1	TZ	Scoot	{}	Scoot Interline Network	AUD	t	tz	2015-07-27 23:10:16.232478	2015-09-21 00:26:24.147113	{"branded_connections":{"state":"idle","count":218951,"updated_at":"2015-09-20T23:50:55.015+00:00"},"smart_routes":{"state":"idle","count":[{"segs":2,"count":1608},{"segs":1,"count":165},{"segs":3,"count":2701}],"updated_at":"2015-09-21T00:26:24.146+00:00"},"route_maps":{"state":"idle","updated_at":"2015-09-15T12:30:28.134+00:00","markets":3647},"route_maps_export":{"state":"processing"}}	3
 \.
 
 
@@ -331,7 +349,7 @@ COPY brands (id, brand_key, name, report_keys, description, default_currency, ac
 -- Name: brands_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('brands_id_seq', 6, true);
+SELECT pg_catalog.setval('brands_id_seq', 9, true);
 
 
 --
@@ -339,12 +357,17 @@ SELECT pg_catalog.setval('brands_id_seq', 6, true);
 --
 
 COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
-1	1	Scoot Navitaire	TZ	2015-08-24 04:39:35.051448	2015-08-24 04:39:35.051448
 2	1	NokScoot Navitaire	XW	2015-08-24 15:45:01.123549	2015-08-24 15:45:01.123549
 5	1	Nok Navitaire	DD	2015-08-24 16:02:25.758282	2015-08-24 16:02:25.758282
-7	2	Nok Navitaire	DD	2015-08-31 09:07:40.218443	2015-08-31 09:07:40.218443
-9	2	NokScoot Navitaire	XW	2015-08-31 09:11:15.761392	2015-08-31 09:11:15.761392
-10	2	Scoot Navitaire	TZ	2015-08-31 09:11:58.301918	2015-08-31 09:11:58.301918
+9	7	NokScoot Navitaire	XW	2015-08-31 09:11:15.761392	2015-09-13 07:46:49.331967
+10	7	Scoot Navitaire	TZ	2015-08-31 09:11:58.301918	2015-09-13 07:46:49.333385
+11	8	Nok Navitaire	DD	2015-09-13 19:05:27.579007	2015-09-13 19:05:27.579007
+1	1	Scoot OwnHost Navitaire	TZ	2015-08-24 04:39:35.051448	2015-09-13 19:06:12.089581
+7	7	Nok OwnHost Navitaire	DD	2015-08-31 09:07:40.218443	2015-09-13 19:06:25.653178
+12	8	NokScoot OwnHost Navitaire	XW	2015-09-13 19:05:48.054701	2015-09-13 19:06:42.593856
+13	8	Scoot Navitaire	TZ	2015-09-13 19:07:33.5542	2015-09-13 19:08:08.760699
+14	9	Vanilla Air	JW	2015-09-17 14:49:06.487982	2015-09-17 14:49:43.359702
+15	9	Scoot Navitaire	TZ	2015-09-18 09:40:26.52999	2015-09-18 09:40:26.52999
 \.
 
 
@@ -352,7 +375,7 @@ COPY hosts (id, brand_id, name, code, created_at, updated_at) FROM stdin;
 -- Name: hosts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hosts_id_seq', 10, true);
+SELECT pg_catalog.setval('hosts_id_seq', 15, true);
 
 
 --
@@ -362,18 +385,19 @@ SELECT pg_catalog.setval('hosts_id_seq', 10, true);
 COPY report_keys (id, report_key, name, file_pattern, comment, active, slug, created_at, updated_at, state) FROM stdin;
 2	SIN	Changi Airport	(HUBSIN)_\\d+	Sinagpore, SG	t	sin	2014-08-21 04:18:19	2015-06-05 05:15:27.553249	idle
 1	MXP	Milan Airport	HUB(MXP)_\\d+	Milan, IT	t	mxp	2014-08-21 04:18:04	2015-06-09 18:10:49.073466	idle
-13	TZBRANDMI	Silk Air	TZBRAND_MI_\\d+	LCC Alliance	t	tzbrandmi	2015-08-04 02:37:28.328034	2015-08-04 02:40:01.532276	idle
 16	SINCXX5JTZ	Singapore Cebu And Scoot	HUB(SIN_CXX5JTZ)_\\d+	Singapore	t	sin-cxx5jtz	2015-06-04 19:55:40.431811	2015-06-05 05:13:39.380934	idle
 3	MAN	Manchester Airport	HUB(MAN)_\\d+	Manchester, UK	t	man	2014-08-21 04:19:04	2015-06-05 05:15:46.961036	idle
-12	TZBRANDSG	Singapore Airlines	(TZBRAND_SQ)_\\d+	LCC Alliance	t	tzbrandsg	2015-08-04 02:39:15.01327	2015-09-09 02:12:03.12	processing
-6	SNN	Shannon Airport	HUB(SNN)_\\d+	Shannon, Ireland	t	snn	2014-08-21 20:56:20	2015-09-13 02:10:53.853028	processing
-10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-13 02:11:23.793702	processing
-51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-13 02:11:53.899759	processing
-53	TR	Tiger Singapore OAG Schedule	(TZBRAND_TR).*	LCC Alliance	t	tr	2015-09-08 18:22:24.379082	2015-09-13 02:21:25.013872	processing
-11	TZBRANDVA	Virgina Australia	(TZBRAND_VA)_\\d+	LCC Alliance	t	tzbrandva	2015-08-04 02:40:23.300228	2015-09-13 02:48:07.83485	idle
-52	DD	NokAir Oag Schedules	(DDBRAND_DD).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-13 03:07:55.686591	idle
-4	FR	Ryan Air	CXX(FR)_\\d+	All Cities	t	fr	2014-08-21 04:29:52	2015-09-13 03:20:47.661166	idle
-50	TZ	Scoot OAG Schedules	(TZBRAND_TZ).*		t	tz	2015-09-08 18:08:53.135762	2015-09-13 03:22:17.043978	idle
+50	TZ	Scoot OAG Schedules	(TZBRAND_TZ).*		t	tz	2015-09-08 18:08:53.135762	2015-09-21 02:22:25.984364	processing
+12	TZBRANDSG	Singapore Airlines	(TZBRAND_SQ).*	LCC Alliance	t	tzbrandsg	2015-08-04 02:39:15.01327	2015-09-21 02:25:56.873902	processing
+10	TZTRDDXW	LCC Alliance	CXX(TZTRDDXW)_\\d+	Asia Pacific	t	tztgddxw	2015-07-18 02:19:41.755081	2015-09-21 11:52:49.919545	idle
+52	DD	NokAir Oag Schedules	(DDBRAND_DD).*	LCC Alliance	t	dd	2015-09-08 18:10:26.877011	2015-09-21 11:56:05.007828	idle
+53	TR	Tiger Singapore OAG Schedule	(TZBRAND_TR).*	LCC Alliance	t	tr	2015-09-08 18:22:24.379082	2015-09-21 11:58:50.147883	idle
+13	TZBRANDMI	Silk Air	(TZBRAND_MI).*	LCC Alliance	t	tzbrandmi	2015-08-04 02:37:28.328034	2015-09-21 12:00:48.435706	processing
+6	SNN	Shannon Airport	HUB(SNN)_\\d+	Shannon, Ireland	t	snn	2014-08-21 20:56:20	2015-09-20 02:30:16.40537	idle
+54	JW	Vanilla Air	(JWBRAND).*		t	jw-brand	2015-09-17 15:08:17.762238	2015-09-18 09:15:14.850879	idle
+11	TZBRANDVA	Virgina Australia	(TZBRAND_VA).*	LCC Alliance	t	tzbrandva	2015-08-04 02:40:23.300228	2015-09-21 02:12:26.188934	idle
+51	XW	NokScoot Oag Schedules	(XWBRAND_XW).*	LCC Alliance	t	xw	2015-09-08 18:09:48.969443	2015-09-21 02:15:11.345517	idle
+4	FR	Ryan Air	CXX(FR)_\\d+	All Cities	t	fr	2014-08-21 04:29:52	2015-09-21 02:16:24.632744	processing
 \.
 
 
@@ -381,7 +405,7 @@ COPY report_keys (id, report_key, name, file_pattern, comment, active, slug, cre
 -- Name: report_keys_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('report_keys_id_seq', 53, true);
+SELECT pg_catalog.setval('report_keys_id_seq', 54, true);
 
 
 --

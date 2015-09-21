@@ -11,6 +11,217 @@ SET client_min_messages = warning;
 
 SET search_path = public, pg_catalog;
 
+DROP INDEX public.index_interline_cxr_rules_on_report_key_id;
+DROP INDEX public.index_airports_on_slug;
+DROP INDEX public.index_airports_on_code;
+DROP INDEX public.index_airlines_on_slug;
+DROP INDEX public.index_airlines_on_code;
+ALTER TABLE ONLY public.interline_cxr_rules DROP CONSTRAINT interline_cxr_rules_pkey;
+ALTER TABLE ONLY public.airports DROP CONSTRAINT airports_pkey;
+ALTER TABLE ONLY public.airport_currencies DROP CONSTRAINT airport_currencies_pkey;
+ALTER TABLE ONLY public.airlines DROP CONSTRAINT airlines_pkey;
+ALTER TABLE public.interline_cxr_rules ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.airports ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.airport_currencies ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.airlines ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE public.interline_cxr_rules_id_seq;
+DROP TABLE public.interline_cxr_rules;
+DROP SEQUENCE public.airports_id_seq;
+DROP TABLE public.airports;
+DROP SEQUENCE public.airport_currencies_id_seq;
+DROP TABLE public.airport_currencies;
+DROP SEQUENCE public.airlines_id_seq;
+DROP TABLE public.airlines;
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: airlines; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE airlines (
+    id integer NOT NULL,
+    code character varying,
+    name character varying,
+    country_name character varying,
+    slug character varying
+);
+
+
+ALTER TABLE public.airlines OWNER TO postgres;
+
+--
+-- Name: airlines_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE airlines_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.airlines_id_seq OWNER TO postgres;
+
+--
+-- Name: airlines_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE airlines_id_seq OWNED BY airlines.id;
+
+
+--
+-- Name: airport_currencies; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE airport_currencies (
+    id integer NOT NULL,
+    name character varying,
+    city character varying,
+    iata character varying,
+    icao character varying,
+    country character varying,
+    country_code character varying,
+    latitude numeric(64,12),
+    longitude numeric(64,12),
+    currency_code character varying
+);
+
+
+ALTER TABLE public.airport_currencies OWNER TO postgres;
+
+--
+-- Name: airport_currencies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE airport_currencies_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.airport_currencies_id_seq OWNER TO postgres;
+
+--
+-- Name: airport_currencies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE airport_currencies_id_seq OWNED BY airport_currencies.id;
+
+
+--
+-- Name: airports; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE airports (
+    id integer NOT NULL,
+    code character varying,
+    name character varying,
+    city character varying,
+    lat numeric(10,6),
+    long numeric(10,6),
+    slug character varying
+);
+
+
+ALTER TABLE public.airports OWNER TO postgres;
+
+--
+-- Name: airports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE airports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.airports_id_seq OWNER TO postgres;
+
+--
+-- Name: airports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE airports_id_seq OWNED BY airports.id;
+
+
+--
+-- Name: interline_cxr_rules; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE interline_cxr_rules (
+    id integer NOT NULL,
+    report_key_id integer,
+    patterns text[] DEFAULT '{(?!)}'::text[],
+    match_on character varying DEFAULT 'id'::character varying,
+    rule_kind character varying DEFAULT 'allow'::character varying NOT NULL,
+    active boolean DEFAULT true,
+    sequence integer DEFAULT 0,
+    description text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.interline_cxr_rules OWNER TO postgres;
+
+--
+-- Name: interline_cxr_rules_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE interline_cxr_rules_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.interline_cxr_rules_id_seq OWNER TO postgres;
+
+--
+-- Name: interline_cxr_rules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE interline_cxr_rules_id_seq OWNED BY interline_cxr_rules.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY airlines ALTER COLUMN id SET DEFAULT nextval('airlines_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY airport_currencies ALTER COLUMN id SET DEFAULT nextval('airport_currencies_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY airports ALTER COLUMN id SET DEFAULT nextval('airports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY interline_cxr_rules ALTER COLUMN id SET DEFAULT nextval('interline_cxr_rules_id_seq'::regclass);
+
+
 --
 -- Data for Name: airlines; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -9693,7 +9904,6 @@ COPY airports (id, code, name, city, lat, long, slug) FROM stdin;
 524	ISA	Mount Isa	Mount Isa	\N	\N	isa
 251	AOI	Ancona	Ancona	43.616389	13.362222	aoi
 36	BEG	Belgrade	Belgrade	44.818444	20.309139	beg
-207	BES	Brest (FR)	Brest (FR)	48.447911	-4.418539	bes
 50	BEY	Beirut	Beirut	33.820931	35.488389	bey
 342	BFS	Belfast International Apt	Belfast	54.657500	-6.215833	bfs
 438	BFV	Buriram	Buriram	15.229539	103.253231	bfv
@@ -10193,6 +10403,14 @@ COPY airports (id, code, name, city, lat, long, slug) FROM stdin;
 481	YYC	Calgary	Calgary	51.113888	-114.020278	yyc
 17	YYZ	Lester B Pearson Intl	Toronto	43.677223	-79.630556	yyz
 447	URT	Surat Thani	Surat Thani	9.132500	99.135556	urt
+207	BES	Brest	Brest	48.447911	-4.418539	bes
+611	CTS	Sapporo New Chitose Apt	Sapporo	\N	\N	cts
+612	OKA	Okinawa Naha Apt	Okinawa	\N	\N	oka
+613	ASJ	Amami	Amami	\N	\N	asj
+614	JJN	Quanzhou	Quanzhou	\N	\N	jjn
+615	CTU	Chengdu	Chengdu	\N	\N	ctu
+616	INC	Yinchuan	Yinchuan	\N	\N	inc
+617	LKO	Lucknow	Lucknow	\N	\N	lko
 \.
 
 
@@ -10200,7 +10418,7 @@ COPY airports (id, code, name, city, lat, long, slug) FROM stdin;
 -- Name: airports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('airports_id_seq', 610, true);
+SELECT pg_catalog.setval('airports_id_seq', 617, true);
 
 
 --
@@ -10218,6 +10436,73 @@ COPY interline_cxr_rules (id, report_key_id, patterns, match_on, rule_kind, acti
 --
 
 SELECT pg_catalog.setval('interline_cxr_rules_id_seq', 2, true);
+
+
+--
+-- Name: airlines_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY airlines
+    ADD CONSTRAINT airlines_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: airport_currencies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY airport_currencies
+    ADD CONSTRAINT airport_currencies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: airports_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY airports
+    ADD CONSTRAINT airports_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: interline_cxr_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY interline_cxr_rules
+    ADD CONSTRAINT interline_cxr_rules_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_airlines_on_code; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airlines_on_code ON airlines USING btree (code);
+
+
+--
+-- Name: index_airlines_on_slug; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airlines_on_slug ON airlines USING btree (slug);
+
+
+--
+-- Name: index_airports_on_code; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airports_on_code ON airports USING btree (code);
+
+
+--
+-- Name: index_airports_on_slug; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_airports_on_slug ON airports USING btree (slug);
+
+
+--
+-- Name: index_interline_cxr_rules_on_report_key_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX index_interline_cxr_rules_on_report_key_id ON interline_cxr_rules USING btree (report_key_id);
 
 
 --

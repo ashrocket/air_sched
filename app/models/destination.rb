@@ -13,6 +13,7 @@ class Destination < ActiveRecord::Base
 
 
   scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
+  scope :unfiltered, -> { where(filtered: false)}
 
   class << self
     #

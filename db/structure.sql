@@ -13,16 +13,14 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
--- The following was commented out by rake db:structure:fix_plpgsql
--- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -717,7 +715,9 @@ CREATE TABLE cnx_pairs (
     origin character varying(4),
     origin_name character varying,
     dest character varying(4),
-    dest_name character varying
+    dest_name character varying,
+    origin_airport_id integer,
+    dest_airport_id integer
 );
 
 
@@ -755,6 +755,7 @@ CREATE TABLE destinations (
     cxrs2 character varying[] DEFAULT '{}'::character varying[],
     dest character varying,
     dest_code character varying,
+    filtered boolean DEFAULT false NOT NULL,
     eff_days json DEFAULT '[]'::json,
     created_at timestamp without time zone,
     updated_at timestamp without time zone

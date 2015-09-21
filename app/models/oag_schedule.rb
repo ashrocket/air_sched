@@ -27,7 +27,10 @@ class OagSchedule < ActiveRecord::Base
 
   # oag_schedules = Arel::Table.new(:oag_schedules)
 
-  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
+  # scope :keyed, lambda {|report_keys| where(report_key: report_keys)}
+  def self.keyed(report_keys)
+     where(report_key: report_keys)
+  end
 
   scope :branded,     lambda {|brand| where(report_key: brand.report_keys) }
 
@@ -47,8 +50,8 @@ class OagSchedule < ActiveRecord::Base
 
 
 
-  def print
-      puts [eff_date, disc_date, airline_code, flight_num, origin_apt, dest_apt,
+  def to_schedule_string
+      [eff_date, disc_date, airline_code, flight_num, origin_apt, dest_apt,
        dep_time_local, arr_time_local, dep_op_days].join " "
       #:eff_date     =>  row[:efffrom],  :disc_date 	  => row[:effto],
       #         :airline_code => row[:carrier1],  :airline_name	=> row[:carrier1name],
@@ -100,12 +103,11 @@ class OagSchedule < ActiveRecord::Base
 
 
     def travelling_on(dep_date)
-      where.between(dep_date  '? BETWEEN eff_date and disc_date', dep_date ).operating(dep_date)
-
+      where('? BETWEEN eff_date and disc_date', dep_date ).operating(dep_date)
     end
 
-    def carriers_for_key(data_key)
-      keyed(data_key).pluck(:airline_code).uniq!
+    def carriers_for_key(report_key)
+      keyed(report_key).pluck(:airline_code).uniq!
     end
 
     def carriers_details_for_report(report)
@@ -127,22 +129,22 @@ class OagSchedule < ActiveRecord::Base
 
 
 
-    def connecting_flights(data_key, travel_date, o, d, stops, mct, maxct, earliest_arrival_time, is_next_day_arrival,cxrs)
+    def connecting_flights(report_key, travel_date, o, d, stops, mct, maxct, earliest_arrival_time, is_next_day_arrival,cxrs)
       conn_flights    = []
       last_date = (earliest_arrival_time + maxct.minutes).to_date
       dates =*(earliest_arrival_time.to_date..last_date)
       dates.each do |arrival_date|
-        x_schedules   =  keyed(data_key).connecting(o,d).travelling_on(arrival_date).for_cxrs(cxrs).stops(stops)
+        x_schedules   =  keyed(report_key).connecting(o,d).travelling_on(arrival_date).for_cxrs(cxrs).stops(stops)
         x_flights     =  x_schedules.map{|s| s.to_flight arrival_date}
         conn_flights += x_flights.select{|flt| flt.dep_time >= earliest_arrival_time}
       end
-      conn_flights.sort_by!{|flt| [flt.dep_date, flt.dep_time_local]}.each{|flt| puts flt.render}
+      conn_flights.sort_by!{|flt| [flt.dep_date, flt.dep_time_local]}.each{|flt| Rails.logger.info(flt.render)}
       conn_flights
     end
 
-    def connections_via_hub(data_key, o, d, hub, travel_date, mct, maxct, stops, cxrs)
+    def connections_via_hub(report_key, o, d, hub, travel_date, mct, maxct, stops, cxrs)
         errors = []
-        scheds  = keyed(data_key).connecting(o, hub).for_cxrs(cxrs).travelling_on(travel_date).stops(stops)
+        scheds  = keyed(report_key).connecting(o, hub).for_cxrs(cxrs).travelling_on(travel_date).stops(stops)
 
         if scheds.blank?
              errors << "No Operating Schedule found between #{o} and #{hub} on #{travel_date}"
@@ -152,8 +154,8 @@ class OagSchedule < ActiveRecord::Base
 
         unless flights.blank?
          earliest_arr_time = Flight.earliest_arrival_time(flights)
-         flights.each{ |flt| puts flt.render}
-         conn_flights = connecting_flights(data_key, travel_date, hub, d, stops, mct, maxct, earliest_arr_time, false, cxrs)
+         flights.each{ |flt| Rails.logger.info(flt.render)}
+         conn_flights = connecting_flights(report_key, travel_date, hub, d, stops, mct, maxct, earliest_arr_time, false, cxrs)
         end
 
 
@@ -178,13 +180,13 @@ class OagSchedule < ActiveRecord::Base
 
     def single_hub_connections(req)
 
-      o_hubs  = Destination.hubs(req.data_key, req.origin_code,  req.dest_code)
+      o_hubs  = Destination.hubs(req.report_key, req.origin_code,  req.dest_code)
       trips = {}
       o_voyages, rt_voyages = [],[]
       trips[:ob] = o_voyages
       o_hubs.each do |selected_hub|
         voyage = {hub: selected_hub}
-        voyage[:journeys] = connections_via_hub(req.data_key, req.origin_code, req.dest_code, selected_hub, req.depart, req.mct, req.maxct, req.stops, req.cxrs)
+        voyage[:journeys] = connections_via_hub(req.report_key, req.origin_code, req.dest_code, selected_hub, req.depart, req.mct, req.maxct, req.stops, req.cxrs)
         voyage[:errors]    += voyage[:journeys][:errors]  unless voyage[:errors].blank?
         voyage[:errors]     = voyage[:journeys][:errors]  if voyage[:errors].blank?
         o_voyages << voyage
@@ -192,7 +194,7 @@ class OagSchedule < ActiveRecord::Base
       end
       trips[:rt]    = rt_voyages
       if req.owrt.eql? "RT"
-       r_hubs  = Destination.hubs(req.data_key, req.dest_code,  req.origin_code)
+       r_hubs  = Destination.hubs(req.report_key, req.dest_code,  req.origin_code)
        r_hubs.each do |selected_hub|
          voyage = {hub: selected_hub}
          voyage[:journeys] = connections_via_hub(req.data_key, req.dest_code, req.origin_code, selected_hub, req.ret_date, req.mct, req.maxct, req.stops, req.cxrs)
@@ -213,8 +215,7 @@ class OagSchedule < ActiveRecord::Base
         directs = {}
         o_flights = []
         return_flights = []
-
-        if req.include_direct
+        if req.include_direct?
           o_flights =  keyed(req.data_key)
                         .connecting(req.origin_code, req.dest_code).effective(req.dep_date)
                         .stops(req.stops).operating(dep_date).map{|s| s.to_flight dep_date}
@@ -230,7 +231,7 @@ class OagSchedule < ActiveRecord::Base
           directs[:rt] = rt_flights
         end
 
-        
+
         one_hub_trips = single_hub_connections(req)
         answers =  {directs: directs, one_hub_trips: one_hub_trips}
         return answers

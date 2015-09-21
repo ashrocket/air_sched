@@ -40,11 +40,12 @@
     .col-sm-12
       .panel#destinations_panel
         - row_count = @origins.count/4
-        - rows = @origins.in_groups(row_count)
-        - rows.each_with_index do |columns, idx|
+        - rows = @origins.in_groups(4)
+        - [*0..(row_count-1)].each do |row_idx|
           .row
             .col-sm-12
-              - columns.each_with_index do |origin, col_idx|
+              - row = [*0..3].map{|col_idx| rows[col_idx][row_idx]}
+              - row.compact.each do |origin|
                 .dest_airport.col-sm-3
                   = link_to origin.name, search_path(origin_code: origin.code)
 

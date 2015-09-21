@@ -19,17 +19,17 @@ class DestinationsController < ApplicationController
   end
 
   def hubs
-    data_key = ReportKey.current_key
+    report_key = ReportKey.current_key
     is_int = Integer(params[:origin]) rescue nil
     if is_int
       origin_apt = Airport.find(params[:origin])
       dest_apt   = Airport.find(params[:dest])
-      hubs = Destination.hubs data_key, origin_apt.code,dest_apt.code
+      hubs = Destination.hubs report_key, origin_apt.code,dest_apt.code
     else
 
       origin = params[:origin].upcase
       dest  =   params[:dest].upcase
-      hubs = Destination.hubs data_key, origin, dest
+      hubs = Destination.hubs report_key, origin, dest
     end
     @hubs = Airport.where(:code => hubs)
   end

@@ -18,7 +18,11 @@
 .fleft {
   float: left
 }
-
+//Typeahead selection highlight
+span.twitter-typeahead .tt-suggestion.tt-cursor, span.twitter-typeahead .tt-suggestion.tt-is-under-cursor {
+  color: #ffffff;
+  background-color: #428bca;
+}
 
 
 //a i, a i:after, a i:before, a i:hover {text-decoration:none;}

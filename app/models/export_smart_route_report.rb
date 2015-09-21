@@ -175,7 +175,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
         end
     end
     def build_smart_routes
-      Rails.logger.info "#{brand.name} :  -> Building Smart Routes - brand.processing_smart_routes?? #{brand.processing_smart_routes?}"
+      Rails.logger.info "#{brand.name} :  -> Building Smart Routes - brand.processing_smart_routes? #{brand.processing_smart_routes?}"
       
       if  brand.processing_connections?
         Rails.logger.info "#{brand.name} :  -> Waiting for smart routes to complete ..."
@@ -190,7 +190,7 @@ class ExportSmartRouteReport < ActiveRecord::Base
        end
     end
     def build_route_maps
-      Rails.logger.info "#{brand.name} :  -> Building Route Maps - brand.processing_route_maps??? #{brand.processing_route_maps?}"
+      Rails.logger.info "#{brand.name} :  -> Building Route Maps - brand.processing_route_maps? #{brand.processing_route_maps?}"
       
       if  brand.processing_route_maps?
         Rails.logger.info "#{brand.name} :  -> Waiting for Route Maps to complete ..."

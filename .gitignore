@@ -38,7 +38,6 @@ spec/rails
 #Gemfile.lock
 Gemfile-*.lock
 capybara*
-viewcumber
 test-rails*
 public
 .rspec

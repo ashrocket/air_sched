@@ -71,23 +71,22 @@ class SearchRequest
     def deduce_origin_data
       unless @origin_code.blank?
         @origin_code = @origin_code.upcase
+        apt = Airport.cached @origin_code
+        @origin_airport = apt
         if @origin_id.blank? or @origin.blank?
-          apt = Airport.cached @origin_code
           @origin_id = apt.id
           @origin = apt.disp_name
-          @origin_airport = apt
         end
       end
     end
     def deduce_dest_data
       unless @dest_code.blank?
         @dest_code = @dest_code.upcase
+        apt = Airport.cached @dest_code
+        @dest_airport = apt
         if @dest_id.blank? or @dest.blank?
-          apt = Airport.cached @dest_code
           @dest_id = apt.id
           @dest = apt.disp_name
-          @dest_airport = apt
-
         end
       end
     end

@@ -10,7 +10,7 @@ module SearchHelper
     search[:maxct] = (search and search[:maxct]) ? search[:maxct].to_i : 1560
     search[:maxct] = 600 if search[:maxct] < 120
     search[:owrt]   = "OW" unless search[:owrt]
-    Rails.logger.info search
+    Rails.logger.info search.inspect
     search
   end
   def owrt_collection

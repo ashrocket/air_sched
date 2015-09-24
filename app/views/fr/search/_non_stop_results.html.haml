@@ -1,0 +1,57 @@
+.avl.fc2{"ng-hide" => "!selDay().flightList.length"}
+  %table.avlTbl.ct
+    %caption.ng-binding
+      =  flight_date.strftime('%A, %b %d %Y')
+    %thead
+      %tr.fc2.fs15
+        %th{:width => "100px"} Flight
+        %th{:width => "100px"} Depart
+        %th{:width => "100px"} Arrive
+        %th.lb.lwrtd{:width => "170px"} Standard Fare
+        %th.bzntd.lb.nbt
+          .clr.bznimg
+            = image_tag("fr/img/ui/bplus_badge_normal.png")
+          .clr.bzntext Business Plus
+    %tbody.fs18.fc1
+      - flights.each do |flight|
+        / ngRepeat: flight in selDay().flightList
+        %tr.ng-scope{"ng-repeat" => "flight in selDay().flightList"}
+          %td.fs15.ng-binding
+            = flight.flight_num_string
+            / ngIf: flight.operatedBy
+          %td.ng-binding= flight.dep_time_local
+          %td.ng-binding= flight.arr_time_local
+          / ngRepeat: fare in flight.fares
+          %td.ct.lb.fs20.lbluetext.ng-scope{"ng-class" => "{'bg2 bluetext': selFare() == fare, 'soldOut':!fare.key, 'businessCell':fare.fareClass == 'B' }", "ng-click" => "!exceedsTime(fare) &amp;&amp; chooseFare(fare)", "ng-repeat" => "fare in flight.fares"}
+            / ngIf: fare.key
+            %input.ng-scope.ng-pristine.ng-valid{:name => "market1", "ng-disabled" => "exceedsTime(fare)", "ng-if" => "fare.key", "ng-model" => "selKey", "ng-value" => "fare.key", :type => "radio", :value => "0~H~~HZ9LOW~BND9~~2~X|FR~9810~ ~~STN~09/30/2015 08:15~BCN~09/30/2015 11:30~"}
+              / end ngIf: fare.key
+              / ngIf: fare.price
+              %span.prc.fs15.ng-scope.ng-binding{"ng-bind-html" => "fare.price | applyRate:bk | currency:'':false:true", "ng-if" => "fare.price"}
+                = sprintf('%d', flight.price)
+                %span= sprintf('%.2f', flight.price).split('.')[1]
+              / end ngIf: fare.price
+              / ngIf: fare.discount
+              / ngIf: fare.seats == 1
+              .fs11.bld.ng-scope.ng-binding{"ng-if" => "fare.seats == 1"} 1 left @ this fare
+              / end ngIf: fare.seats == 1
+              / ngIf: fare.seats > 1
+              / ngIf: fare.freeMove
+          / end ngRepeat: fare in flight.fares
+          %td.ct.lb.fs20.lbluetext.ng-scope.businessCell{"ng-class" => "{'bg2 bluetext': selFare() == fare, 'soldOut':!fare.key, 'businessCell':fare.fareClass == 'B' }", "ng-click" => "!exceedsTime(fare) &amp;&amp; chooseFare(fare)", "ng-repeat" => "fare in flight.fares"}
+            / ngIf: fare.key
+            %input.ng-scope.ng-pristine.ng-valid{:name => "market1", "ng-disabled" => "exceedsTime(fare)", "ng-if" => "fare.key", "ng-model" => "selKey", "ng-value" => "fare.key", :type => "radio", :value => "0~H~~H9LBUS~BS09~~2~X|FR~9810~ ~~STN~09/30/2015 08:15~BCN~09/30/2015 11:30~"}
+              / end ngIf: fare.key
+              / ngIf: fare.price
+              %span.prc.fs15.ng-scope.ng-binding{"ng-bind-html" => "fare.price | applyRate:bk | currency:'':false:true", "ng-if" => "fare.price"}
+                = '--'
+                %span= '--'
+              / end ngIf: fare.price
+              / ngIf: fare.discount
+              / ngIf: fare.seats == 1
+              .fs11.bld.ng-scope.ng-binding{"ng-if" => "fare.seats == 1"} --
+              / end ngIf: fare.seats == 1
+              / ngIf: fare.seats > 1
+              / ngIf: fare.freeMove
+          / end ngRepeat: fare in flight.fares
+        / end ngRepeat: flight in selDay().flightList

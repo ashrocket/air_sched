@@ -1,0 +1,84 @@
+
+// Place all the styles related to the search controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.form-container .trip-type-selector {
+    font-size: 14px;
+    text-align: center;
+    padding-bottom: 10px;
+    margin-top: 10px;
+}
+.fr-search-form {
+  //reset
+  //.search_request_depart, #search_request_depart, .search_request_ret_date, #search_request_ret_date, .search_request_dest, #search_request_dest, .search_request_origin, #search_request_origin {
+  //  width: inherit;
+  //}
+  #reverse_pair{
+    margin-top: -25px;
+    font-size: 1.5em;
+    font-weight: bold;
+    z-index: 100;
+  }
+  .search-request-dest, .search-request-origin{
+    margin: 0;
+  }
+  .search-request-dest{
+    margin-bottom: 15px;
+  }
+  .fr-search-dates{
+   positon: relative;
+    margin-top: 20px;
+  }
+
+}
+.form-container .hotel-form-header {
+  .nav-link {
+    font-size: 12px;
+    float: right;  }
+}
+.search-origin {
+
+}
+.search-settings-form {
+ background-color: lightgrey;
+  min-width: 200px;
+  padding: 5px 10px;
+  margin-top: 10px;
+}
+
+//.xflt {
+//  margin-left: 160px;
+//  padding-top: 5px;
+//}
+tr.mct_invalid_flt {
+  td{
+    background-color: #ffd1d1 !important;
+  }
+  padding-top: 5px;
+  margin-left: 160px;
+  border: 2px dashed red;
+  color: #708090;
+}
+
+.rtflt {
+  margin-left: 40px;
+  border: 1px solid grey
+}
+.rtxflt {
+  margin-left: 160px;
+  border: 1px solid grey
+}
+input.datepicker-input{
+  width: 115px;
+}
+body>header aside#links {
+    display: table;
+    font-size: 10px;
+    text-transform: uppercase;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.dataTable thead {
+    background-color:#426dab;color:#fff;
+}

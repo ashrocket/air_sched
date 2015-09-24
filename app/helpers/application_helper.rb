@@ -1,18 +1,33 @@
 module ApplicationHelper
 
+
   def controller_stylesheet_link_tag
-    stylesheet = "#{params[:controller]}.css" #e.g. home_controller =>assets/stylesheets/home.css
-    #if stylesheet asset exists include it
-    unless Rails.application.assets.find_asset(stylesheet).nil?
-      stylesheet_link_tag stylesheet
+
+    if @brand_layout
+      stylesheets = ["#{File.join(@brand_layout,params[:controller])}",
+                     "#{File.join(@brand_layout,@brand_layout)}"]
+    else
+      stylesheets = ["#{params[:controller]}.css"] #e.g. home_controller =>assets/stylesheets/home.css
     end
+
+    stylesheets.delete_if{|stylesheet| Rails.application.assets.find_asset("#{stylesheet}.css").nil?}
+
+    stylesheet_link_tag(*stylesheets)
+
   end
+
   def controller_javascript_include_tag
-    javascript = "#{params[:controller]}.js" #e.g. home_controller =>assets/javascripts/home.js
-    unless Rails.application.assets.find_asset(javascript).nil?
+    if @brand_layout
+      javascript = File.join(@brand_layout,params[:controller])  #e.g. home_controller =>assets/stylesheets/home.css
+      else
+        javascript = "#{params[:controller]}" #e.g. home_controller =>assets/stylesheets/home.css
+    end
+
+    unless Rails.application.assets.find_asset("#{javascript}.js").nil?
       javascript_include_tag javascript
     end
   end
+
   def title(page_title)
     content_for :title, page_title.to_s
   end

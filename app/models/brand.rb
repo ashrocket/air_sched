@@ -101,4 +101,8 @@ class Brand < ActiveRecord::Base
      carriers = Airline.where(code: carrier_codes)
    end
 
+  def layout_key
+    brand_key.downcase
+  end
+
 end

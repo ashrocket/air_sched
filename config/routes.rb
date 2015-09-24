@@ -44,8 +44,11 @@ Rails.application.routes.draw do
   #post 'search', to: 'search#search', as: :search, format: 'json'
   post 'search', to: 'search#search', as: :search
 
-  resources :direct_flight, only: [:none] do
+  resources :direct_flights,  only: [:index, :show] do
+   get :explore, on: :collection
+   get 'from/:origin', to: 'direct_flights#from',  as: :from, on:  :collection, origin: /[a-zA-Z]{3}/
   end
+
 
   resources :send_emails
 

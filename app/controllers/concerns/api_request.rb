@@ -10,7 +10,7 @@ module ApiRequest
       params[:report_key] = ReportKey.find(params[:report_key_id])
     end
     @req = SearchRequest.new(params)
-    Rails.logger.info @req
+    Rails.logger.info @req.inspect
     @req
   end
   def validate_json params
@@ -22,7 +22,7 @@ module ApiRequest
        params[:report_key] = ReportKey.find(params[:report_key_id])
      end
      @req = SearchRequest.new(params)
-     Rails.logger.info @req
+     Rails.logger.info @req.inspect
      @req
   end
 

@@ -1,0 +1,52 @@
+.row
+  %br
+  %br
+.row
+  .col-sm-2
+    %h4
+      Route Map
+  .col-sm-2
+    - search_link = search_index_url
+    %a.btn.btn-default#search_flights{href: "#{search_link}", role:"button"}
+      %i.fa.fa-plane
+      Search for Flights
+.row
+  %br
+.row
+  .col-sm-12
+    Departing Airports
+.row
+  %br
+.row
+  .col-sm-12
+    = simple_form_for :direct_flight,
+     :html => {id: 'direct_flight_search_form'} do |form|
+
+      = form.input :origin, label: false,
+           input_html:{class: 'explore-origin typeahead',
+                       placeholder: 'Type the name of an origin airport to see where you can go with 0 stops'}
+
+
+      = form.hidden_field :origin_id
+      = form.hidden_field :origin_code
+
+.row
+  .col-sm-12
+    .h3#direct_flights_panel_header
+      Departing From
+    .panel#direct_flights_panel
+      - row_count = @origins.count/4
+      - rows = @origins.in_groups(4)
+      - [*0..(row_count-1)].each do |row_idx|
+        .row
+          .col-sm-12
+            - row = [*0..3].map{|col_idx| rows[col_idx][row_idx]}
+            - row.compact.each do |origin|
+              .origin_airport.col-sm-3
+                = link_to "#{origin.name} (#{origin.code})", 'javascript:void(0)',
+                  data: {origin_apt_code: origin.code, origin_apt_name: origin.name}
+
+.row
+  %br
+  %br
+

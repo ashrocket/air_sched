@@ -1,7 +1,9 @@
 class SearchController < ApplicationController
   include ApiRequest
   include ApiResponse
-
+  before_action :set_brand_layout
+  layout :select_layout
+  before_filter :set_branded_viewpath
 
   respond_to :html, :xml, :json
 
@@ -28,7 +30,9 @@ class SearchController < ApplicationController
         format.html{
           @search_request  = validate_form params["search_request"]
           if @search_request.valid?
-            @search_results   = OagSchedule.search_interlines @search_request
+
+            shop_service = ShoppingService.new
+            @search_results = shop_service.shop(@search_request)
             @status = :ok
           else
             render action: :index
@@ -38,5 +42,15 @@ class SearchController < ApplicationController
     end
 
   end
+  private
+    # # Use callbacks to share common setup or constraints between actions.
+    # def set_search
+    #   @search = Host.find(params[:id])
+    # end
+    #
+    # # Only allow a trusted parameter "white list" through.
+    # def search_params
+    #   params.require(:search).permit(:name, :code, airline_ids: [])
+    # end
 
 end

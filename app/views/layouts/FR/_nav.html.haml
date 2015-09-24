@@ -1,0 +1,39 @@
+%header.ng-scope{"ng-controller" => "HeaderCtrlr", "ng-init" => ""}
+  %div
+    %aside#myRyanair
+      / ngIf: !isPage('itinerary')
+      .hidden.ng-scope{"ng-if" => "!isPage('itinerary')"}
+        %a.loginIcon.ng-binding.ng-hide{:href => "", "ng-click" => "openLogin('')", "ng-show" => "usr.isLogged()"}
+          Welcome
+          %br
+        %a.fs13.loginIcon{:href => "", "ng-click" => "openLogin('i')", "ng-hide" => "usr.isLogged()"} Login
+        %span{"ng-hide" => "usr.isLogged()"} |
+        %a.fs13{:href => "", "ng-click" => "openLogin('r')", "ng-hide" => "usr.isLogged()"} Sign Up
+      / end ngIf: !isPage('itinerary')
+    #logo
+      %a{:href => "#"}
+        = image_tag("fr/img/logo.png", :alt => "Ryanair.com Homepage", :height => "34", :title => "Ryanair.com Homepage", :width => "223")
+    %aside#links
+      %ul
+        %li
+          %a{:href => "#"} Home
+        %li
+          %a{:href => "#", :target => "_blank"} F.A.Q.
+        %li
+          %a.infolink{:href => "#", :rel => "FeesLinks"} Fees
+  -#:javascript
+  -#  Crumbs.loc = [" » ","Flights","Services","Extras","Car","Payment","Itinerary","Confirmation","Manage Your Booking","Add Services","Retrieve","Booking History","Change/Review","Flights Search","Flights Select","Reprint","Documents","Confirm Check-in","Outbound","Return","Boarding Pass","Special Assistance","Passenger Information","American Tourister","Vouchers","ERROR"];
+  -#  Crumbs.flows = {"SimpleBooking":{"Booking":-1,"Search":1,"Captcha":1,"Select":1,"Services":2,"CarHire":4,"SpecialAssistanceWarning":4,"Payment":5,"Tds":5,"PayPal":5,"iDeal":5,"Wait":5,"PaymentError":5,"PaymentReject":5,"PaymentPNRError":5,"PaymentFailureError":5,"PaymentDeclined":5,"Itinerary":6},"Manage":{"ManageBooking":8,"ViewItinerary":6},"ManageUnbalanced":{"UnbalancedSecurity":-1,"UnbalancedBooking":5,"iDealUnbalanced":5,"PaymentErrorUnbalanced":5,"PaymentRejectUnbalanced":5,"PaymentDeclinedUnbalanced":5,"WaitUnbalanced":5},"BookingList":{"RetrieveBookingList":8},"BookingHistory":{"BookingHistory":11},"UpgradeToBusinessPlus":{"UpgradeBusinessPlus":-1,"UpgradeBusinessPlusServices":-1,"PaymentUpgrade":5,"iDealServicesUpgrad":5,"WaitServicesUpgrade":5,"UpgradeItinerary":6},"ServicesChange":{"ServicesChange":9,"PaymentServicesChange":5,"iDealServicesChange":5,"WaitServicesChange":5,"PaymentErrorServicesChange":5,"PaymentDeclinedServicesChange":5,"PaymentRejectServicesChange":5,"ServicesChangeItinerary":6,"SpecialAssistanceWarningChange":6},"ServicesChangeSeat":{"ServicesChangeSeat":-1,"PaymentServicesChangeSeat":5,"iDealServicesChangeSeats":5,"WaitServicesChange":5,"PaymentErrorServicesChange":5,"PaymentDeclinedServicesChange":5,"PaymentRejectServicesChange":5,"ServicesChangeItinerary":6,"SpecialAssistanceWarningSeat":6},"FlightChange":{"RetrieveBooking":10,"FlightChange":12,"SearchChange":13,"SelectChange":14,"SeatSelectionChange":14,"PaymentChange":5,"iDealChange":5,"WaitChange":5,"PaymentErrorChange":5,"PaymentRejectChange":5,"PaymentDeclinedChange":5,"ItineraryChange":6},"WebCheckIn":{"Security":10,"RestrictedWCI":10,"Terms":10,"Segments":16,"OutboundCheckin":18,"ReturnCheckin":19,"ServicesChangeWCI":9,"CarHireWCI":9,"SpecialAssistanceWarningWCIOutbound":9,"SpecialAssistanceWarningWCIReturn":9,"PaymentWCI":9,"iDealWCI":9,"WaitWCI":9,"CheckIn":17,"CallCentre":17,"BoardingPassDisplay":20,"BoardingPass-PDF":20},"Reprint":{"Reprint":15,"BoardingPassDisplayReprint":20},"NameChange":{"RetrieveNameChange":10,"PassengerInfo":22,"PaymentNameChange":5,"iDealNameChange":5,"WaitNameChange":5,"PaymentErrorNameChange":5,"PaymentRejectNameChange":5,"PaymentDeclinedNameChange":5,"ItineraryNameChange":6},"SpecialAssistance":{"RetrieveAssistance":10,"SpecialAssistance":21,"ItineraryAssistance":6},"Vouchers":{"Vouchers":24,"VoucherPayment":5,"iDealVO":5,"WaitVO":5,"PaymentErrorVO":5,"PaymentRejectVO":5,"PaymentDeclinedVO":5,"VoucherItinerary":7},"Samsonite":{"Samsonite":23,"SamsonitePayment":5,"iDealSamsonit":5,"SamsoniteWait":5,"SamsonitePaymentError":5,"SamsonitePaymentReject":5,"SamsonitePaymentDeclined":5,"SamsoniteReceipt":6},"Insurance":{"RetrieveInsurance":-1,"InsuranceChange":-1,"PaymentInsuranceChange":5,"iDealInsuranceChange":5,"WaitInsuranceChange":5,"PaymentErrorInsuranceChange":5,"PaymentDeclinedInsuranceChange":5,"PaymentRejectInsuranceChange":5,"InsuranceChangeItinerary":6},"Member":{"Profile":-1},"Error":{"Error":25},"BoardingPassPrintPopUnder":{"BoardingPassPrintPopUnderState":-1}};
+  %nav
+    %ol
+      / ngRepeat: crumb in crumbs
+      %li.fs15.ng-scope.ng-binding.cur{"ng-class" => "{'cur':crumb.pos==currentPos}", "ng-repeat" => "crumb in crumbs"} Flights
+      / end ngRepeat: crumb in crumbs
+      %li.fs15.ng-scope.ng-binding{"ng-class" => "{'cur':crumb.pos==currentPos}", "ng-repeat" => "crumb in crumbs"} Services
+      / end ngRepeat: crumb in crumbs
+      %li.fs15.ng-scope.ng-binding{"ng-class" => "{'cur':crumb.pos==currentPos}", "ng-repeat" => "crumb in crumbs"} Car
+      / end ngRepeat: crumb in crumbs
+      %li.fs15.ng-scope.ng-binding{"ng-class" => "{'cur':crumb.pos==currentPos}", "ng-repeat" => "crumb in crumbs"} Payment
+      / end ngRepeat: crumb in crumbs
+      %li.fs15.ng-scope.ng-binding{"ng-class" => "{'cur':crumb.pos==currentPos}", "ng-repeat" => "crumb in crumbs"} Itinerary
+      / end ngRepeat: crumb in crumbs

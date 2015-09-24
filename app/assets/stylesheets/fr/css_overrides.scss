@@ -1,0 +1,57 @@
+.row_selected {
+  background-color: whitesmoke
+}
+.table-hover > tbody > tr.row_selected:hover > td, .table-hover > tbody > tr.row_selected:hover > th {
+  background-color: ghostwhite;
+
+}
+.twitter-typeahead .tt-hint {
+    display: block;
+    //height: 34px;
+    padding: 6px 12px;
+    //font-size: 16px;
+    //line-height: 1.428571429;
+    color: #428bca;
+    border: 1px solid transparent;
+    border-radius:4px;
+    width: 100%;
+}
+.twitter-typeahead .hint-small {
+    height: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 3px;
+    line-height: 1.5;
+}
+.twitter-typeahead .hint-large {
+    height: 45px;
+    padding: 10px 16px;
+    font-size: 18px;
+    border-radius: 6px;
+    line-height: 1.33;
+}
+.twitter-typeahead {
+  width: 100%;
+}
+.tt-dropdown-menu {
+   width:100%;
+   width: 400px;
+}
+
+input.datepicker-input.form-control[readonly],
+{
+  cursor: pointer;
+}
+// Jasny Bootstrap 3 fixes
+.fileinput .btn-file,
+.fileinput.fileinput-exists .btn {
+    display: table-cell;
+}
+
+//Datatables images
+table.dataTable thead .sorting { background: url('../datatables/media/images/sort_both.png') no-repeat center right; }
+table.dataTable thead .sorting_asc { background: url('../datatables/media/images/sort_asc.png') no-repeat center right; }
+table.dataTable thead .sorting_desc { background: url('../datatables/media/images/sort_desc.png') no-repeat center right; }
+
+table.dataTable thead .sorting_asc_disabled { background: url('../datatables/media/images/sort_asc_disabled.png') no-repeat center right; }
+table.dataTable thead .sorting_desc_disabled { background: url('../datatables/media/images/sort_desc_disabled.png') no-repeat center right; }

@@ -33,6 +33,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'haml-rails', '~> 0.9.0'
 gem 'bootstrap-sass', '~> 3.3.5.1'
 gem 'font-awesome-rails', '~> 4.4.0.0'
+gem 'google-webfonts-rails'
 
 gem 'bootstrap-generators', '~> 3.3.4'
 
@@ -76,9 +77,10 @@ gem 'seed_dump'
 
 
 group :development, :test do
-    gem 'better_errors'
-    gem 'binding_of_caller'
-    gem 'byebug'
+    gem 'better_errors', '~> 2.1.1'
+    gem 'binding_of_caller', '~> 0.7.2'
+    gem 'web-console', '~> 2.2.1'
+    gem 'byebug', '~> 6.0.2'
     gem 'rspec',  '~> 3.0.0.beta2'
     gem 'rspec-rails',  '~> 3.0.0.beta2'
     gem 'rack-mini-profiler'

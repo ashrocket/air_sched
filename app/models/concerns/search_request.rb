@@ -6,8 +6,8 @@ class SearchRequest
 
     attr_accessor :report_key, :report_key_id, :join, :owrt
     attr_accessor :cxrs
-    attr_accessor :origin, :origin_id, :origin_code
-    attr_accessor :dest, :dest_id, :dest_code
+    attr_accessor :origin, :origin_id, :origin_code, :origin_airport
+    attr_accessor :dest, :dest_id, :dest_code, :dest_airport
     attr_accessor :depart,:ret_date
     attr_accessor :mct, :maxct
     attr_accessor :stops
@@ -47,13 +47,23 @@ class SearchRequest
       @ret_date  = Chronic.parse(@ret_date).to_date unless @ret_date.blank?
       @cxrs = OagSchedule.carriers_for_key(attributes[:report_key]) if @cxrs.blank?
 
-
     end
 
     def include_direct?
       @include_direct
     end
 
+    def journey_type_string
+      case owrt
+        when /OW/
+          'One Way'
+        when /RT/
+          'Round Trip'
+        else
+          'Round Trip'
+      end
+    end
+    
     private
     def ret_date_is_date
       @ret_date.class.is_a? Date
@@ -65,6 +75,7 @@ class SearchRequest
           apt = Airport.cached @origin_code
           @origin_id = apt.id
           @origin = apt.disp_name
+          @origin_airport = apt
         end
       end
     end
@@ -75,6 +86,8 @@ class SearchRequest
           apt = Airport.cached @dest_code
           @dest_id = apt.id
           @dest = apt.disp_name
+          @dest_airport = apt
+
         end
       end
     end

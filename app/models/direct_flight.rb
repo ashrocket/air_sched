@@ -7,8 +7,10 @@ class DirectFlight < ActiveRecord::Base
   # :origin
   # :dest
   # :carriers
-  scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
-  scope :branded,     lambda {|brand| where(report_key: brand.report_keys) }
+  scope :keyed, lambda {|report_keys| where(report_key: report_keys)}
+  scope :branded, lambda {|brand| where(report_key: brand.report_keys) }
+
+  scope :dest_from_origin, lambda {|origin| where(origin: origin).pluck(:dest)}
 
   class << self
     #

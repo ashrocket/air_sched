@@ -1,0 +1,90 @@
+- no_connects = results.select{|r| r[:journeys][:f].blank?}
+- valids      = results.select{|r| not r[:journeys][:f].blank?}
+- invalids    = results.map{|r| r[:journeys][:mct_invalid]}
+- unless valids.blank?
+  - valids.sort_by!{|r| r[:journeys][:f].count}.reverse!
+<!-- Nav tabs -->
+%ul.nav.nav-tabs
+  - unless valids.blank?
+    %li.active
+      %a{:href=>"#flyable_#{direction}", "data-toggle"=>"tab"}
+        Valid
+    %li
+      %a{:href=>"#non_flyable_#{direction}", "data-toggle"=>"tab"}
+        Invalid
+  - no_connects_class = (valids.blank? and invalids.blank?) ? "active" : ""
+  - unless no_connects.blank?
+    %li{:class => "#{no_connects_class}"}
+      %a{:href=>"#no_connects_#{direction}", "data-toggle"=>"tab"}
+        Non Connecting
+
+
+<!-- Tab panes -->
+.tab-content
+  .tab-pane.active{:id => "flyable_#{direction}"}
+    %table.table.table-condensed.table-striped
+      - unless valids.blank?
+        - valids.each do |hub_results|
+          %tr
+            %td{:colspan=>14}= "via #{hub_results[:hub]}"
+          - unless hub_results[:errors].blank?
+            - hub_results[:errors].each do |err|
+              %tr
+                %td.error{:colspan=>14}= err
+
+          - if hub_results[:journeys] and hub_results[:journeys][:f] and hub_results[:journeys][:f].count > 0
+            - hub_results[:journeys][:f].each do |flt|
+              - valid_ids = hub_results[:journeys][:xmap][flt.id]
+              - valid_ids.each do |x_id|
+                - valid_flt = hub_results[:journeys][:x].find{|x| x.id.eql? x_id}
+                - if valid_flt
+                  %tr.flt{:data => {'xflt_ids' => hub_results[:journeys][:xmap][flt.id]}}
+                    = render partial: "search/flight", locals: {flt: flt}
+                  %tr.xflt
+                    = render partial: "search/connection", locals: {flt: valid_flt}
+                    = render partial: "search/book", locals: {flt: flt, connection: valid_flt }
+      %tr
+        %br
+      %tr
+        %br
+  .tab-pane{:id => "non_flyable_#{direction}"}
+    %table.table.table-condensed.table-striped
+      - unless invalids.blank?
+        - invalid_outbounds = invalids.map{|combos| combos.keys}.flatten.uniq
+        - results.each do |r1|
+          %tr
+            %td{:colspan=>14}= "via #{r1[:hub]}"
+          - unless r1[:errors].blank?
+            - r1[:errors].each do |err|
+              %tr
+                %td.error{:colspan=>14}= err
+
+          - invalid_flights = r1[:journeys][:f].select{|flt| invalid_outbounds.include? flt.id}
+          - unless invalid_flights.blank?
+            - invalid_flights.each do |invalid_flt|
+              - mct_invalid_connection_ids =  invalids.find{|invalid_combo| invalid_combo[invalid_flt.id]}[invalid_flt.id]
+              - mct_invalid_connection_ids.each do |x_id|
+                - invalid_connection_flt = r1[:journeys][:x].find{|flt| flt.id.eql? x_id }
+                %tr.flt{:data => {'xflt_ids' => mct_invalid_connection_ids}}
+                  =render partial: "search/flight", locals: {flt: invalid_flt}
+                %tr.mct_invalid_flt
+                  %td= "MCT VIOLATION"
+                  = render partial: "search/connection", locals: {flt: invalid_connection_flt}
+          %tr
+            %br
+          %tr
+            %br
+  - unless no_connects.blank?
+    .tab-pane{:id => "no_connects_#{direction}", :class => "#{no_connects_class}"}
+      %table.table.table-condensed.table-striped
+        - no_connects.each do |hub_results|
+          %tr
+            %td{:colspan=>14}= "via #{hub_results[:hub]}"
+          - unless hub_results[:errors].blank?
+            - hub_results[:errors].each do |err|
+              %tr
+                %td.error{:colspan=>14}= err
+
+
+
+

@@ -1,0 +1,40 @@
+@import 'fr-base';
+@import 'fr-style';
+
+body.index .fr-container{
+  background: url(asset_path("fr/ryan-air-sky.png"));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+
+
+
+}
+body > header aside a, body > header aside a:visited{
+  color: white;
+}
+body>header aside#links {
+    display: table;
+    font-size: 10px;
+    text-transform: uppercase;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.form-container {
+    background: #FFF;
+    //width: 380px;
+    padding: 30px 20px 18px;
+    z-index: 1;
+    vertical-align: middle;
+    //display: inline-block;
+    margin-top: 24px;
+}
+.form-container .hotel-form-header {
+    font-family: Oxygen;
+    font-size: 24px;
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 24px;
+    margin-bottom: 8px;
+    padding: 0 20px;
+}

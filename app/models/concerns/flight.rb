@@ -66,6 +66,10 @@ class Flight
   #  Oag_Flight.new(flt_h)
   #end
 
+  def flight_num_string
+    "#{airline_code}#{flight_num}"
+  end
+
   def render
     "#{dep_date} #{airline_code} #{flight_num} #{origin_apt} #{dep_time_local} #{arr_date} #{dest_apt } #{arr_time_local}"
   end

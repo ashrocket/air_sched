@@ -1,0 +1,35 @@
+.container
+  .row
+    %br
+    %br
+  .row
+    .col-sm-2
+      %h5
+        Explore
+    .col-sm-2
+      - search_link = search_index_url
+      %a.btn.btn-default#search_flights{href: "#{search_link}", role:"button"}
+        %i.fa.fa-plane
+        Search
+    .col-sm-2
+      %a.btn.btn-default#settings{href: "#{admin_dashboard_url}"}
+        %i.fa.fa-gear
+        Settings
+  .row
+    %br
+  .row
+    .col-sm-12
+      Search for Destinations
+      = "connecting trips for #{ReportKey.current_report.name}"
+  .row
+    %br
+  .row
+    - href = "search"
+    .panel#destinations_panel{data: {url: "#{href}"}}
+    - @destinations.each do |dest|
+      .row
+        .col-sm-12
+          = "#{dest.origin_code}-#{dest.hub_code}-#{dest.dest_code}  #{dest.origin} #{dest.hub_name} #{dest.dest} "
+
+%br
+

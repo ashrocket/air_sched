@@ -1,8 +1,12 @@
 ActiveAdmin.register Airport do
   menu :parent => "Codes"
 
-
-  # See permitted parameters documentation:
+  filter :code, filters: [:cont, :eq, :start, :end]
+  filter :name, filters: [:cont, :eq, :start, :end]
+  filter :city, filters: [:cont, :eq, :start, :end]
+  filter :lat
+  filter :long
+  # # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
   permit_params :code, :name, :city
@@ -11,6 +15,8 @@ ActiveAdmin.register Airport do
     column :code
     column :name
     column :city
+    column :lat
+    column :long
     actions
   end
 

@@ -36,7 +36,7 @@ class Destination < ActiveRecord::Base
      end
   end
   def origins
-    Airport.where(code: keyed(report_key).select(:origin_code).distinct(:origin_code).pluck(:origin_code))
+    Airport.where(code: keyed(ReportKey.current_key).select(:origin_code).distinct(:origin_code).pluck(:origin_code))
     # (cached_origins ReportKey.current_key)
   end
   # def cached_dest_airports  report_key, origin_code

@@ -1,4 +1,6 @@
 class Airport < ActiveRecord::Base
+  include ArelHelpers::ArelTable
+
   # :code
   # :name
   extend FriendlyId

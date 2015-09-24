@@ -69,6 +69,10 @@ class ReportKey < ActiveRecord::Base
   end # End Class Methods
 
 
+  def markets
+
+  end
+
   def code
     report_key
   end

@@ -206,6 +206,9 @@ class OagSchedule < ActiveRecord::Base
       trips
     end
 
+    def search_directs req
+
+     end
 
     def search_interlines req
         trips   = {}
@@ -216,14 +219,14 @@ class OagSchedule < ActiveRecord::Base
         o_flights = []
         return_flights = []
         if req.include_direct?
-          o_flights =  keyed(req.data_key)
-                        .connecting(req.origin_code, req.dest_code).effective(req.dep_date)
-                        .stops(req.stops).operating(dep_date).map{|s| s.to_flight dep_date}
+          o_flights =  keyed(req.report_key)
+                        .connecting(req.origin_code, req.dest_code).effective(req.depart)
+                        .stops(req.stops).operating(req.depart).map{|s| s.to_flight req.depart}
 
 
           rt_flights = []
           if req.owrt.eql? "RT"
-            rt_flights = keyed(req.data_key)
+            rt_flights = keyed(req.report_key)
                           .connecting(req.dest_code, req.origin_code).effective(req.ret_date)
                           .stops(req.stops).operating(ret_date).map { |s| s.to_flight ret_date}
           end

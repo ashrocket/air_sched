@@ -58,6 +58,9 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
+  config.assets.precompile += %w( .svg .eot .woff .ttf)
+
   #Sidekiq.default_worker_options = { :queue => :schedule_loader }
 
   # Raises error for missing translations

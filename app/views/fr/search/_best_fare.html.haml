@@ -1,0 +1,45 @@
+%ol#tabs1.tabs
+  %li.loadBtn.arrow{"ng-class" => "{'loadingsmall':loading}"}
+    %a{:href => "", "ng-click" => "loadMore(true, 'SelectInput$LinkButtonPrev1')", "ng-disabled" => "loading", :title => "Previous Week"} &lt;
+  -# HACK until I implement a best fare service
+  - [3,2,1].each do |daynum|
+    / ngRepeat: day in days | limitTo: offset - days.length | limitTo: limit
+    %li.ng-scope{"ng-repeat" => "day in days | limitTo: offset - days.length | limitTo: limit"}
+      %a.noFlights{:href => "", "ng-class" => "{'active':selDay() == day, 'noFlights':!day.flightList.length, 'soldOut':day.flightList.length &amp;&amp; !day.lowest[selClass]}", "ng-click" => "chooseDay(day)"}
+        %time.ng-binding= (flight_date - daynum.day).strftime('%A, %b %d')
+        .prc.ng-binding.ng-hide{"ng-bind-html" => "day.lowest[selClass].price | applyRate:bk | currency:'':false:true", "ng-show" => "day.flightList.length &amp;&amp; day.lowest[selClass]"}
+        / ngIf: day.lowest[selClass].price &amp;&amp; day.flightList.length
+        .legend{"ng-show" => "day.flightList.length == 0"}
+          %span Not Implemented
+        .legend.hidden.ng-hide{"ng-show" => "day.flightList.length &amp;&amp; !day.lowest[selClass]"}
+          %span Sold out
+  / end ngRepeat: day in days | limitTo: offset - days.length | limitTo: limit
+  %li.ng-scope{"ng-repeat" => "day in days | limitTo: offset - days.length | limitTo: limit"}
+    %a{:href => "", "ng-class" => "{'active':selDay() == day, 'noFlights':!day.flightList.length, 'soldOut':day.flightList.length &amp;&amp; !day.lowest[selClass]}", "ng-click" => "chooseDay(day)"}
+      %time.ng-binding Fri, Sep 25
+      .prc.ng-binding{"ng-bind-html" => "day.lowest[selClass].price | applyRate:bk | currency:'':false:true", "ng-show" => "day.flightList.length &amp;&amp; day.lowest[selClass]"}
+        - price = flights.min_by{|flight| flight.price}.price
+        = sprintf('%d', price)
+        %span= sprintf('%.2f', price).split('.')[1]
+      / ngIf: day.lowest[selClass].price &amp;&amp; day.flightList.length
+      %span.ng-scope.ng-binding{"ng-if" => "day.lowest[selClass].price &amp;&amp; day.flightList.length"} EUR
+      / end ngIf: day.lowest[selClass].price &amp;&amp; day.flightList.length
+      .legend.hidden.ng-hide{"ng-show" => "day.flightList.length == 0"}
+        %span No Flight
+      .legend.hidden.ng-hide{"ng-show" => "day.flightList.length &amp;&amp; !day.lowest[selClass]"}
+        %span Sold out
+
+  - [1,2,3].each do |daynum|
+    / ngRepeat: day in days | limitTo: offset - days.length | limitTo: limit
+    %li.ng-scope{"ng-repeat" => "day in days | limitTo: offset - days.length | limitTo: limit"}
+      %a.noFlights{:href => "", "ng-class" => "{'active':selDay() == day, 'noFlights':!day.flightList.length, 'soldOut':day.flightList.length &amp;&amp; !day.lowest[selClass]}", "ng-click" => "chooseDay(day)"}
+        %time.ng-binding= (flight_date + daynum.day).strftime('%A, %b %d')
+        .prc.ng-binding.ng-hide{"ng-bind-html" => "day.lowest[selClass].price | applyRate:bk | currency:'':false:true", "ng-show" => "day.flightList.length &amp;&amp; day.lowest[selClass]"}
+        / ngIf: day.lowest[selClass].price &amp;&amp; day.flightList.length
+        .legend{"ng-show" => "day.flightList.length == 0"}
+          %span Not Implemented
+        .legend.hidden.ng-hide{"ng-show" => "day.flightList.length &amp;&amp; !day.lowest[selClass]"}
+          %span Sold out
+
+  %li.loadBtn.arrow{"ng-class" => "{'loadingsmall':loading}"}
+    %a{:href => "", "ng-click" => "loadMore(false, 'SelectInput$LinkButtonNext1')", "ng-disabled" => "loading", :title => "Next Week"} &gt;

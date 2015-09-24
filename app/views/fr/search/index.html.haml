@@ -1,0 +1,57 @@
+.row
+  .col-sm-4.col-sm-offset-6.form-container
+    .hotel-form-header
+      Find Your Flight
+      %a.nav-link{href: "#{explore_direct_flights_url}"}
+        %i.fa.fa-globe
+        Routes
+    = render partial: 'search/search_form', locals: {search_form_url: search_url}
+
+.row
+
+
+  %br
+  .table-responsive.hide
+    %table.table.table-hover.table-striped#to_hub_table
+      %thead
+        %tr
+          %th Eff
+          %th Disc
+          %th From
+          %th To
+          %th Airline
+          %th Flight Number
+          %th Dep Time
+          %th Arr Time
+          %th Freq
+          %th Stops
+
+      %tbody
+        -#%tr
+    -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
+
+.row
+
+  %br
+  .table-responsive.hide
+    %table.table.table-hover.table-striped#from_hub_table
+      %thead
+        %tr
+          %th Eff
+          %th Disc
+          %th From
+          %th To
+          %th Airline
+          %th Flight Number
+          %th Dep Time
+          %th Arr Time
+          %th Freq
+          %th Stops
+
+      %tbody
+        -#%tr
+    -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
+
+%br
+
+

@@ -1,0 +1,61 @@
+.container
+  #main
+    %article#search.ng-scope{"ng-controller" => "SearchCtrlr", "ng-init" => "edit=false"}
+      .ng-binding{"ng-hide" => "edit"}
+        %button.flr{"ng-click" => "edit=true", :type => "button"} Edit
+        = "#{@search_results[:req].origin} → #{@search_results[:req].dest}, #{@search_results[:req].journey_type_string},"
+        %span.ng-binding{"ng-show" => "paxes['ADT'][0] > 0"} 1 Adult
+        %span.ng-binding.ng-hide{"ng-show" => "paxes['TEEN'][0] > 0"} , 0 Teen
+        %span.ng-binding.ng-hide{"ng-show" => "paxes['CHD'][0] > 0"} , 0 Child
+        %span.ng-binding.ng-hide{"ng-show" => "paxes['INFANT'][0] > 0"} , 0 Infant
+      %fieldset.slide.ng-pristine.ng-valid.ng-valid-required.ng-hide{"ng-form" => "SearchForm", "ng-show" => "edit", :style => ""}
+
+
+    - if @search_results[:directs][:ob].count > 0
+      %article.selectFlights.ng-scope{"ng-controller" => "SelectCtrlr", "ng-init" => "setMinTimes(3600000, 2015, 8, 23, 20, 18, 00); init(0, 7);"}
+      %h1.ng-binding{"ng-bind-html" => "(depart | apNameFormat) + ' → ' + (arrive | apNameFormat)"}
+        = @search_results[:req].origin_airport.city
+        %small= "(#{@search_results[:req].origin_airport.name})"
+        → #{@search_results[:req].dest_airport.city}
+        %small= "(#{@search_results[:req].dest_airport.name})"
+      = render partial: "search/best_fare", locals: {flights: @search_results[:directs][:ob], flight_date: @search_results[:req].depart, direction: "ob"}
+      = render partial: "search/non_stop_results", locals: {flights: @search_results[:directs][:ob], flight_date: @search_results[:req].depart, direction: "ob"}
+
+      .hidden.ng-hide{"ng-show" => "selDay().flightList.length === 0"}
+        %p This may be because:
+        %ol
+          %li The travel dates requested are for our next schedule period and the fares/seats are yet not loaded for these dates.
+          %li There may not be a flight scheduled for this day of the week.
+      .hidden.fs11
+        = image_tag("fr/img/ui/soldOut.png", :alt => "Sold out", :height => "25",  :style => "vertical-align:middle;", :width => "25") do
+          \&nbsp;
+          Sold out&nbsp;&nbsp;
+          = image_tag("fr/img/ui/noFlights.png", :alt => "No flights", :height => "25",  :style => "vertical-align:middle;", :width => "25") do
+            \&nbsp;
+            No Flight
+            %span.flr Optional charges excluded
+
+
+
+-#.row
+-#  .col-sm-12
+-#    .panel.panel-primary
+-#      .panel-heading Outbound Flight Options
+-#      - unless @search_results[:one_hub_trips][:ob].blank?
+-#        .panel-body
+-#          The following flight combinations will get you from #{@search_request.origin} to #{@search_request.dest}
+-#        = render partial: "search/results", locals: {results: @search_results[:one_hub_trips][:ob], direction: "ob"}
+-#      - unless @search_results[:one_hub_trips][:rt].blank?
+-#        .panel-heading Return Flight Options
+-#        = render partial: "search/results", locals: {results: @search_results[:one_hub_trips][:rt], direction: "rt"}
+-#.row
+-#  .col-sm-12
+-#    %br
+-#    %br
+-#    - req = @search_request
+-#    - url_array = [req.origin_code, req.dest_code, req.depart, req.owrt]
+-#    - url_array << req.ret_date if req.owrt.eql? "RT"
+-#    - url_path = url_array.join "/"
+-#    = link_to "Search Again", "#{search_index_url}/#{url_path}"
+-#    %br
+-#    %br

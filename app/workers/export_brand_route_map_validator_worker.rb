@@ -1,13 +1,11 @@
-# app/workers/export_brand_route_maps_worker.rb
+# app/workers/brand_route_maps_export_worker.rb
 require 'sidekiq-lock'
 
 class ExportBrandRouteMapValidatorWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
 
-  sidekiq_options :queue => :report_queue, :retry => false, :backtrace => true, unique: true,
-                  unique_job_expiration: 180 * 60,
-                  unique_args: ->(args) { [ args.first ] },
+  sidekiq_options :queue => :report_queue, :retry => false, :backtrace => true,
                   lock: {
                   timeout: proc { |_, timeout = 1_200_000 | timeout * 2 },
                   name: 'lock-export-brand-route-map-validator-worker'

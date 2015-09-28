@@ -2,8 +2,9 @@ class CreateOagReports < ActiveRecord::Migration
   def change
     create_table :oag_reports do |t|
       t.references :report_key
+      t.integer  :seq, default: 1
       t.string   :msg_id
-      t.string   :workflow_state
+      t.string   :workflow_state, default: 'uninitialized'
       t.json     :load_status, default: {}
       t.json     :log_data, default: []
       t.string   :attachment_status, default: 'unstored'

@@ -7,13 +7,20 @@ class ReportKey < ActiveRecord::Base
 
   has_many :oag_reports
   has_many :interline_cxr_rules
+
+
+  include Workflow
+
+
+
+
   #t.string :code
   #t.string :name
   #t.boolean :active
 
   class << self
     def keyed(code)
-       where(report_key: code).first
+       where(code: code).first
     end
 
     def active
@@ -21,7 +28,7 @@ class ReportKey < ActiveRecord::Base
     end
 
     def active_keycodes
-     where(active: true).uniq.pluck(:report_key)
+     where(active: true).uniq.pluck(:code)
     end
 
     def current_key
@@ -36,7 +43,7 @@ class ReportKey < ActiveRecord::Base
 
     def strings(report_keys)
       if  report_keys and report_keys.respond_to?(:first) and report_keys.first.is_a?(ReportKey)
-          report_keys.map{|r| r.report_key}
+          report_keys.map{|r| r.code}
       else
           [""]
       end
@@ -68,15 +75,66 @@ class ReportKey < ActiveRecord::Base
 
   end # End Class Methods
 
+  #
+  # Instance Methods
+  #
 
-  def code
-    report_key
+
+
+  workflow do
+    state :idle do
+      event :import_schedule, :transitions_to => :waiting_for_schedule_load
+      event :reset, :transitions_to => :idle
+    end
+
+    state :waiting_for_schedule_load do
+      event :confirm_schedule_load, :transitions_to => :idle
+      event :reset, :transitions_to => :idle
+    end
+
+
+    after_transition do |from, to, triggering_event, *event_args|
+          stash_log "#{code} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
+    end
+
+    on_transition do |from, to, triggering_event, *event_args|
+      stash_log "#{code} Event: #{triggering_event} transitioning FROM #{from} -> #{to}"
+    end
   end
+
+
+  def next_seq
+    if current_seq < 99
+      current_seq + 1
+    else
+      0
+    end
+  end
+
+  def cycle_schedules
+    expired_seq = current_seq - 2
+    self.current_seq = next_seq
+    save
+    OagSchedule.delete_all(report_key: self, seq: expired_seq)
+
+  end
+
+
+
   def latest_finished_report
     OagReport.keyed(self).with_finished_state.latest
   end
   def latest_report
     OagReport.keyed(self).latest
+  end
+
+  def latest_valid_seq
+      any_schedules = OagSchedule.where(report_key: self, seq: current_seq)
+      if any_schedules.count > 0
+        return  current_seq
+      else
+        return nil
+      end
   end
 
   # def validate
@@ -94,4 +152,10 @@ class ReportKey < ActiveRecord::Base
     name = "REPORT NAME IS REQUIRED"
     super
   end
+
+  private
+    def stash_log msg
+      Rails.logger.info msg
+      save
+    end
 end

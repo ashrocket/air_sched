@@ -33,8 +33,8 @@
                 %li.list-group-item.col-sm-4
                   = link_to(rk.name, edit_admin_report_key_path(rk))
           %td= brand.description
-          %td= brand.default_currency
-          %td= brand.max_segments
+          %td= brand.settings.default_currency
+          %td= brand.settings.max_segments
           %td
             %ul#sorted_hosts.list-group
               - brand.hosts.each do |h|

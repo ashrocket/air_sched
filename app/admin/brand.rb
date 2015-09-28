@@ -1,20 +1,18 @@
 ActiveAdmin.register Brand, as: 'Brands' do
   menu priority: 2,  :parent => 'Config'
 
-
+  filter :brand_key, filters: [:cont, :eq, :start, :end]
+  filter :report_keys
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
   permit_params :brand_key, :report_keys, :name,  :description,
-                :default_currency, :max_segments,  :active, report_key_ids: [], host_ids: []
-  #
-  # or
-  #
-  # permit_params do
-  #  permitted = [:permitted, :attributes]
-  #  permitted << :other if resource.something?
-  #  permitted
-  # end
+                :default_currency, :max_segments,  :active, report_key_ids: [], host_ids: [],
+                settings_attributes: [:route_map_filename, :default_currency, :max_segments]
+
+
+
+
   controller do
     def find_resource
       scoped_collection.friendly.find(params[:id])
@@ -55,17 +53,20 @@ ActiveAdmin.register Brand, as: 'Brands' do
            }.join.html_safe
          end
        end
-       column :default_currency
-       column :max_segments
+       column :default_currency do |brand|
+         brand.settings.default_currency
+       end
+       column :max_segments do |brand|
+         brand.settings.max_segments
+       end
 
        actions
   end
 
   member_action :build_connections do
    @brand = Brand.friendly.find(params[:id])
-   unless @brand.processing_connections?
-
-     UpdateBrandConnectionsWorker.perform_async(@brand.brand_key)
+   if @brand.data_state.idle?
+     @brand.data_state.build_connections!
      redirect_to :back, notice: 'Beginning to build Branded Connections ...'
    else
      redirect_to :back, alert: 'Already building Branded Connections! - In Progress'
@@ -74,9 +75,8 @@ ActiveAdmin.register Brand, as: 'Brands' do
 
   member_action :build_smart_routes do
     @brand = Brand.friendly.find(params[:id])
-    unless @brand.processing_smart_routes?
-
-      UpdateSmartRoutesWorker.perform_async(@brand.brand_key)
+    if @brand.data_state.idle?
+       @brand.data_state.build_smart_routes!
       redirect_to :back, notice: 'Beginning to build Smart Routes ...'
     else
       redirect_to :back, alert: 'Already building Smart Routes! - In Progress'
@@ -85,25 +85,36 @@ ActiveAdmin.register Brand, as: 'Brands' do
 
   member_action :build_route_maps do
     @brand = Brand.friendly.find(params[:id])
-    unless @brand.processing_route_maps?
 
-      UpdateRouteMapsWorker.perform_async(@brand.brand_key)
+    if @brand.data_state.idle?
+      @brand.data_state.build_route_maps!
       redirect_to :back, notice: 'Beginning to build Route Maps ...'
     else
       redirect_to :back, alert: 'Already building Route Maps! - In Progress'
     end
   end
+
+
   member_action :full_export_route_maps do
     @brand = Brand.friendly.find(params[:id])
-    unless @brand.processing_route_map_export?
-      report = ExportSmartRouteReport.create(brand: @brand)
-      ExportBrandRouteMapsWorker.perform_async(@brand.brand_key, report.id)
+    if @brand.export_state.idle?
+      export_report = @brand.pending_export_report
+      @brand.report_keys.each do |rk|
+        seq = rk.latest_valid_seq
+        if seq
+          export_report.schedule_report_keys[rk.code] = {'status': 'ready', 'seq': seq}
+        end
+        export_report.save
+      end
+      r = Oag::Report.new
+      r.auto_export_route_maps(@brand, export_report)
       redirect_to :back, notice: 'Beginning to build Full Route Maps and Export (this may take a while)...'
     else
       redirect_to :back, alert: 'In Progress! - Already building build Full Route Maps and Export (this may take a while)'
     end
   end
   # TODO: Move this into a seperate sidekiq worker
+
   member_action :export_only_route_maps do
      @brand = Brand.friendly.find(params[:id])
 
@@ -111,31 +122,29 @@ ActiveAdmin.register Brand, as: 'Brands' do
      if brm.blank?
        redirect_to :back, alert: 'No route map is built.  Build a Route map or wait!'
      else
-        unless @brand.processing_route_map_export?
-          report = ExportSmartRouteReport.create(brand: @brand)
+       if @brand.export_state.idle?
+          report = BrandRouteMapExportReport.create(brand: @brand)
           report.finalize!
           redirect_to :back, notice: 'Beginning to Export route map...'
-        else
-          redirect_to :back, alert: 'In Progress! - Already exporting route map (this may take a while)'
-        end
+       else
+          redirect_to :back, alert: 'Export Currently In Progress! - try again later.'
+       end
      end
 
    end
-  member_action :reset_data_states do
-    @brand = Brand.friendly.find(params[:id])
-    data_state_name = params[:data_state]
-    if data_state_name
-      if @brand.data_states[data_state_name] and @brand.data_states[data_state_name]['state']
-        @brand.data_states[data_state_name]['state'] = 'idle'
-      else
-        @brand.data_states[data_state_name] = {}
-      end
-    else
-      @brand.data_states = {}
-    end
-    @brand.save
-    redirect_to :back, notice: 'Data States reset'
 
+  member_action :reset_data_state do
+    @brand = Brand.friendly.find(params[:id])
+    @brand.data_state.reset!
+    @brand.save
+    redirect_to :back, notice: 'Data State reset'
+  end
+
+  member_action :reset_export_state do
+    @brand = Brand.friendly.find(params[:id])
+    @brand.export_state.reset!
+    @brand.save
+    redirect_to :back, notice: 'Export State reset'
   end
 
   action_item(:build_connections, only: :show)  do
@@ -153,9 +162,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
   action_item(:full_export, only: :show) do
    link_to('Auto Export Route', full_export_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
-  action_item(:reset_data_states, only: :show) do
-     link_to('Reset DataState', reset_data_states_admin_brand_path(brand), class: 'btn btn-primary btn-med')
-  end
+
 
 
 
@@ -180,14 +187,12 @@ ActiveAdmin.register Brand, as: 'Brands' do
       end
 
       # def update
-      #   byebug
       #   @brand = Brand.friendly.find(params[:id])
       #   @brand.update(permitted_params[:brand])
       #
       # end
 
      #  def create
-     #       byebug
      #       @brand = Brand.create(permitted_params[:brand])
      # end
   end

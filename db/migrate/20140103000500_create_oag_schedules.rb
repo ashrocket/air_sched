@@ -3,7 +3,7 @@ class CreateOagSchedules < ActiveRecord::Migration
   def change
      create_table :oag_schedules do |t|
        t.references :report_key
-
+       t.integer    :seq, default: 1
        t.datetime :eff_date
        t.datetime :disc_date
 
@@ -38,18 +38,22 @@ class CreateOagSchedules < ActiveRecord::Migration
 
        t.timestamps
      end
-     add_index :oag_schedules, [:report_key_id,:eff_date], :name => 'oag_eff_date'
-     add_index :oag_schedules, [:report_key_id, :disc_date], :name => 'oag_disc_date'
-     add_index :oag_schedules, [:report_key_id, :eff_date, :disc_date], :name => 'oag_eff_disc_dates'
-     add_index :oag_schedules, [:report_key_id, :eff_date, :disc_date, :origin_apt, :dep_time_local], :name => 'oag_origins'
+     add_index :oag_schedules, [:report_key_id,:seq], :name => 'oag_sched_rk_cs'
+     add_index :oag_schedules, [:report_key_id,:seq, :origin_apt], :name => 'oag_keyed_origins'
+     add_index :oag_schedules, [:report_key_id,:seq, :dest_apt], :name => 'oag_keyed_dests'
+     add_index :oag_schedules, [:report_key_id,:seq, :origin_apt, :dest_apt], :name => 'oag_keyed_airports'
+     add_index :oag_schedules, [:report_key_id,:seq, :mkt], :name => 'oag_keyed_mkts'
 
 
-     add_index :oag_schedules, [:airline_code, :flight_num], :name => 'oag_flight_id'
-     add_index :oag_schedules, [:dep_time_local, :flight_num], :name => 'oag_flight_id_time'
-     add_index :oag_schedules, [:origin_apt, :dest_apt], :name => 'oag_comp_mkt'
-     add_index :oag_schedules, :mkt
-     add_index :oag_schedules, :dest_apt
-     add_index :oag_schedules, :origin_apt
+
+     add_index :oag_schedules, [:report_key_id,:seq, :eff_date], :name => 'oag_eff_date'
+     add_index :oag_schedules, [:report_key_id,:seq, :disc_date], :name => 'oag_disc_date'
+     add_index :oag_schedules, [:report_key_id,:seq, :eff_date, :disc_date], :name => 'oag_eff_disc_dates'
+     add_index :oag_schedules, [:report_key_id,:seq, :eff_date, :disc_date, :origin_apt, :dep_time_local], :name => 'oag_departures'
+
+
+     add_index :oag_schedules, [:report_key_id,:seq,:airline_code, :flight_num], :name => 'oag_flight_id'
+     add_index :oag_schedules, [:report_key_id,:seq,:dep_time_local, :flight_num], :name => 'oag_flight_id_time'
 
 
    end

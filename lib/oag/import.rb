@@ -165,7 +165,7 @@ module Oag
 
     orig_airports = schedules.collect{ |n| n[:origin_apt] }
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
-    OagSchedule.keyed(report.report_key).delete_all
+    # OagSchedule.keyed(report.report_key).delete_all
 
     report.stash_log "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key_code}"
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
@@ -179,12 +179,17 @@ module Oag
     loaded = 0
     group_size = 2000
     schedule_count = schedules.count
+    report_key     = report.report_key
+    next_seq       = report_key.next_seq
+    #  Just in case there was an unfinished report that loaded schedules
+    OagSchedule.delete_all(report_key: report_key, seq: next_seq)
 
     schedules.in_groups_of(group_size) do |schedule_group|
     schedule_group.compact.each do |sched|
       begin
             oag_sched = OagSchedule.new(sched)
-            oag_sched.report_key = report.report_key
+            oag_sched.report_key = report_key
+            oag_sched.seq        = next_seq
             schedule_records << oag_sched
 
       rescue Exception => e

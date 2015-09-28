@@ -17,10 +17,10 @@
   %dt Description:
   %dd= @brand.description
   %dt Default currency:
-  %dd= @brand.default_currency
+  %dd= @brand.settings.default_currency
   %br
   %dt Max Segments:
-  %dd= @brand.max_segments
+  %dd= @brand.settings.max_segments
   %br
   %dt Hosts:
   %dd
@@ -30,25 +30,41 @@
           = link_to(h.name, [:admin,h])
 
   %br
-  %dt Data States:
-  -#%dd= @brand.data_states
+  %dt Export State:
   %dd
-    - sorted_data_states = @brand.data_states.sort_by { |k,v| v["updated_at"] or Time.now }.reverse
+    %ul.list-group
+    - if  @brand.export_state.idle?
+      %li.list-group-item.col-sm-4.list-group-item-info= @brand.export_state.current_state
+    - else
+      %li.list-group-item.col-sm-4.list-group-item-warning
+        %span= @brand.export_state.current_state
+        .pull-right.btn.btn-sm.btn-default= link_to("reset", reset_export_state_admin_brand_path)
+
+  %dt Data State:
+  %dd
+    %ul.list-group
+    - if  @brand.data_state.idle?
+      %li.list-group-item.col-sm-4.list-group-item-info= @brand.data_state.current_state
+    - else
+      %li.list-group-item.col-sm-4.list-group-item-warning
+        %span= @brand.data_state.current_state
+        .pull-right.btn.btn-sm.btn-default= link_to("reset", reset_data_state_admin_brand_path)
+
+
+  %br
+  %dt Data Stats:
+  %dd
+    - sorted_stats = @brand.data_state.stats.sort_by { |k,v| v["updated_at"] or Time.now }.reverse
     %ul#sorted_hosts.list-group
-      - sorted_data_states.each do |k,v|
+      - sorted_stats.each do |k,v|
         - if v.is_a? Hash
-          - state_class = (v["state"] and v["state"].eql? 'processing') ? 'list-group-item-warning' : 'list-group-item-info'
-          %li.list-group-item.col-sm-8{class: state_class}
-            %div= "#{k}: #{v["state"]}"
-            %div= v.except("updated_at", "state")
+          %li.list-group-item.list-group-item-info.col-sm-8
+            %div= "#{k}: #{v.except('updated_at')}"
             %div= v["updated_at"] or nil
-            = link_to("reset", reset_data_states_admin_brand_path(data_state:k))
         - else
           %li.list-group-item.list-group-item-info.col-sm-8
             %div= "#{k}"
             %div= v
-            = link_to("reset", reset_data_states_admin_brand_path(data_state:k))
-
   %br
 
   %dt Active:
@@ -60,7 +76,7 @@
   %dt Latest Route Maps :
   %dd
     %ul#sorted_hosts.list-group
-      - @brand.export_smart_route_reports.limit(2).each do |rpt|
+      - @brand.route_map_export_reports.limit(2).each do |rpt|
         %li.list-group-item.col-sm-4
           = link_to("#{rpt.workflow_state} #{rpt.location}", [:admin,rpt])
           %div= rpt.updated_at

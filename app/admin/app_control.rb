@@ -27,7 +27,6 @@ ActiveAdmin.register AppControl do
       end
       #
       # def update
-      #   byebug
       #   @singly = AppControl.singleton
       #   @singly.update(permitted_params[:app_control])
       # end

@@ -5,7 +5,9 @@
   %dd= @oag_report.msg_id
   %dt Report Key:
   - if @oag_report.report_key
-    %dd= link_to @oag_report.report_key.report_key, admin_report_key_path(@oag_report.report_key)
+    %dd= link_to @oag_report.report_key.code, admin_report_key_path(@oag_report.report_key)
+    %dt Report Key Seq:
+    %dd= @oag_report.seq
   - else
     %dd
   %dt Report status:

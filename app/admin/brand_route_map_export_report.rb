@@ -1,11 +1,11 @@
-ActiveAdmin.register ExportSmartRouteReport  do
+ActiveAdmin.register BrandRouteMapExportReport  do
   menu priority: 1, label: 'Route Map Reports', parent: 'Reports'
   actions :all, :except => [:new,:edit]
 
 
   controller do
       def show
-        @export_smart_route_report = ExportSmartRouteReport.find(params[:id])
+        @brand_route_map_export_report = BrandRouteMapExportReport.find(params[:id])
          render :show,  layout: 'active_admin'
       end
     end
@@ -13,8 +13,8 @@ ActiveAdmin.register ExportSmartRouteReport  do
   index do
     selectable_column
 
-      column 'Report Id' do |report|
-        report.id
+      column 'Report Id' do |export_report|
+        export_report.id
       end
       column :brand
       column :state do |report|

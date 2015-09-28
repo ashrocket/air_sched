@@ -1,0 +1,16 @@
+%p#notice= notice
+%p#alert= alert
+%dl.dl-horizontal
+  %dt ID:
+  %dd= @brand_route_map_export_report.id
+  %dt Brand:
+  %dd=  link_to(@brand_route_map_export_report.brand.name, admin_brand_path(@brand_route_map_export_report.brand))
+  %dt Location:
+  - if @brand_route_map_export_report.location.blank?
+    %dd
+  - else
+    %dd= link_to @brand_route_map_export_report.location, @brand_route_map_export_report.location
+  %dt Report status:
+  %dd= @brand_route_map_export_report.current_state.name
+  %dt Report details:
+  %dd= @brand_route_map_export_report.details

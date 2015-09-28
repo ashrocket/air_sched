@@ -19,7 +19,6 @@ module AirSched
     #   config.sass.load_paths << path.join('stylesheets')
     #   config.assets.paths += %w(javascripts fonts images).map(&path.method(:join))
     # end
-    # byebug
     #
 
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
@@ -46,6 +45,7 @@ module AirSched
     end
 
     config.exceptions_app = self.routes
+    config.active_job.queue_adapter = :sidekiq
 
 
   end

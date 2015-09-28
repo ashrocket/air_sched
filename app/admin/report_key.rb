@@ -6,7 +6,7 @@ ActiveAdmin.register ReportKey do
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :report_key, :name, :comment, :file_pattern, :active, brand_ids: []
+  permit_params :code, :name, :comment, :file_pattern, :active, brand_ids: []
   #
   # or
   #
@@ -15,8 +15,13 @@ ActiveAdmin.register ReportKey do
   #  permitted << :other if resource.something?
   #  permitted
   # end
+
+
+
+
   index do
-       column :report_key
+       column :code
+       column :current_seq
        column :name
        column :file_pattern
        column :comment

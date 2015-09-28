@@ -27,19 +27,17 @@
       -#TODO:  Change the association checkboxes to use Jquey List Boxes
       -#with Add Left or Remove Right
       = f.input :description
-      = f.input :default_currency
-      = f.input :max_segments
       -#TODO:  Change the association checkboxes to use filter Only for Hosts with not associated with
       -# would be best to enable nested attribute creation
 
       = f.association :hosts, collection: Host.branded_or_unassigned(@brand), as: :check_boxes, label_method: lambda {|host| host.brand ? "#{host.name} (Brand:#{host.brand.brand_key})" : "#{host.name} (Brand: unnassigned)"}
       = f.input :active
 
-      -#= f.input :data_states, as: :text
-      -#= f.simple_fields_for :data_states do |s|
-      -#  = s.input 'branded_connections'
-      -#  = s.input 'smart_routes'
-      -#  = s.input 'route_maps'
+      #settings
+        = f.simple_fields_for :settings do |settings|
+          = settings.input :default_currency, wrapper: :small
+          = settings.input :max_segments, wrapper: :small
+
     %br
     .form-actions.col-sm-offset-1
       = f.button :submit, class: 'btn btn-primary'

@@ -55,6 +55,7 @@ class BrandsController < ApplicationController
     def brand_params
       params.require(:brand).permit(:brand_key, :name, :description,
                                     :default_currency, :host_map, :active, :slug,
-                                    report_key_ids: [])
+                                    report_key_ids: [], settings_attributes: [:route_map_filename, :default_currency, :max_segments])
     end
+
 end

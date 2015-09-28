@@ -39,6 +39,7 @@ gem 'bootstrap-generators', '~> 3.3.4'
 
 #View based gems
 gem 'simple_form', '~> 3.1.0'
+# gem 'cocoon', '~> 1.2.6'
 # gem 'css3-progress-bar-rails', '~> 0.5.0'
 
 gem 'rack-cors', '~> 0.4.0', :require => 'rack/cors'
@@ -54,7 +55,7 @@ gem 'rabl'
 #
 gem 'parallel', '~> 1.6.1'
 gem 'devise', '~> 3.5.2'
-gem 'activeadmin', '~> 1.0.0.pre1'
+gem 'activeadmin', '1.0.0.pre1'
 gem 'active_admin_import', '~> 2.1.2'
 #
 gem 'rails-settings-cached', '0.4.1'
@@ -62,15 +63,15 @@ gem 'rails-settings-cached', '0.4.1'
 # Asyn Functionality Background processing
 gem 'aws-sdk', '~> 2.1.14'
 gem 'redis-objects', '~> 0.9'
-gem 'sidekiq', '~> 2.17'
+gem 'sidekiq', '3.5.0'
+gem 'sidekiq-cron', '~> 0.3.1'
 gem 'sidekiq-lock', '~> 0.2.0'
 gem 'sidekiq-failures', '~> 0.4.5'
-gem 'sidetiq', '0.5.0'
-gem 'sidekiq-unique-jobs', '~> 3.0.14'
 gem 'sinatra', '>= 1.3.0', :require => nil
-gem 'mastiff', '~> 0.1'
+#gem 'mastiff', path: '../mastiff'
+gem 'mastiff', '~> 0.1.4'
 gem 'roo', '~> 2.1.1'
-
+#
 gem 'exception_handler'
 gem 'seed_dump'
 
@@ -81,7 +82,7 @@ group :development, :test do
     gem 'byebug'
     gem 'rspec',  '~> 3.0.0.beta2'
     gem 'rspec-rails',  '~> 3.0.0.beta2'
-    gem 'rack-mini-profiler'
+    # gem 'rack-mini-profiler'
 
     gem 'cucumber'
     gem 'cucumber-rails', :require=>false

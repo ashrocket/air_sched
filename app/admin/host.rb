@@ -17,7 +17,6 @@ ActiveAdmin.register Host do
   #   link_to 'Clone', clone_admin_host_path(host) if (host and host.id)
   # end
   # action :clone, only: :index do
-  #   byebug
   #   link_to 'Clone', clone_admin_host_path(host) if (host and host.id)
   # end
   # [ :all ].each do |sym|

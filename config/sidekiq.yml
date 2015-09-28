@@ -4,4 +4,5 @@
   - email_queue
   - report_queue
   - export_queue
+:pidfile: ./tmp/pids/sidekiq.pid
 :logfile: log/air_sched_sidekiq.log

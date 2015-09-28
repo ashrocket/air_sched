@@ -5,12 +5,9 @@ require 'sidekiq-lock'
 class SyncMailWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
-  include Sidetiq::Schedulable
   sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
   sidekiq_options lock: { timeout: 120000, name: 'lock-mail-worker' }
 
-  recurrence { minutely(10) }
-  # recurrence { secondly(6) }
 
   def perform
     Rails.logger = Sidekiq::Logging.logger
@@ -26,3 +23,4 @@ class SyncMailWorker
     end
   end
 end
+Sidekiq::Cron::Job.create(name: 'SyncMailWorker', cron: '*/10 * * * *', klass: 'SyncMailWorker')

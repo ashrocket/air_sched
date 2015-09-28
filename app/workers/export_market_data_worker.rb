@@ -6,11 +6,9 @@ require 'sidekiq-lock'
 class ExportMarketDataWorker
 include Sidekiq::Worker
 include Sidekiq::Lock::Worker
-include Sidetiq::Schedulable
 sidekiq_options :queue => :export_queue, :retry => false, :backtrace => true
 sidekiq_options lock: { timeout: 600000, name: 'lock-export-market-worker' }
 
-recurrence { daily(1) }
 
 def perform()
    Rails.logger = Sidekiq::Logging.logger
@@ -29,3 +27,4 @@ def perform()
    end
 end
 end
+Sidekiq::Cron::Job.create(name: 'ExportMarketDataWorker daily', cron: '* * */1 * *', klass: 'ExportMarketDataWorker')

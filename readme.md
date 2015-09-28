@@ -116,7 +116,7 @@ creates a new  Oag::Process object, and move the OagReport object through it's s
 
  - processor.import_oag_file(report)
  - processor.refresh_airports(report)
- - UpdateAirportsWorker.perform_async()
+ - UpdateAirportsWorker.perform_async
  - processor.refresh_airlines(report)
  - processor.refresh_direct_flights(report)
  - processor.refresh_destinations(report)
@@ -211,10 +211,11 @@ These files are already in the db folder.
 
 **TODOs**
 
- 1. Update Schedule Importer to use a fast upsert methodology so schedule_ids don't need to be destroyed if they haven't changed.  Most likely a Blob Checksum, or a diff_set.
- 2. Update BrandedConnection builder and later states to check against existing datasets and only update changes.
- 3. Add realtime log viewing to Admin Console
- 4. Refactor Import StateMachine to a real state machine
- 5. Implement RouteMap Exporter as a statemachine
+ 1. Update Schedule Importer to use a fast upsert methodology so schedule_ids don't need to be destroyed if they haven't changed.  Most likely a Blob Checksum, or a diff_set. - done
+ 2. Update BrandedConnection builder and later states to check against existing datasets and only update changes. - done
+ 3. Add realtime log viewing to Admin Console - done
+ 4. Refactor Import StateMachine to a real state machine  - done
+ 5. Implement RouteMap Exporter as a statemachine - done
+ 6. Replace sidetiq with sidekiq-cron
  
 

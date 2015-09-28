@@ -167,7 +167,7 @@ class ExportRouteValidatorReport < ActiveRecord::Base
          ExportBrandRouteMapValidatorWorker.delay_for(30).perform_async(brand.brand_key,id)
          halt
        else
-         UpdateBrandConnectionsWorker.delay_for(30).perform_async(brand.brand_key)
+         BrandDataProcessorWorker.delay_for(30).perform_async(brand.brand_key)
          # Transtion to the waiting for connections state
          dly = (5..30).to_a.sample
          ExportBrandRouteMapValidatorWorker.delay_for(dly).perform_async(brand.brand_key,id)

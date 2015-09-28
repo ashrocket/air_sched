@@ -53,44 +53,45 @@ class OagReport < ActiveRecord::Base
        event :process_attachment, :transitions_to => :queued
     end
     state :direct_flights_refreshed do
-       event :refresh_destinations, :transitions_to => :destinations_refreshed
+       event :finalize, :transitions_to => :finished
+       # event :refresh_destinations, :transitions_to => :destinations_refreshed
        event :reject, :transitions_to => :rejected
        event :reset, :transitions_to => :uninitialized
 
        event :process_attachment, :transitions_to => :queued
 
     end
-    state :destinations_refreshed do
-       event :refresh_cnx_pairs, :transitions_to => :connections_refreshed
-       event :reject, :transitions_to => :rejected
-       event :reset, :transitions_to => :uninitialized
-
-       event :process_attachment, :transitions_to => :queued
-
-    end
-    state :connections_refreshed do
-      event :wait_for_destinations_filter, :transitions_to => :waiting_for_destinations_filtered
-      event :reject, :transitions_to => :rejected
-      event :reset, :transitions_to => :uninitialized
-
-      event :process_attachment, :transitions_to => :queued
-    end
-    state :waiting_for_destinations_filtered do
-      event :finalize, :transitions_to => :finished
-      event :reject, :transitions_to => :rejected
-      event :reset, :transitions_to => :uninitialized
-
-      event :process_attachment, :transitions_to => :queued
-    end
+    # state :destinations_refreshed do
+    #    event :refresh_cnx_pairs, :transitions_to => :connections_refreshed
+    #    event :reject, :transitions_to => :rejected
+    #    event :reset, :transitions_to => :uninitialized
+    #
+    #    event :process_attachment, :transitions_to => :queued
+    #
+    # end
+    # state :connections_refreshed do
+    #   event :wait_for_destinations_filter, :transitions_to => :waiting_for_destinations_filtered
+    #   event :reject, :transitions_to => :rejected
+    #   event :reset, :transitions_to => :uninitialized
+    #
+    #   event :process_attachment, :transitions_to => :queued
+    # end
+    # state :waiting_for_destinations_filtered do
+    #   event :finalize, :transitions_to => :finished
+    #   event :reject, :transitions_to => :rejected
+    #   event :reset, :transitions_to => :uninitialized
+    #
+    #   event :process_attachment, :transitions_to => :queued
+    # end
     state :finished
     state :rejected
 
     after_transition do |from, to, triggering_event, *event_args|
       case to
         when /uninitialized|finished|rejected|queued_for_large_file/
-          stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
+          stash_log "#{msg_id} #{id}: #{report_key_code} completed: #{from} -> #{to}, #{triggering_event}!"
         else
-          stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioned FROM #{from} -> #{to} calling ScheduleImportWorker"
+          stash_log "#{msg_id} #{id}: #{report_key_code} completed: #{from} -> #{to}, #{triggering_event}!  Calling ScheduleImportWorker"
 
           dly = (5..10).to_a.sample
           ScheduleImportWorker.delay_for(dly).perform_async(id)
@@ -98,7 +99,7 @@ class OagReport < ActiveRecord::Base
     end
 
     on_transition do |from, to, triggering_event, *event_args|
-      stash_log "#{msg_id} #{id}: #{report_key_code} Event: #{triggering_event} transitioning FROM #{from} -> #{to}"
+      stash_log "#{msg_id} #{id}: #{report_key_code} start: #{from} -> #{to} , #{triggering_event}!"
     end
   end
 
@@ -118,13 +119,13 @@ class OagReport < ActiveRecord::Base
       when /airlines_refreshed/
         refresh_direct_flights!
       when /direct_flights_refreshed/
-        refresh_destinations!
-      when /destinations_refreshed/
-        refresh_cnx_pairs!
-      when /connections_refreshed/
-        wait_for_destinations_filter!
-      when /waiting_for_destinations_filtered/
         finalize!
+      # when /destinations_refreshed/
+      #   refresh_cnx_pairs!
+      # when /connections_refreshed/
+      #   wait_for_destinations_filter!
+      # when /waiting_for_destinations_filtered/
+      #   finalize!
     end
   end
   
@@ -139,6 +140,7 @@ class OagReport < ActiveRecord::Base
       estimated_report_key  = ReportKey.match_filename(report_name)
       if estimated_report_key.is_a? ReportKey
         self.report_key = estimated_report_key
+        self.seq = self.report_key.next_seq
         save
       else
         stash_log "Report rejected due to  undefined or invalid report key #{report_name}"
@@ -152,7 +154,8 @@ class OagReport < ActiveRecord::Base
   end
 
   def import_oag_file
-      self.report_key.state = 'processing'
+      self.report_key.reset!
+      self.report_key.import_schedule!
       self.report_key.save
       self.load_status['schedule_import_time'] = Time.now
       if large_report?
@@ -175,7 +178,6 @@ class OagReport < ActiveRecord::Base
   def refresh_airports
     processor.refresh_airports(self)
     save
-    UpdateAirportsWorker.perform_async()
   end
   def refresh_airlines
     processor.refresh_airlines(self)
@@ -185,48 +187,51 @@ class OagReport < ActiveRecord::Base
     processor.refresh_direct_flights(self)
     save
   end
-  def refresh_destinations
-    self.load_status['destinations_map_status'] = 'refreshing'
-    processor.refresh_destinations(self)
-    self.load_status['destinations_map_status'] = 'refreshed'
-    FilterDestinationsWorker.perform_async(id)
-    save
-  end
-  def refresh_cnx_pairs
-    processor.refresh_cnx_pairs(self)
-    save
-  end
-  def wait_for_destinations_filter
-  end
+  # def refresh_destinations
+  #   self.load_status['destinations_map_status'] = 'refreshing'
+  #   processor.refresh_destinations(self)
+  #   self.load_status['destinations_map_status'] = 'refreshed'
+  #   FilterDestinationsWorker.perform_async(id)
+  #   save
+  # end
+  # def refresh_cnx_pairs
+  #   processor.refresh_cnx_pairs(self)
+  #   save
+  # end
+  # def wait_for_destinations_filter
+  # end
 
   def finalize
-    unless load_status['destinations_map_status'].eql? 'eff_days_filtered'
-      stash_log "#{msg_id} #{id}: #{report_key_code}  -> waiting for destinations filter"
-      ScheduleImportWorker.delay_for(1.minute).perform_async(id)
-      halt
-    else
-      processor.finalize(self, 'processed')
-      self.report_key.state = 'idle'
-      self.report_key.save
+    # unless load_status['destinations_map_status'].eql? 'eff_days_filtered'
+    #   stash_log "#{msg_id} #{id}: #{report_key_code}  -> waiting for destinations filter"
+    #   ScheduleImportWorker.delay_for(1.minute).perform_async(id)
+    #   halt
+    # else
+    finalize_attachment('processed')
+      report_key.cycle_schedules
+      report_key.confirm_schedule_load!
+      report_key.save
       save
 
-      delay_minutes  = (20..60).to_a.sample
-
       report_key.brands.each do |brand|
-        if brand.active? and AppSwitch.on?('autogenerate_routemaps')
-          report = ExportSmartRouteReport.create(brand: brand)
-          ExportBrandRouteMapsWorker.delay_for(delay_minutes.minute).perform_async(brand.brand_key, report.id)
+        if brand.active? and AppSwitch.on?('autogenerate_routemaps') and brand.export_state.idle?
+          export_report = brand.pending_export_report
+          export_report.schedule_report_keys[report_key.code] = {'status': 'ready', 'seq': report_key.current_seq}
+          export_report.save
+          r = Oag::Report.new
+          r.auto_export_route_maps(brand, export_report)
         end
       end
 
-    end
+    # end
   end
+
   def reject
-    processor.finalize(self, 'rejected')
-     if self.report_key
-       self.report_key.state = 'idle'
-       self.report_key.save
-     end
+    finalize_attachment('rejected')
+    if self.report_key
+      self.report_key.reset!
+      self.report_key.save
+    end
 
     save
   end
@@ -274,7 +279,6 @@ class OagReport < ActiveRecord::Base
     # TODO:  Check for Existing Report Key filename patterns and only process if Key Exists.
 
     stash_log "Decompressing Email Attachment for message #{msg_id} #{attachment_path}"
-
     ext = File.extname(attachment_path)
 
     if ext.eql? '.csv'
@@ -318,4 +322,17 @@ class OagReport < ActiveRecord::Base
      # self.report_key = ReportKey.none
      # self.report_key = ReportKey.where(name: 'Null Report', report_key: 'NONE').first_or_create if report_key.blank?
    end
+
+
+   def finalize_attachment(status)
+         #TODO provide the option to store the processed files in the processed folder
+        stash_log "Finalizing #{attachment_path} import"
+
+        File.delete attachment_path if File.exist?(attachment_path)
+        File.delete report_path if File.exist?(report_path)
+        Mastiff::Email.finalize([msg_id], status)
+        self.load_status['attachment_status'] = status
+        self.complete = true
+        save
+    end
 end

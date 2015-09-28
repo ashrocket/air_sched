@@ -1,18 +1,18 @@
 class CreateReportKeys < ActiveRecord::Migration
   def change
     create_table :report_keys do |t|
-      t.string :report_key,  null: false
+      t.string :code,  null: false
       t.string :name,  null: false
+      t.string :workflow_state, default: 'idle'
       t.string :file_pattern,  null: false, default: '(?!)'
-      t.string :comment
+      t.string  :comment
       t.boolean :active
-      t.string :state, default: 'idle'
-      t.string :slug
-
+      t.string  :slug
+      t.integer :current_seq, default: 1
 
       t.timestamps
     end
-    add_index :report_keys, :report_key, unique: true
+    add_index :report_keys, :code, unique: true
     add_index :report_keys, :slug, unique: true
 
   end

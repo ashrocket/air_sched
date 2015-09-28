@@ -3,11 +3,8 @@
 class UpdateAirportsWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
-  include Sidetiq::Schedulable
-  recurrence { hourly }
 
-  sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true, unique: true,
-                  unique_job_expiration: 180 * 60
+  sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
 
   sidekiq_options lock: {
         timeout: proc { |_, timeout = 1_200_000 | timeout * 2 },      # you don't use user_id here thus the naming
@@ -17,9 +14,11 @@ class UpdateAirportsWorker
 
   def perform
     Rails.logger = Sidekiq::Logging.logger
-    if lock.acquire! and AppSwitch.on?('update_airports')
-    begin
-      airports = {}
+    Rails.logger.info 'UpdateAirportsWorker Checking for lock and AppSwitch'
+    if  AppSwitch.on?('update_airports')
+      if lock.acquire!
+        begin
+        airports = {}
 
      	File.foreach(File.join('lib', 'assets', 'global_airports.csv')) do |csv_line|
      		escaped_text = csv_line.gsub('\'', '""')
@@ -52,16 +51,10 @@ class UpdateAirportsWorker
         end
         lock.release!
       end
-    else
-      if AppSwitch.on?('update_airports')
-        Sidekiq::Logging.logger.info "Update Airports Worker, busy, delaying  for 1 hour"
-      else
-        Sidekiq::Logging.logger.info "Update Airports disabled, retry in 1 hour"
       end
-        UpdateAirportsWorker.delay_for(60.minute).perform_async()
-
     end
     #Do Something here with the message
     #
   end
 end
+Sidekiq::Cron::Job.create(name: 'UpdateAirportsWorker daily', cron: '* * */1 * *', klass: 'UpdateAirportsWorker')

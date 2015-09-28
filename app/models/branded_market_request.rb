@@ -66,7 +66,7 @@ class BrandedMarketRequest < ActiveRecord::Base
     if airport_currency
       currency = airport_currency.currency_code
     else
-      brand.default_currency
+      brand.settings.default_currency
     end
   end
 

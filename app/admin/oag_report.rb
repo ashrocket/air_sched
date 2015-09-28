@@ -30,11 +30,12 @@ ActiveAdmin.register OagReport  do
       end
       column 'Report Key', :sortable => :report_key do |report|
         if report.report_key
-          link_to report.report_key.report_key, admin_report_key_path(report.report_key)
+          link_to report.report_key.code, admin_report_key_path(report.report_key)
         else
           'No Report Key Matched'
         end
       end
+      column :seq
       column 'Finished', :sortable => :complete  do |report|
         pretty_boolean(report.complete)
       end

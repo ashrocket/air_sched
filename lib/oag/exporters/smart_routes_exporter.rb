@@ -6,7 +6,7 @@ class SmartRoutesExporter
 
   # TODO make this configurable with an App Config Setting or as a Brand attribute
   def filename(brand)
-    "#{brand.brand_key.downcase}_route_map.json"
+    "#{brand.brand_key.downcase}_route_map.#{Date.today}.json"
   end
 
   def export_to_s3(brand)

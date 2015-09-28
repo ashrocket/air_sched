@@ -1,15 +1,29 @@
 class Brand < ActiveRecord::Base
   extend FriendlyId
+  before_create :build_defaults
+
+
+
   friendly_id :brand_key, use: [:slugged, :finders]
 
+  has_one :settings, class_name: 'BrandSetting',  dependent: :destroy
+  has_one :data_state, class_name: 'BrandDataState', dependent: :destroy
+  has_one :export_state, class_name: 'BrandExportState', dependent: :destroy
+
   has_many :brand_report_keys, dependent: :destroy
-  has_many :report_keys,  -> { order(report_key: :asc) }, through: :brand_report_keys
+  has_many :report_keys,  -> { order(code: :asc) }, through: :brand_report_keys
+
 
   has_many :hosts, -> { order(name: :asc) }
 
-  has_many :export_smart_route_reports, -> {order('export_smart_route_reports.updated_at DESC')}
+  has_many :route_map_export_reports,  -> {order('brand_route_map_export_reports.updated_at DESC')}, class_name: 'BrandRouteMapExportReport'
+  has_many :oag_reports, -> {order('oag_reports.updated_at DESC')}
 
   scope :keyed,     lambda {|brand_key| find_by(brand_key: brand_key)}
+
+
+  accepts_nested_attributes_for :settings, reject_if: :all_blank, allow_destroy: true
+  validates_presence_of :settings
 
   # Class Methods
   class << self
@@ -20,54 +34,17 @@ class Brand < ActiveRecord::Base
   #
   # Instance Methods
   #
-
-  # Psuedo State Machine
-  # TODO: Add a seperate StateMachine object for Sub State Machines,
-  # Can't add state machine to Brand since state machien doesn't support sub-states
-  def processing_connections?
-    data_states['branded_connections'] and
-    data_states['branded_connections']['state'] and
-    data_states['branded_connections']['state'].eql? 'processing'
-  end
-  def processing_smart_routes?
-    data_states['smart_routes'] and
-    data_states['smart_routes']['state'] and
-    data_states['smart_routes']['state'].eql? 'processing'
-  end
-  def processing_route_maps?
-    data_states['route_maps'] and
-    data_states['route_maps']['state'] and
-    data_states['route_maps']['state'].eql? 'processing'
-  end
-  def processing_route_map_export?
-    data_states['route_maps_export'] and
-    data_states['route_maps_export']['state'] and
-    data_states['route_maps_export']['state'].eql? 'processing'
-  end
-  def processing_route_map_validator_export?
-    data_states['route_map_validator_export'] and
-    data_states['route_map_validator_export']['state'] and
-    data_states['route_map_validator_export']['state'].eql? 'processing'
-  end
-  def processing_potential_markets?
-    data_states['potential_markets'] and
-    data_states['potential_markets']['state'] and
-    data_states['potential_markets']['state'].eql? 'processing'
-  end
-  def processing_potential_carriers?
-    data_states['potential_carriers'] and
-    data_states['potential_carriers']['state'] and
-    data_states['potential_carriers']['state'].eql? 'processing'
-  end
-  def processing_potential_routes?
-    data_states['potential_routes'] and
-    data_states['potential_routes']['state'] and
-    data_states['potential_routes']['state'].eql? 'processing'
+  def pending_export_report
+    export_reports = route_map_export_reports
+    if not export_reports.empty? and export_reports.last.uninitialized?
+       export_reports.last
+    else
+      rpt = route_map_export_reports.create
+      save
+      rpt
+    end
   end
 
-  def build_connections
-    oag_reports = report_keys.map{ |rk| OagReport.keyed(rk.report_key).latest}
-  end
 
   def hosts_for(cxrs)
      hosts.includes(:airlines).where(Airline[:code].in(cxrs)).references(:airlines)
@@ -100,5 +77,28 @@ class Brand < ActiveRecord::Base
      carrier_codes = OagSChedule.branded(self).distinct(:airline_code).distinct(:airline_code)
      carriers = Airline.where(code: carrier_codes)
    end
+
+
+
+  private
+  def build_defaults
+    # build default data_state instance. Will use default params.
+    # The foreign key to the owning Brand model is set automatically
+    build_data_state
+    true
+    build_export_state
+    true
+    build_settings
+    true
+    # Always return true in callbacks as the normal 'continue' state
+         # Assumes that the data_state can **always** be created.
+         # or
+         # Check the validation of the data_state. If it is not valid, then
+         # return false from the callback. Best to use a before_validation
+         # if doing this. View code should check the errors of the child.
+         # Or add the child's errors to the User model's error array of the :base
+         # error item
+  end
+
 
 end

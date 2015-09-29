@@ -3,6 +3,8 @@
 class UpdateAirportsWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
+  include Sidetiq::Schedulable
+  recurrence { daily }
 
   sidekiq_options :queue => :email_queue, :retry => false, :backtrace => true
 
@@ -57,4 +59,3 @@ class UpdateAirportsWorker
     #
   end
 end
-Sidekiq::Cron::Job.create(name: 'UpdateAirportsWorker daily', cron: '* * */1 * *', klass: 'UpdateAirportsWorker')

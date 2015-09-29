@@ -8,7 +8,10 @@ ActiveAdmin.register Brand, as: 'Brands' do
   #
   permit_params :brand_key, :report_keys, :name,  :description,
                 :default_currency, :max_segments,  :active, report_key_ids: [], host_ids: [],
-                settings_attributes: [:route_map_filename, :default_currency, :max_segments]
+                settings_attributes: [:route_map_filename,
+                                      :default_currency,
+                                      :max_segments,
+                                      :schedule_load_timeout]
 
 
 
@@ -97,17 +100,20 @@ ActiveAdmin.register Brand, as: 'Brands' do
 
   member_action :full_export_route_maps do
     @brand = Brand.friendly.find(params[:id])
+
+    current_sched_set_ids = @brand.report_keys.map{|report_key| report_key.current_schedule_set_id }
+
+    if current_sched_set_ids.include? nil
+      redirect_to :back, alert: 'Not all report_keys have loaded schedules!'
+    end
+
     if @brand.export_state.idle?
-      export_report = @brand.pending_export_report
-      @brand.report_keys.each do |rk|
-        seq = rk.latest_valid_seq
-        if seq
-          export_report.schedule_report_keys[rk.code] = {'status': 'ready', 'seq': seq}
-        end
-        export_report.save
+
+      @brand.report_keys.each do |report_key|
+
+        BrandRouteMapsSyncWorker.perform_async({'brand_key': @brand.brand_key, 'report_key': report_key.code, 'schedule_set_id': report_key.current_schedule_set_id} )
       end
-      r = Oag::Report.new
-      r.auto_export_route_maps(@brand, export_report)
+
       redirect_to :back, notice: 'Beginning to build Full Route Maps and Export (this may take a while)...'
     else
       redirect_to :back, alert: 'In Progress! - Already building build Full Route Maps and Export (this may take a while)'
@@ -183,6 +189,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
 
       def new
         @brand = Brand.new
+        @brand.settings = BrandSetting.new
         render :new,  layout: 'active_admin'
       end
 

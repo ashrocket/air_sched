@@ -30,6 +30,10 @@
           = link_to(h.name, [:admin,h])
 
   %br
+  %dt Load Time Out:
+  %dd= @brand.settings.schedule_load_timeout
+  %br
+
   %dt Export State:
   %dd
     %ul.list-group
@@ -54,7 +58,7 @@
   %br
   %dt Data Stats:
   %dd
-    - sorted_stats = @brand.data_state.stats.sort_by { |k,v| v["updated_at"] or Time.now }.reverse
+    - sorted_stats = @brand.data_state.stats.sort_by { |k,v| v["updated_at"] or DateTime.now.in_time_zone  }.reverse
     %ul#sorted_hosts.list-group
       - sorted_stats.each do |k,v|
         - if v.is_a? Hash

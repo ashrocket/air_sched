@@ -37,6 +37,7 @@
         = f.simple_fields_for :settings do |settings|
           = settings.input :default_currency, wrapper: :small
           = settings.input :max_segments, wrapper: :small
+          = settings.input :schedule_load_timeout, wrapper: :small
 
     %br
     .form-actions.col-sm-offset-1

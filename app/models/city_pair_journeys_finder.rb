@@ -1,7 +1,7 @@
 class CityPairJourneysFinder
 
 	def initialize
-		@start_time = Time.now
+		@start_time = DateTime.now.in_time_zone
     ReportKey.current_key = 'SNN'
 		@params = {  
 			"data_key"=>"SNN", 
@@ -30,7 +30,7 @@ class CityPairJourneysFinder
 				find_flights
 			end
 		end
-		puts "Finished in #{Time.now - @start_time} seconds"
+		puts "Finished in #{DateTime.now.in_time_zone  - @start_time} seconds"
 	end
 
 	def setup_storage
@@ -83,7 +83,7 @@ class CityPairJourneysFinder
 
 	def find_flights
 		(0...180).each do |num|
-			actual_date = Time.now + num.days
+			actual_date = DateTime.now.in_time_zone  + num.days
 			@month = actual_date.month
 			@day = actual_date.day
 			date = (actual_date).strftime("%m-%d-%Y")

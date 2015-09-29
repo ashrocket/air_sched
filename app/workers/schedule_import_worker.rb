@@ -19,7 +19,7 @@ class ScheduleImportWorker
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
-        report = OagReport.find_by(id: report_id)
+        report = ScheduleSet.find_by(id: report_id)
 
         if report
           Sidekiq::Logging.logger.info "Import Worker Lock acquired, processing #{report_id}: #{report.report_key_code}"
@@ -31,12 +31,11 @@ class ScheduleImportWorker
         lock.release!
       end
     else
-      report = OagReport.find_by(id: report_id)
-      timeout_minutes = lock.timeout/60_000
-      delay_time = timeout_minutes/6
+      report = ScheduleSet.find_by(id: report_id)
+      dly = (10..180).to_a.sample
 
-      Sidekiq::Logging.logger.info "Import Worker, busy, check back on  #{report_id} in #{delay_time} minutes #{report.report_key_code}"
-      ScheduleImportWorker.delay_for(delay_time.minute).perform_async(report_id)
+      Sidekiq::Logging.logger.info "Import Worker, busy, check back on  #{report_id} in #{dly} seconds #{report.report_key_code}"
+      ScheduleImportWorker.delay_for(dly).perform_async(report_id)
     end
 
   end

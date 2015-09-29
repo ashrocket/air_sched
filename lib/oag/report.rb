@@ -8,9 +8,8 @@ module Oag
 
       # CURRENTLY DOES NOT SUPPORT EMBEDDED SEGMENTS, AS THE SCHEDULE MODEL DOESN'T KNOW THE VIA POINT
       # AND FURTHER MORE YOU CAN End Up with Circle Trip Flights like TR 2771
-      origins = OagSchedule.branded(brand).for_cxrs(filtered_cxrs).stops(0)
-                           .pluck(:origin_apt)
-                           .sort.uniq
+
+      origins = brand.origins.pluck(:origin_apt).sort
 
 
 
@@ -19,25 +18,15 @@ module Oag
 
       origins.each_with_index do |origin_code, index|
 
-        via_points =
-            OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
-                .departing(origin_code).stops(0)
-                .pluck(:dest_apt).sort.uniq
-
+        via_points = brand.current_schedules.departing(origin_code).select(:dest_apt).distinct.pluck(:dest_apt).sort
 
         # via_points.each_with_index do |via_code, via_index|
         Parallel.each_with_index(via_points, in_threads:4) do |via_code, via_index|
 
 
            log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
-
-           leg1_scheds = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
-                                    .departing(origin_code)
-                                    .arriving(via_code).stops(0)
-
-           leg2_scheds = OagSchedule.branded(brand).for_cxrs(filtered_cxrs)
-                                    .departing(via_code).stops(0)
-                                    .reject{|sched| sched.dest_apt == origin_code}
+           leg1_scheds = brand.current_schedules.departing(origin_code).arriving(via_code)
+           leg2_scheds = brand.current_schedules.departing(via_code).reject{|sched| sched.dest_apt == origin_code}
 
            possible_routes = Set.new
 
@@ -120,7 +109,7 @@ module Oag
                             " of #{tot} remaining for #{brand.brand_key}"
           tot = tot - connection_group.compact.count
       end
-      brand.data_state.stats['branded_connections'] = {'count': total_branded_connections, 'updated_at': Time.now}
+      brand.data_state.stats['branded_connections'] = {'count': total_branded_connections, 'updated_at': DateTime.now.in_time_zone }
       brand.save
       brand.data_state.confirm_connections!
 
@@ -144,7 +133,7 @@ module Oag
       counts_array = BrandedMarketSegmentsRequest.branded(brand).pluck('DISTINCT segment_count')
       counts_array.map!{ |c| { segs: c, count: BrandedMarketSegmentsRequest.branded(brand).with_segs(c).count} }
 
-      brand.data_state.stats['smart_routes'] = {'count': counts_array, 'updated_at': Time.now}
+      brand.data_state.stats['smart_routes'] = {'count': counts_array, 'updated_at': DateTime.now.in_time_zone }
       brand.save
       brand.data_state.confirm_smart_routes!
 
@@ -194,7 +183,7 @@ module Oag
       branded_route_map.save
 
 
-      brand.data_state.stats['route_maps'] = {'updated_at': Time.now, 'markets': market_maps.keys.count}
+      brand.data_state.stats['route_maps'] = {'updated_at': DateTime.now.in_time_zone , 'markets': market_maps.keys.count}
       brand.save
       brand.data_state.confirm_route_maps!
 
@@ -221,16 +210,6 @@ module Oag
     end
 
 
-    def auto_export_route_maps(brand, export_report)
-     unless brand.export_state.waiting_for_route_map_export?
-        if brand.export_state.idle?
-          brand.export_state.auto_export_route_maps!(export_report)
-        else
-        # If currently processing a different Export, then check later
-          BrandDataProcessorWorker.delay_for(10.minutes).perform_async(brand.brand_key, 'auto_export_route_maps')
-        end
-     end
-   end
 
   private
 
@@ -306,12 +285,9 @@ module Oag
             Rails.logger.info " ==== (#{brand.brand_key}) Building One Segment mkt requests  for #{origin} #{dest} "
             Rails.logger.info " ==== (#{brand.brand_key}) Building #{index} of (#{one_segment_markets.count}) "
 
-
-
-            mkt_operating_carriers = OagSchedule.branded(brand).market(origin, dest).pluck(:airline_code).uniq
+            mkt_operating_carriers = brand.current_schedules.market(origin, dest).select(:airline_code).distinct.pluck(:airline_code)
 
             hostcodes = brand.hostcodes_map
-
             #  TODO:  Possbily Group Common Host with Multiple Carriers into the same RouteRequest
             mkt_operating_carriers.each do |cxr|
                 host_codes = hostcodes[cxr]

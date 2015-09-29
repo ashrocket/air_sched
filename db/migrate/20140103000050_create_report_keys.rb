@@ -8,7 +8,7 @@ class CreateReportKeys < ActiveRecord::Migration
       t.string  :comment
       t.boolean :active
       t.string  :slug
-      t.integer :current_seq, default: 1
+      t.integer :current_schedule_set_id
 
       t.timestamps
     end

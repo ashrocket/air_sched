@@ -9,7 +9,7 @@ class BrandExportState < ActiveRecord::Base
 
   workflow do
     state :idle do
-      event :auto_export_route_maps, :transitions_to => :waiting_for_route_map_export
+      event :export_route_maps, :transitions_to => :waiting_for_route_map_export
       event :export_markets, :transitions_to => :waiting_for_markets_export
       event :reset, :transitions_to => :idle
     end
@@ -26,17 +26,17 @@ class BrandExportState < ActiveRecord::Base
 
 
     after_transition do |from, to, triggering_event, *event_args|
-           stash_log "#{brand.brand_key} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
+           stash_log "Brand Export State #{brand.brand_key} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
      end
 
      on_transition do |from, to, triggering_event, *event_args|
-       stash_log "#{brand.brand_key} Event: #{triggering_event} transitioning FROM #{from} -> #{to}"
+       stash_log "Brand Export State  #{brand.brand_key} Event: #{triggering_event} transitioning FROM #{from} -> #{to}"
      end
   end
 
 
-  def auto_export_route_maps(export_report)
-    BrandRouteMapsExportWorker.delay_for(5).perform_async(brand.brand_key, export_report.id)
+  def export_route_maps(export_report_id)
+    BrandRouteMapsExportWorker.delay_for(5).perform_async(brand.brand_key, export_report_id)
   end
 
   def export_markets

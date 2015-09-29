@@ -116,24 +116,25 @@ module Oag
       schedules.delete_if{|s| s[:disc_date].blank?}
       schedules.uniq
   end
-  def process_schedule_chunk(report, schedules, options={})
+
+  def process_schedule_chunk(schedule_set, schedules, options={})
     orig_airports = schedules.collect{ |n| n[:origin_apt] }
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
 
-    report.stash_log "Loading chunk of #{schedules.count} schedules into Schedule tables for #{report.report_key_code}"
+    schedule_set.stash_log "Loading chunk of #{schedules.count} schedules into Schedule tables for #{schedule_set.report_key_code}"
 
-    report.load_status['expired_schedules_count'] = 0 unless report.load_status.has_key?('expired_schedules_count')
-    report.load_status['schedules_count']         = 0 unless report.load_status.has_key?('schedules_count')
-    report.load_status['expired_schedules_count'] +=  expired.count
+    schedule_set.load_status['expired_schedules_count'] = 0 unless schedule_set.load_status.has_key?('expired_schedules_count')
+    schedule_set.load_status['schedules_count']         = 0 unless schedule_set.load_status.has_key?('schedules_count')
+    schedule_set.load_status['expired_schedules_count'] +=  expired.count
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status['schedules_count'] +=  schedules.count
-    report.save
+    schedule_set.load_status['schedules_count'] +=  schedules.count
+    schedule_set.save
 
 
-    report.stash_log "There are  #{expired.count} expired schedules in chunk  for #{report.report_key_code}."
-    report.stash_log "There are  #{report.load_status['expired_schedules_count']} expired schedules so far  for #{report.report_key_code}."
-    report.stash_log "There are  #{report.load_status['schedules_count']} schedules so far for #{report.report_key_code}."
+    schedule_set.stash_log "There are  #{expired.count} expired schedules in chunk  for #{schedule_set.report_key_code}."
+    schedule_set.stash_log "There are  #{schedule_set.load_status['expired_schedules_count']} expired schedules so far  for #{schedule_set.report_key_code}."
+    schedule_set.stash_log "There are  #{schedule_set.load_status['schedules_count']} schedules so far for #{schedule_set.report_key_code}."
 
 
     schedule_records = []
@@ -143,54 +144,52 @@ module Oag
     schedules.in_groups_of(group_size) do |schedule_group|
       schedule_group.compact.each do |sched|
         begin
+
+          sched.merge!(report_key_id: schedule_set.report_key_id, schedule_set_id: schedule_set.id)
           oag_sched = OagSchedule.new(sched)
-          oag_sched.report_key = report.report_key
           schedule_records << oag_sched
+
+         
         rescue Exception => e
             Rails.logger.error sched
             Rails.logger.error e.message
             raise RuntimeError, e
         end
       end
-      report.stash_log "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key_code}."
+      schedule_set.stash_log "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{schedule_set.report_key_code}."
       schedule_count = schedule_count - schedule_records.count
       loaded += schedule_records.count
       OagSchedule.import schedule_records
       schedule_records = []
     end
-    report.stash_log "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key_code} ---"
+    schedule_set.stash_log "--- Loaded  #{loaded} valid schedules into the DB for #{schedule_set.report_key_code} ---"
   end
 
-  def process_schedules(report, schedules, options={})
+  def process_schedules(schedule_set, schedules, options={})
 
     orig_airports = schedules.collect{ |n| n[:origin_apt] }
     dest_airports = schedules.collect{ |n| n[:dest_apt] }
-    # OagSchedule.keyed(report.report_key).delete_all
+    # OagSchedule.keyed(schedule_set.schedule_set_key).delete_all
 
-    report.stash_log "Loading #{schedules.count} schedules into Schedule tables for #{report.report_key_code}"
+    schedule_set.stash_log "Loading #{schedules.count} schedules into Schedule tables for #{schedule_set.report_key_code}"
     expired       = schedules.select{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status['expired_schedules_count'] = expired.count
+    schedule_set.load_status['expired_schedules_count'] = expired.count
 
-    report.stash_log "There are  #{expired.count} expired schedules in the file  for #{report.report_key_code}."
+    schedule_set.stash_log "There are  #{expired.count} expired schedules in the file  for #{schedule_set.report_key_code}."
     schedules.delete_if{|sched| Date.parse(sched[:disc_date]) < Date.today}
-    report.load_status['schedules_count'] = schedules.count
+    schedule_set.load_status['schedules_count'] = schedules.count
 
     schedule_records = []
     loaded = 0
     group_size = 2000
     schedule_count = schedules.count
-    report_key     = report.report_key
-    next_seq       = report_key.next_seq
-    #  Just in case there was an unfinished report that loaded schedules
-    OagSchedule.delete_all(report_key: report_key, seq: next_seq)
 
     schedules.in_groups_of(group_size) do |schedule_group|
     schedule_group.compact.each do |sched|
       begin
-            oag_sched = OagSchedule.new(sched)
-            oag_sched.report_key = report_key
-            oag_sched.seq        = next_seq
-            schedule_records << oag_sched
+        sched.merge!(report_key_id: schedule_set.report_key_id, schedule_set_id: schedule_set.id)
+        oag_sched = OagSchedule.new(sched)
+        schedule_records << oag_sched
 
       rescue Exception => e
           Rails.logger.error sched
@@ -198,23 +197,23 @@ module Oag
           raise RuntimeError, e
       end
     end
-    report.stash_log "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{report.report_key_code}."
+    schedule_set.stash_log "Loading  #{schedule_records.count} (of #{schedule_count } from #{schedules.count}) valid schedules into the DB  for #{schedule_set.report_key_code}."
     schedule_count = (schedule_count - schedule_records.count)
 
     loaded += schedule_records.count
     OagSchedule.import schedule_records
     schedule_records = []
   end
-  report.stash_log "--- Loaded  #{loaded} valid schedules into the DB for #{report.report_key_code} ---"
-  report.load_status['report_status'] = 'imported'
-  report.save
+  schedule_set.stash_log "--- Loaded  #{loaded} valid schedules into the DB for #{schedule_set.report_key_code} ---"
+  schedule_set.load_status['report_status'] = 'imported'
+  schedule_set.save
 
   end
 
 
-  def parse_report report
+  def parse_report schedule_set
 
-    csv_string  = report.report_file_string
+    csv_string  = schedule_set.report_file_string
 
 
     CSV::Converters[:oag_converters]  = body_converters
@@ -225,20 +224,20 @@ module Oag
     rescue Exception  => ex
      Rails.logger.error ex.message
     end
-    tstart = Time.now
-    report.load_status['processing_time'] = Time.now - tstart
+    tstart = DateTime.now.in_time_zone
+    schedule_set.load_status['processing_time'] = DateTime.now.in_time_zone  - tstart
     data
   end
 
-  def parse_large_report(report)
-    line_count  = report.attachment_lines
+  def parse_large_report(schedule_set)
+    line_count  = schedule_set.attachment_lines
     block_size  = 2000
     block_count = line_count / block_size
     block_mod   = line_count % block_size
     blocks = (block_mod.eql? 0 ) ? block_count : block_count + 1
 
 
-    report.load_status['report_line_ptr'] = 2 unless report.load_status.has_key? 'report_line_ptr'
+    schedule_set.load_status['report_line_ptr'] = 2 unless schedule_set.load_status.has_key? 'report_line_ptr'
     CSV::Converters[:oag_converters]  = body_converters
     options = {:headers => true, :header_converters => :symbol, :converters => [:oag_converters]}
 
@@ -248,20 +247,20 @@ module Oag
       Oag::Util.refresh_forked_process_postgres_db_connection
 
 
-      starting_row = (batch_number * block_size) + report.load_status['report_line_ptr']
+      starting_row = (batch_number * block_size) + schedule_set.load_status['report_line_ptr']
       end_row      = block_size + starting_row
       csv_row_num  = 2
       csv_rows     = []
       begin
-        CSV.foreach(report.load_status['report_path'], options) do |row|
+        CSV.foreach(schedule_set.load_status['report_path'], options) do |row|
           begin
             if csv_row_num.eql?  end_row
                break
             end
             if csv_row_num >= starting_row
               if csv_row_num.eql? starting_row
-                report.stash_log "Parsing Block # #{starting_row/block_size} of #{blocks} blocks containing #{block_size} rows."
-                report.stash_log "Scanning line numbers #{csv_row_num}-#{end_row} of #{line_count} #{report.load_status['report_path']}"
+                schedule_set.stash_log "Parsing Block # #{starting_row/block_size} of #{blocks} blocks containing #{block_size} rows."
+                schedule_set.stash_log "Scanning line numbers #{csv_row_num}-#{end_row} of #{line_count} #{schedule_set.load_status['report_path']}"
               end
               csv_rows << row
             end
@@ -279,25 +278,25 @@ module Oag
     Oag::Util.refresh_forked_process_postgres_db_connection
 
     schedule_rows.flatten!
-    report.load_status['report_line_ptr'] = report.load_status['report_line_ptr'] + schedule_rows.count
-    report.stash_log "Scanned #{schedule_rows.count} rows of #{report.load_status['report_path']}"
+    schedule_set.load_status['report_line_ptr'] = schedule_set.load_status['report_line_ptr'] + schedule_rows.count
+    schedule_set.stash_log "Scanned #{schedule_rows.count} rows of #{schedule_set.load_status['report_path']}"
     schedule_rows
 
   end
 
 
-  def parse_and_load_report(report)
+  def parse_and_load_report(schedule_set)
 
     # Read remaining rows as CSV file
-    schedule_rows = parse_report(report)
+    schedule_rows = parse_report(schedule_set)
     schedules     = load_schedule(schedule_rows)
-    process_schedules(report, schedules)
+    process_schedules(schedule_set, schedules)
 
   end
 
-  def parse_and_load_large_report(report)
+  def parse_and_load_large_report(schedule_set)
     begin
-      schedule_rows = parse_large_report(report)
+      schedule_rows = parse_large_report(schedule_set)
     rescue Exception => ex
       Rails.logger.error ex.message
     end
@@ -309,14 +308,14 @@ module Oag
     # end
 
     schedules.flatten!
-    OagSchedule.keyed(report.report_key).delete_all
+    OagSchedule.keyed(schedule_set.report_key).delete_all
 
     # TODO: Currently This is not doing anything different than process schedules.
     # Needs to process them in chunks.
     process_schedule_chunk(report, schedules)
-    if report.load_status['report_line_ptr'].to_i >= report.attachment_lines
-      # report.report_status = 'schedules_loaded'
-      report.stash_log "There were  #{report.load_status['expired_schedules_count']} expired schedules in the file  for #{report.report_key_code}."
+    if schedule_set.load_status['report_line_ptr'].to_i >= schedule_set.attachment_lines
+      # schedule_set.report_status = 'schedules_loaded'
+      schedule_set.stash_log "There were  #{schedule_set.load_status['expired_schedules_count']} expired schedules in the file  for #{schedule_set.report_key_code}."
 
     end
 

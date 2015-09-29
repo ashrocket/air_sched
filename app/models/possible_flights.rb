@@ -1,6 +1,6 @@
 class PossibleFlights
 	def initialize
-		@start_time = Time.now
+		@start_time = DateTime.now.in_time_zone
 
 		@params = {  
 			"data_key"=>"SNN", 
@@ -32,7 +32,7 @@ class PossibleFlights
 				find_flights
 			end
 		end
-		puts "Finished in #{Time.now - @start_time} seconds"
+		puts "Finished in #{DateTime.now.in_time_zone  - @start_time} seconds"
 	end
 
 	def find_with_params(params)
@@ -72,7 +72,7 @@ class PossibleFlights
 
 	def find_flights
 		(1...180).each do |num|
-			actual_date = Time.now + num.days
+			actual_date = DateTime.now.in_time_zone  + num.days
 			@month = actual_date.month
 			@day = actual_date.day
 			date = (actual_date).strftime("%d-%m-%Y")

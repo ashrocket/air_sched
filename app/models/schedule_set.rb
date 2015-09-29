@@ -1,10 +1,11 @@
 require 'oag/process'
 require 'filter_destinations_worker'
 
-class OagReport < ActiveRecord::Base
+class ScheduleSet < ActiveRecord::Base
   include Workflow
   belongs_to :report_key
 
+  has_many :oag_schedules, dependent: :destroy
 
   scope :keyed, lambda {|report_keys| where(report_key: [report_keys].flatten)}
   scope :latest, -> { order(updated_at: :desc).first}
@@ -12,7 +13,7 @@ class OagReport < ActiveRecord::Base
   scope :incomplete,  -> { where(complete: false) }
 
   after_initialize :set_null_report_key
-
+  before_destroy   :unset_report_key
 
   workflow do
     state :uninitialized do
@@ -98,9 +99,7 @@ class OagReport < ActiveRecord::Base
       end
     end
 
-    on_transition do |from, to, triggering_event, *event_args|
-      stash_log "#{msg_id} #{id}: #{report_key_code} start: #{from} -> #{to} , #{triggering_event}!"
-    end
+
   end
 
   # Linear State Machine Advance method
@@ -140,7 +139,6 @@ class OagReport < ActiveRecord::Base
       estimated_report_key  = ReportKey.match_filename(report_name)
       if estimated_report_key.is_a? ReportKey
         self.report_key = estimated_report_key
-        self.seq = self.report_key.next_seq
         save
       else
         stash_log "Report rejected due to  undefined or invalid report key #{report_name}"
@@ -157,7 +155,7 @@ class OagReport < ActiveRecord::Base
       self.report_key.reset!
       self.report_key.import_schedule!
       self.report_key.save
-      self.load_status['schedule_import_time'] = Time.now
+      self.load_status['schedule_import_time'] = DateTime.now.in_time_zone
       if large_report?
         ScheduleLargeImportWorker.delay_for(60).perform_async(self.id)
         queue_large_oag_file!
@@ -168,7 +166,7 @@ class OagReport < ActiveRecord::Base
       save
   end
   def import_large_oag_file!
-        self.load_status['schedule_import_time'] = Time.now
+        self.load_status['schedule_import_time'] = DateTime.now.in_time_zone
 
         processor.import_large_oag_file(self)
         save
@@ -208,18 +206,26 @@ class OagReport < ActiveRecord::Base
     #   halt
     # else
     finalize_attachment('processed')
-      report_key.cycle_schedules
+      report_key.cycle_schedules(self)
       report_key.confirm_schedule_load!
       report_key.save
       save
 
       report_key.brands.each do |brand|
-        if brand.active? and AppSwitch.on?('autogenerate_routemaps') and brand.export_state.idle?
-          export_report = brand.pending_export_report
-          export_report.schedule_report_keys[report_key.code] = {'status': 'ready', 'seq': report_key.current_seq}
-          export_report.save
-          r = Oag::Report.new
-          r.auto_export_route_maps(brand, export_report)
+        if brand.active? and AppSwitch.on?('autogenerate_routemaps')
+          BrandRouteMapsSyncWorker.perform_async({'brand_key': brand.brand_key, 'schedule_set_id': self.id, 'report_key': report_key.code})
+          # export_report = brand.active_export_report
+          # export_report = brand.next_export_report unless export_report
+          # Rails.logger.info "Setting Report Key #{report_key.code} state to ready,  brand.export_state => #{ brand.export_state.current_state}"
+          # Rails.logger.info "Setting Report Key #{report_key.code} export_report.current_state => #{ export_report.current_state}"
+          #
+          # export_report.schedule_report_keys[report_key.code] = {'status': 'ready', 'seq': report_key.current_seq}
+          # export_report.save
+          # # Don't kick off a new worker if one is running.
+          # if brand.export_state.idle?
+          #   r = Oag::Report.new
+          #   r.auto_export_route_maps(brand, export_report)
+          # end
         end
       end
 
@@ -310,6 +316,13 @@ class OagReport < ActiveRecord::Base
     save
 
   end
+  def active?
+    report_key.current_schedule_set.eql? self
+  end
+
+  def to_label
+    "#{current_state.name} #{updated_at}"
+  end
 
   def stash_log msg
     Rails.logger.info msg
@@ -322,6 +335,16 @@ class OagReport < ActiveRecord::Base
      # self.report_key = ReportKey.none
      # self.report_key = ReportKey.where(name: 'Null Report', report_key: 'NONE').first_or_create if report_key.blank?
    end
+  def unset_report_key
+     if report_key.current_schedule_set_id.eql? self.id
+        report_key.current_schedule_set_id = nil
+        prev_set = ScheduleSet.keyed(report_key).where.not(id: self.id).with_finished_state.latest
+        unless prev_set.blank?
+          report_key.current_schedule_set_id = prev_set.id
+        end
+        report_key.save
+     end
+  end
 
 
    def finalize_attachment(status)
@@ -329,7 +352,9 @@ class OagReport < ActiveRecord::Base
         stash_log "Finalizing #{attachment_path} import"
 
         File.delete attachment_path if File.exist?(attachment_path)
-        File.delete report_path if File.exist?(report_path)
+        if report_path
+          File.delete report_path if File.exist?(report_path)
+        end
         Mastiff::Email.finalize([msg_id], status)
         self.load_status['attachment_status'] = status
         self.complete = true

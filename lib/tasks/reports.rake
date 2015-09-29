@@ -4,7 +4,7 @@ namespace :reports do
 
   desc "Reset OAG reports and Email Queue"
   task :reset_oag => :environment do |t, args|
-    OagReport.delete_all
+    ScheduleSet.delete_all
     Rake::Task["mastiff:reset"].invoke
     email_queue = Sidekiq::Queue.new("email_queue")
     report_queue = Sidekiq::Queue.new("report_queue")

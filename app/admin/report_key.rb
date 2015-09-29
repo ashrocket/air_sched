@@ -2,11 +2,11 @@ ActiveAdmin.register ReportKey do
   menu priority: 3,  :parent => 'Config'
 
 
-  remove_filter :brand_report_keys, :oag_reports, :interline_cxr_rules, :slug, :state
+  remove_filter :brand_report_keys, :schedule_sets, :interline_cxr_rules, :slug, :state
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
-  permit_params :code, :name, :comment, :file_pattern, :active, brand_ids: []
+  permit_params :code, :name, :comment, :file_pattern, :current_schedule_set_id, :active, brand_ids: []
   #
   # or
   #
@@ -21,7 +21,7 @@ ActiveAdmin.register ReportKey do
 
   index do
        column :code
-       column :current_seq
+       column :current_schedule_set
        column :name
        column :file_pattern
        column :comment
@@ -34,11 +34,11 @@ ActiveAdmin.register ReportKey do
            }.join.html_safe
          end
        end
-       column :oag_reports do |report_key|
+       column :schedule_sets do |report_key|
          content_tag :ul, class: 'list-group' do
-           report_key.oag_reports.order('updated_at DESC').limit(2).collect{ |rpt|
+           report_key.schedule_sets.order('updated_at DESC').limit(2).collect{ |rpt|
              content_tag(:li, class: 'list-group-item') do
-                link_to(admin_oag_report_path(rpt)) do
+                link_to(admin_schedule_set_path(rpt)) do
                   concat(content_tag(:div,rpt.current_state.name))
                   concat(content_tag(:div,rpt.updated_at))
                 end

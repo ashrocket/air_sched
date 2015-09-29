@@ -4,8 +4,12 @@
 %dl.dl-horizontal
   %dt Report Key:
   %dd= @report_key.code
-  %dt Current Seq:
-  %dd= @report_key.current_seq
+  %dt Current Schedule Set:
+  %dd
+    - if @report_key.current_schedule_set
+      = link_to @report_key.current_schedule_set.to_label, admin_schedule_set_path(@report_key.current_schedule_set)
+    - else
+      = 'Not set'
   %br
 
   %dt File pattern:

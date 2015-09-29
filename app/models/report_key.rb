@@ -1,12 +1,24 @@
 class ReportKey < ActiveRecord::Base
   extend FriendlyId
-  friendly_id :report_key, use: [:slugged, :finders]
+  friendly_id :code, use: [:slugged, :finders]
 
+  has_many :interline_cxr_rules
   has_many :brand_report_keys
   has_many :brands, through: :brand_report_keys
 
-  has_many :oag_reports
-  has_many :interline_cxr_rules
+  has_many :oag_schedules
+  has_many :schedule_sets
+
+
+
+  has_many :current_schedules, class_name: 'OagSchedule' do
+    def with_current_schedule_set
+          where(schedule_set: self.current_schedule_set)
+    end
+  end
+
+
+
 
 
   include Workflow
@@ -94,38 +106,33 @@ class ReportKey < ActiveRecord::Base
 
 
     after_transition do |from, to, triggering_event, *event_args|
-          stash_log "#{code} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
+          stash_log "ReportKey State #{code} Event: #{triggering_event} transitioned FROM #{from} -> #{to}"
     end
 
-    on_transition do |from, to, triggering_event, *event_args|
-      stash_log "#{code} Event: #{triggering_event} transitioning FROM #{from} -> #{to}"
-    end
+
   end
 
-
-  def next_seq
-    if current_seq < 99
-      current_seq + 1
+  def current_schedule_set
+    if current_schedule_set_id
+      ScheduleSet.find(current_schedule_set_id)
     else
-      0
+      nil
     end
   end
 
-  def cycle_schedules
-    expired_seq = current_seq - 2
-    self.current_seq = next_seq
-    save
-    OagSchedule.delete_all(report_key: self, seq: expired_seq)
 
+  def cycle_schedules(schedule_set)
+    self.current_schedule_set_id = schedule_set.id
+    save
   end
 
 
 
   def latest_finished_report
-    OagReport.keyed(self).with_finished_state.latest
+    ScheduleSet.keyed(self).with_finished_state.latest
   end
   def latest_report
-    OagReport.keyed(self).latest
+    ScheduleSet.keyed(self).latest
   end
 
   def latest_valid_seq

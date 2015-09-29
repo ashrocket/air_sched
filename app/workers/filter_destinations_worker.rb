@@ -18,7 +18,7 @@ class FilterDestinationsWorker
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
-        report = OagReport.find_by(id: report_id)
+        report = ScheduleSet.find_by(id: report_id)
         Sidekiq::Logging.logger.info "Filter Destinations Worker Lock acquired for #{report_id}"
 
         if report
@@ -39,7 +39,7 @@ class FilterDestinationsWorker
         lock.release!
       end
     else
-      report = OagReport.find_by(id: report_id)
+      report = ScheduleSet.find_by(id: report_id)
       Sidekiq::Logging.logger.info "Filter Destinations Worker, busy, delaying #{report_id} for 08 minute #{report.report_key_code}"
       FilterDestinationsWorker.delay_for(8.minute).perform_async(report_id)
     end

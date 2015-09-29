@@ -63,13 +63,13 @@ gem 'rails-settings-cached', '0.4.1'
 # Asyn Functionality Background processing
 gem 'aws-sdk', '~> 2.1.14'
 gem 'redis-objects', '~> 0.9'
-gem 'sidekiq', '3.5.0'
-gem 'sidekiq-cron', '~> 0.3.1'
+gem 'sidekiq', '3.0.0'
+gem 'sidetiq', '0.6.3'
 gem 'sidekiq-lock', '~> 0.2.0'
 gem 'sidekiq-failures', '~> 0.4.5'
 gem 'sinatra', '>= 1.3.0', :require => nil
 #gem 'mastiff', path: '../mastiff'
-gem 'mastiff', '~> 0.1.4'
+gem 'mastiff', '~> 0.1.3'
 gem 'roo', '~> 2.1.1'
 #
 gem 'exception_handler'

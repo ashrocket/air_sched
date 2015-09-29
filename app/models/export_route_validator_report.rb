@@ -213,13 +213,13 @@ class ExportRouteValidatorReport < ActiveRecord::Base
       url = exporter.export_to_s3(brand)
       self.location = url.to_s
       save
-      brand.data_states['route_map_validator_export'] = {'state':'idle', 'location': self.location, 'updated_at': Time.now}
+      brand.data_states['route_map_validator_export'] = {'state':'idle', 'location': self.location, 'updated_at': DateTime.now.in_time_zone }
       brand.save
 
     end
 
     def reject
-      brand.data_states['route_map_validator_export'] = {'state':'idle', 'error':'rejected', 'updated_at': Time.now}
+      brand.data_states['route_map_validator_export'] = {'state':'idle', 'error':'rejected', 'updated_at': DateTime.now.in_time_zone }
       brand.save
     end
 

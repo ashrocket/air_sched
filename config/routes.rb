@@ -100,8 +100,7 @@ Rails.application.routes.draw do
 
 
   require 'sidekiq/web'
-  require 'sidekiq/cron/web'
-
+  require 'sidetiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
 

@@ -1,0 +1,36 @@
+%p#notice= notice
+%p#alert= alert
+%dl.dl-horizontal
+  %dt Msg:
+  %dd= @schedule_set.msg_id
+  %dt Report Key:
+  - if @schedule_set.report_key
+    %dd= link_to @schedule_set.report_key.code, admin_report_key_path(@schedule_set.report_key)
+  - else
+    %dd
+  %dt Active:
+  %dd= @schedule_set.active?
+  %dt Report status:
+  %dd= @schedule_set.current_state.name
+  %dt Attachment status:
+  %dd= @schedule_set.attachment_status
+  %dt Received:
+  %dd= @schedule_set.received
+  %dt Attachment lines:
+  %dd= @schedule_set.attachment_lines
+  %dt Attachment path:
+  %dd= @schedule_set.attachment_path
+  %dt Attachment size:
+  %dd= @schedule_set.attachment_size
+  %dt Carriers:
+  %dd= @schedule_set.carriers
+  %dt Complete:
+  %dd= @schedule_set.complete
+  %dt Load status:
+  %dd= @schedule_set.load_status
+  %dt Load status:
+  %dd
+    %ul
+      - @schedule_set.log_data.each do |log_line|
+        %li= log_line
+

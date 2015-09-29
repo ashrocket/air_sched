@@ -17,7 +17,7 @@ class ProcessAttachmentWorker
     if lock.acquire!
     begin
       msg = Mastiff::Email::Message.get(message_id)
-      report = OagReport.where(msg_id: message_id).first
+      report = ScheduleSet.where(msg_id: message_id).first
       Sidekiq::Logging.logger.info "Process Attachment Worker, autoload oag => #{AppSwitch.on?('autoload_oag')}"
 
       if report and AppSwitch.on?('autoload_oag')

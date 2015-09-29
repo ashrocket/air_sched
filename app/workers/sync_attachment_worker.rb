@@ -22,12 +22,12 @@ class SyncAttachmentWorker
         if msg.uploader and msg.stored_filename
              att_path = File.join( msg.uploader.store_dir,  msg.stored_filename)
         end
-        report = OagReport.where(msg_id: message_id).first
+        report = ScheduleSet.where(msg_id: message_id).first
         if report
           Sidekiq::Logging.logger.info "Sync Attachment Worker ==> EXISTING Import Report found for #{message_id} #{report.id}"
           report.reset!
         else
-          report = OagReport.create(msg_id: message_id)
+          report = ScheduleSet.create(msg_id: message_id)
           Sidekiq::Logging.logger.info "Sync Attachment Worker  -> New Import Report created for #{message_id} #{report.id}"
         end
 

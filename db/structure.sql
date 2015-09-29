@@ -13,14 +13,16 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -489,7 +491,8 @@ CREATE TABLE brand_settings (
     max_segments integer DEFAULT 3,
     brand_id integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    schedule_load_timeout integer DEFAULT 20
 );
 
 
@@ -1265,7 +1268,7 @@ ALTER SEQUENCE oag_reports_id_seq OWNED BY oag_reports.id;
 CREATE TABLE oag_schedules (
     id integer NOT NULL,
     report_key_id integer,
-    seq integer DEFAULT 1,
+    schedule_set_id integer,
     eff_date timestamp without time zone,
     disc_date timestamp without time zone,
     airline_code character varying,
@@ -1463,9 +1466,9 @@ CREATE TABLE report_keys (
     comment character varying,
     active boolean,
     slug character varying,
-    current_seq integer DEFAULT 1,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    current_schedule_set_id integer
 );
 
 
@@ -1486,6 +1489,48 @@ CREATE SEQUENCE report_keys_id_seq
 --
 
 ALTER SEQUENCE report_keys_id_seq OWNED BY report_keys.id;
+
+
+--
+-- Name: schedule_sets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE schedule_sets (
+    id integer NOT NULL,
+    report_key_id integer,
+    msg_id character varying,
+    workflow_state character varying DEFAULT 'uninitialized'::character varying,
+    load_status json DEFAULT '{}'::json,
+    log_data json DEFAULT '[]'::json,
+    attachment_status character varying DEFAULT 'unstored'::character varying,
+    received timestamp without time zone,
+    attachment_lines integer DEFAULT 0,
+    attachment_path character varying,
+    attachment_size integer,
+    carriers character varying[] DEFAULT '{}'::character varying[],
+    complete boolean DEFAULT false,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: schedule_sets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE schedule_sets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: schedule_sets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE schedule_sets_id_seq OWNED BY schedule_sets.id;
 
 
 --
@@ -1824,6 +1869,13 @@ ALTER TABLE ONLY potential_branded_markets ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY report_keys ALTER COLUMN id SET DEFAULT nextval('report_keys_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY schedule_sets ALTER COLUMN id SET DEFAULT nextval('schedule_sets_id_seq'::regclass);
 
 
 --
@@ -2170,6 +2222,14 @@ ALTER TABLE ONLY report_keys
 
 
 --
+-- Name: schedule_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY schedule_sets
+    ADD CONSTRAINT schedule_sets_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2489,77 +2549,154 @@ CREATE UNIQUE INDEX index_settings_on_thing_type_and_thing_id_and_var ON setting
 -- Name: oag_departures; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_departures ON oag_schedules USING btree (report_key_id, seq, eff_date, disc_date, origin_apt, dep_time_local);
+CREATE INDEX oag_departures ON oag_schedules USING btree (report_key_id, eff_date, disc_date, origin_apt, dep_time_local);
 
 
 --
 -- Name: oag_disc_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_disc_date ON oag_schedules USING btree (report_key_id, seq, disc_date);
+CREATE INDEX oag_disc_date ON oag_schedules USING btree (report_key_id, disc_date);
 
 
 --
 -- Name: oag_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_eff_date ON oag_schedules USING btree (report_key_id, seq, eff_date);
+CREATE INDEX oag_eff_date ON oag_schedules USING btree (report_key_id, eff_date);
 
 
 --
 -- Name: oag_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_eff_disc_dates ON oag_schedules USING btree (report_key_id, seq, eff_date, disc_date);
+CREATE INDEX oag_eff_disc_dates ON oag_schedules USING btree (report_key_id, eff_date, disc_date);
 
 
 --
 -- Name: oag_flight_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_flight_id ON oag_schedules USING btree (report_key_id, seq, airline_code, flight_num);
+CREATE INDEX oag_flight_id ON oag_schedules USING btree (report_key_id, airline_code, flight_num);
 
 
 --
 -- Name: oag_flight_id_time; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_flight_id_time ON oag_schedules USING btree (report_key_id, seq, dep_time_local, flight_num);
+CREATE INDEX oag_flight_id_time ON oag_schedules USING btree (report_key_id, dep_time_local, flight_num);
 
 
 --
 -- Name: oag_keyed_airports; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_keyed_airports ON oag_schedules USING btree (report_key_id, seq, origin_apt, dest_apt);
+CREATE INDEX oag_keyed_airports ON oag_schedules USING btree (report_key_id, origin_apt, dest_apt);
 
 
 --
 -- Name: oag_keyed_dests; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_keyed_dests ON oag_schedules USING btree (report_key_id, seq, dest_apt);
+CREATE INDEX oag_keyed_dests ON oag_schedules USING btree (report_key_id, dest_apt);
 
 
 --
 -- Name: oag_keyed_mkts; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_keyed_mkts ON oag_schedules USING btree (report_key_id, seq, mkt);
+CREATE INDEX oag_keyed_mkts ON oag_schedules USING btree (report_key_id, mkt);
 
 
 --
 -- Name: oag_keyed_origins; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_keyed_origins ON oag_schedules USING btree (report_key_id, seq, origin_apt);
+CREATE INDEX oag_keyed_origins ON oag_schedules USING btree (report_key_id, origin_apt);
 
 
 --
 -- Name: oag_sched_rk_cs; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX oag_sched_rk_cs ON oag_schedules USING btree (report_key_id, seq);
+CREATE INDEX oag_sched_rk_cs ON oag_schedules USING btree (report_key_id);
+
+
+--
+-- Name: oag_sset; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset ON oag_schedules USING btree (schedule_set_id);
+
+
+--
+-- Name: oag_sset_airports; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_airports ON oag_schedules USING btree (schedule_set_id, origin_apt, dest_apt);
+
+
+--
+-- Name: oag_sset_departures; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_departures ON oag_schedules USING btree (schedule_set_id, eff_date, disc_date, origin_apt, dep_time_local);
+
+
+--
+-- Name: oag_sset_dests; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_dests ON oag_schedules USING btree (schedule_set_id, dest_apt);
+
+
+--
+-- Name: oag_sset_disc_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_disc_date ON oag_schedules USING btree (schedule_set_id, disc_date);
+
+
+--
+-- Name: oag_sset_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_eff_date ON oag_schedules USING btree (schedule_set_id, eff_date);
+
+
+--
+-- Name: oag_sset_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_eff_disc_dates ON oag_schedules USING btree (schedule_set_id, eff_date, disc_date);
+
+
+--
+-- Name: oag_sset_flight_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_flight_id ON oag_schedules USING btree (schedule_set_id, airline_code, flight_num);
+
+
+--
+-- Name: oag_sset_flight_id_time; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_flight_id_time ON oag_schedules USING btree (schedule_set_id, dep_time_local, flight_num);
+
+
+--
+-- Name: oag_sset_mkts; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_mkts ON oag_schedules USING btree (schedule_set_id, mkt);
+
+
+--
+-- Name: oag_sset_origins; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX oag_sset_origins ON oag_schedules USING btree (schedule_set_id, origin_apt);
 
 
 --
@@ -2697,6 +2834,10 @@ INSERT INTO schema_migrations (version) VALUES ('20140103000035');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000050');
 
+INSERT INTO schema_migrations (version) VALUES ('20140103000060');
+
+INSERT INTO schema_migrations (version) VALUES ('20140103000070');
+
 INSERT INTO schema_migrations (version) VALUES ('20140103000150');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000155');
@@ -2714,10 +2855,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140103000200');
 INSERT INTO schema_migrations (version) VALUES ('20140103000220');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000230');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000300');
-
-INSERT INTO schema_migrations (version) VALUES ('20140103000500');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103000520');
 

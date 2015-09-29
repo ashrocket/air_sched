@@ -15,9 +15,7 @@ class Brand < ActiveRecord::Base
 
 
   has_many :hosts, -> { order(name: :asc) }
-
   has_many :route_map_export_reports,  -> {order('brand_route_map_export_reports.updated_at DESC')}, class_name: 'BrandRouteMapExportReport'
-  has_many :oag_reports, -> {order('oag_reports.updated_at DESC')}
 
   scope :keyed,     lambda {|brand_key| find_by(brand_key: brand_key)}
 
@@ -31,17 +29,38 @@ class Brand < ActiveRecord::Base
 
   end
 
+
+
   #
   # Instance Methods
   #
-  def pending_export_report
-    export_reports = route_map_export_reports
-    if not export_reports.empty? and export_reports.last.uninitialized?
-       export_reports.last
-    else
-      rpt = route_map_export_reports.create
-      save
-      rpt
+
+  def origins
+    current_schedules.select(:origin_apt).distinct
+  end
+
+
+  def schedule_set_ids
+    report_keys.map{|rk| rk.current_schedule_set_id  }
+  end
+  def current_schedules
+    OagSchedule.branded(self).where(schedule_set_id: schedule_set_ids)
+  end
+
+
+
+  def next_export_report
+    Rails.logger.info "Brand #{brand_key} - Creating New Export Report"
+    rpt = route_map_export_reports.create
+    save
+    return rpt
+  end
+
+  def active_export_report
+    active_report = nil
+    export_reports = route_map_export_reports.in_progress.sort_by{|r| r.updated_at}.reverse
+    unless export_reports.empty?
+      active_report = export_reports.first
     end
   end
 

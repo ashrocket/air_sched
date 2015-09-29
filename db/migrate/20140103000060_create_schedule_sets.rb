@@ -1,8 +1,7 @@
-class CreateOagReports < ActiveRecord::Migration
+class CreateScheduleSets < ActiveRecord::Migration
   def change
-    create_table :oag_reports do |t|
+    create_table :schedule_sets do |t|
       t.references :report_key
-      t.integer  :seq, default: 1
       t.string   :msg_id
       t.string   :workflow_state, default: 'uninitialized'
       t.json     :load_status, default: {}

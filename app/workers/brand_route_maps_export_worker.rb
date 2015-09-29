@@ -15,18 +15,17 @@ class BrandRouteMapsExportWorker
 
   def perform(brand_key, report_id)
     Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker called with  #{brand_key}, #{report_id}"
-
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
         Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker checking if Export is Ready for  #{brand_key}"
-        report = BrandRouteMapExportReport.find(report_id)
-        Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker found report:  #{brand_key}, #{report.id}: #{report.current_state.name}"
+        export_report = BrandRouteMapExportReport.find(report_id)
+        Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker found report:  #{brand_key}, #{export_report.id}: #{export_report.current_state.name}"
 
-        if report and not report.exported?
-            Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker: #{brand_key}, #{report.id}: advancing state."
+        if export_report and not export_report.exported?
+            Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker: #{brand_key}, #{export_report.id}: advancing state."
 
-            report.advance_state!
+            export_report.advance_state!
         end
 
 

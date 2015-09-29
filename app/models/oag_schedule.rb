@@ -32,6 +32,7 @@ class OagSchedule < ActiveRecord::Base
      where(report_key: report_keys)
   end
 
+  scope :keyed_by_seq, lambda{|report_key, seq| where(report_key: report_key, seq: seq)}
   scope :branded,     lambda {|brand| where(report_key: brand.report_keys) }
 
   scope :for_cxr,   lambda {|cxr| where(:airline_code => cxr)}

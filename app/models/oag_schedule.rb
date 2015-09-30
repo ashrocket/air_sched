@@ -268,7 +268,7 @@ class OagSchedule < ActiveRecord::Base
 #
 #################
   def report_key_string
-    report_key.report_key
+    report_key.code
   end
 
   def mkt_carriers_flights

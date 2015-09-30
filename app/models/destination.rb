@@ -30,7 +30,7 @@ class Destination < ActiveRecord::Base
   # Cached Data
   # ----
   def cached_origins report_key
-     Rails.cache.fetch("destination_origin_#{report_key.report_key}", :expires_in => 1.hour) do
+     Rails.cache.fetch("destination_origin_#{report_key.code}", :expires_in => 1.hour) do
        codes = keyed(report_key).select("DISTINCT(origin_code)").map{|f| f.origin_code}
        Airport.where(code:codes)
      end

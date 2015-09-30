@@ -30,7 +30,7 @@ class DirectFlight < ActiveRecord::Base
     # Cached Data
     # ----
     def cached_origins report_key
-       Rails.cache.fetch("direct_flight_origin_#{report_key.report_key.parameterize.downcase}", :expires_in => 1.hour) do
+       Rails.cache.fetch("direct_flight_origin_#{report_key.code.parameterize.downcase}", :expires_in => 1.hour) do
          codes = keyed(report_key).select("DISTINCT(origin)").map{|f| f.origin}
          Airport.where(code:codes)
        end
@@ -41,7 +41,7 @@ class DirectFlight < ActiveRecord::Base
 
 
     def cached_dest_airports  report_key, origin_code
-       Rails.cache.fetch("direct_flights_dest_#{report_key.report_key.parameterize.downcase}_#{origin_code}", :expires_in => 1.hour) do
+       Rails.cache.fetch("direct_flights_dest_#{report_key.code.parameterize.downcase}_#{origin_code}", :expires_in => 1.hour) do
          codes = keyed(report_key).where(origin: origin_code).select("DISTINCT(dest)").map{|f| f.dest}
          Airport.where(code:codes)
        end
@@ -51,7 +51,7 @@ class DirectFlight < ActiveRecord::Base
     end
 
     def cached_pair report_key, o,d
-        Rails.cache.fetch("direct_flight_#{report_key.report_key.parameterize.downcase}_#{o}_#{d}", :expires_in => 1.hour) do
+        Rails.cache.fetch("direct_flight_#{report_key.code.parameterize.downcase}_#{o}_#{d}", :expires_in => 1.hour) do
           keyed(report_key).pair(o,d)
         end
     end

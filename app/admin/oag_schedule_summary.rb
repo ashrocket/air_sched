@@ -29,6 +29,12 @@ ActiveAdmin.register OagSchedule, :as => "Schedule Summaries" do
            link_to sched.report_key.code, admin_report_key_path(sched.report_key)
          end
          column :airline_code
+         column 'Origin Apt Code' do |sched|
+           sched.origin_apt
+         end
+         column 'Dest Apt Code' do |sched|
+           sched.dest_apt
+         end
 
          column 'EffectiveDT' do |sched|
            sched.eff_date.strftime('%Y-%m-%d')
@@ -40,14 +46,8 @@ ActiveAdmin.register OagSchedule, :as => "Schedule Summaries" do
          column 'flt num', :sortable => :flight_num do |sched|
            sched.plated_flt_number
          end
-         column 'Origin Apt Code' do |sched|
-           sched.origin_apt
-         end
          column 'Dep Time' do |sched|
            sched.dep_time_local
-         end
-         column 'Dest Apt Code' do |sched|
-           sched.dest_apt
          end
          column 'Arr Time' do |sched|
            sched.arr_time_local

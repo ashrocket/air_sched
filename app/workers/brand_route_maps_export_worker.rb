@@ -21,7 +21,6 @@ class BrandRouteMapsExportWorker
         Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker checking if Export is Ready for  #{brand_key}"
         export_report = BrandRouteMapExportReport.find(report_id)
         Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker found report:  #{brand_key}, #{export_report.id}: #{export_report.current_state.name}"
-
         if export_report and not export_report.exported?
             Sidekiq::Logging.logger.info "BrandRouteMapsExportWorker: #{brand_key}, #{export_report.id}: advancing state."
 

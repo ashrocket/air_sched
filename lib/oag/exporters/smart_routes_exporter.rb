@@ -9,6 +9,7 @@ class SmartRoutesExporter
     "#{brand.brand_key.downcase}_route_map.#{Date.today}.#{DateTime.now.in_time_zone.hour}-#{DateTime.now.in_time_zone.min}.json"
   end
 
+  #TODO: use temp files instead of Files
   def export_to_s3(brand)
     s3_location = ''
 
@@ -36,6 +37,7 @@ class SmartRoutesExporter
     bucket_obj.put(body: IO.read(zipped_file))
     s3_location  =  bucket_obj.public_url
 
+    File.delete(zipfile_name)
     s3_location
   end
 

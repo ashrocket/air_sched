@@ -20,7 +20,9 @@ class BrandRouteMapExportReport < ActiveRecord::Base
     state :uninitialized do
       event :verify_report_keys, :transitions_to => :waiting_for_report_keys
       event :confirm_report_keys, :transitions_to => :report_keys_loaded
+      event :finalize, :transitions_to => :exported
       event :reject, :transitions_to => :rejected
+
     end
     state :waiting_for_report_keys do
       event :verify_report_keys, :transitions_to => :waiting_for_report_keys

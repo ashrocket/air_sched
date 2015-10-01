@@ -10,6 +10,7 @@ class BrandExportState < ActiveRecord::Base
   workflow do
     state :idle do
       event :export_route_maps, :transitions_to => :waiting_for_route_map_export
+      event :wait_for_export_route_maps, :transitions_to => :waiting_for_markets_export
       event :export_markets, :transitions_to => :waiting_for_markets_export
       event :reset, :transitions_to => :idle
     end
@@ -36,6 +37,9 @@ class BrandExportState < ActiveRecord::Base
 
 
   def export_route_maps(export_report_id)
+    BrandRouteMapsExportWorker.delay_for(5).perform_async(brand.brand_key, export_report_id)
+  end
+  def force_export_route_maps(export_report_id)
     BrandRouteMapsExportWorker.delay_for(5).perform_async(brand.brand_key, export_report_id)
   end
 

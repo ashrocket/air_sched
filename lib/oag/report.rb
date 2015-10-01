@@ -15,7 +15,7 @@ module Oag
       imp_markets_array.sort!
       ImpliedMarkets.import imp_markets_array
 
-    end.report_key
+    end
 
     def build_brand_connections(brand)
 

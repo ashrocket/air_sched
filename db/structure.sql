@@ -1219,49 +1219,6 @@ ALTER SEQUENCE markets_id_seq OWNED BY markets.id;
 
 
 --
--- Name: oag_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE oag_reports (
-    id integer NOT NULL,
-    report_key_id integer,
-    seq integer DEFAULT 1,
-    msg_id character varying,
-    workflow_state character varying DEFAULT 'uninitialized'::character varying,
-    load_status json DEFAULT '{}'::json,
-    log_data json DEFAULT '[]'::json,
-    attachment_status character varying DEFAULT 'unstored'::character varying,
-    received timestamp without time zone,
-    attachment_lines integer DEFAULT 0,
-    attachment_path character varying,
-    attachment_size integer,
-    carriers character varying[] DEFAULT '{}'::character varying[],
-    complete boolean DEFAULT false,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: oag_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE oag_reports_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: oag_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE oag_reports_id_seq OWNED BY oag_reports.id;
-
-
---
 -- Name: oag_schedules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1826,13 +1783,6 @@ ALTER TABLE ONLY markets ALTER COLUMN id SET DEFAULT nextval('markets_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oag_reports ALTER COLUMN id SET DEFAULT nextval('oag_reports_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY oag_schedules ALTER COLUMN id SET DEFAULT nextval('oag_schedules_id_seq'::regclass);
 
 
@@ -2163,14 +2113,6 @@ ALTER TABLE ONLY interline_cxr_rules
 
 ALTER TABLE ONLY markets
     ADD CONSTRAINT markets_pkey PRIMARY KEY (id);
-
-
---
--- Name: oag_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY oag_reports
-    ADD CONSTRAINT oag_reports_pkey PRIMARY KEY (id);
 
 
 --

@@ -38,13 +38,16 @@ class Brand < ActiveRecord::Base
   def origins
     current_schedules.select(:origin_apt).distinct
   end
+  def destinations
+     current_schedules.select(:dest_apt).distinct
+  end
 
 
   def schedule_set_ids
     report_keys.map{|rk| rk.current_schedule_set_id  }
   end
   def current_schedules
-    OagSchedule.branded(self).where(schedule_set_id: schedule_set_ids)
+    OagSchedule.where(schedule_set_id: schedule_set_ids)
   end
 
 

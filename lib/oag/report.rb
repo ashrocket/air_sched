@@ -2,6 +2,21 @@ require 'benchmark'
 module Oag
   class Report
 
+
+    def build_implied_markets(brand, origins, destinations)
+      ImpliedMarkets.where(brand: brand).delete_all
+      markets = origins.product destinations
+      imp_markets_array = []
+      markets.each do |o,d|
+        i_m = ImpliedMarkets.new(brand: brand, origin: o, dest: d)
+        imp_markets_array << i_m
+      end
+
+      imp_markets_array.sort!
+      ImpliedMarkets.import imp_markets_array
+
+    end.report_key
+
     def build_brand_connections(brand)
 
       filtered_cxrs = []
@@ -10,8 +25,9 @@ module Oag
       # AND FURTHER MORE YOU CAN End Up with Circle Trip Flights like TR 2771
 
       origins = brand.origins.pluck(:origin_apt).sort
+      destinations = brand.destinations.pluck(:dest_apt).sort
 
-
+      self.build_implied_markets(brand, origins, destinations)
 
       routes = Set.new
       brand_connections = []

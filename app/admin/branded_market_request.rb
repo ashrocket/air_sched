@@ -25,7 +25,15 @@ ActiveAdmin.register BrandedMarketRequest do
          column :origin
          column :dest
          column :seg_count
-
+         column :details do |bmr|
+           content_tag :ul, class: 'list-group' do
+                bmr.branded_route_requests.collect{ |brr|
+                    content_tag(:li, class: 'list-group-item') do
+                      link_to("#{brr.key}  (#{brr.id})", [:admin,brr])
+                        end
+                      }.join.html_safe
+           end
+         end
          actions
    end
 

@@ -2,10 +2,9 @@ ActiveAdmin.register ImpliedMarket  do
   menu priority: 0, label: 'Single Markets', :parent => 'Validators'
   actions :all, :except => [:new, :edit, :destroy]
 
-  # filter :report_key, filters: [:cont, :eq, :start, :end]
-  # filter :workflow_state, filters: [:cont, :eq, :start, :end]
-  # filter :complete
-  # filter :created_at
+   filter :brand
+   filter :origin, filters: [:cont, :eq, :start, :end]
+   filter :dest, filters: [:cont, :eq, :start, :end]
 
 
 
@@ -33,7 +32,27 @@ ActiveAdmin.register ImpliedMarket  do
             mkt.origin
       end
       column 'Destination' do |mkt|
-            mkt.destination
+            mkt.dest
+      end
+      column '0 Stops' do |mkt|
+        count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(1).count
+        link_to count, admin_direct_flights_path("q[origin_eq]": mkt.origin,
+                                                 "q[dest_eq]": mkt.dest)
+      end
+      column '1 Stops' do |mkt|
+        count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(2).count
+        link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
+                                                          "q[origin_eq]": mkt.origin,
+                                                          "q[dest_eq]": mkt.dest,
+                                                          "q[seg_count_equals]":2)
+
+      end
+      column '2 Stops' do |mkt|
+        count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(3).count
+                link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
+                                                                  "q[origin_eq]": mkt.origin,
+                                                                  "q[dest_eq]": mkt.dest,
+                                                                  "q[seg_count_equals]":3)
       end
 
 

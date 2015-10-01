@@ -93,7 +93,11 @@ class Brand < ActiveRecord::Base
    def all_possible_markets
      origins     = DirectFlight.branded(self).distinct(:origin).pluck(:origin)
      destination = DirectFlight.branded(self).distinct(:dest).pluck(:dest)
-     origins.product destinations
+     airports = origins | destination
+     markets = origins.product destinations
+     markets.delete_if{|o,d| o.eql? d}
+     markets
+
    end
    def all_possible_carriers
      carrier_codes = OagSChedule.branded(self).distinct(:airline_code).distinct(:airline_code)

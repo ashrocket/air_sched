@@ -40,6 +40,7 @@ ActiveAdmin.register ScheduleSet  do
   index do
 
       selectable_column
+      column :id
       column 'Mail Id' do |report|
         report.msg_id
       end

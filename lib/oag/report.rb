@@ -4,16 +4,18 @@ module Oag
 
 
     def build_implied_markets(brand, origins, destinations)
-      ImpliedMarkets.where(brand: brand).delete_all
+      ImpliedMarket.where(brand: brand).delete_all
       markets = origins.product destinations
       imp_markets_array = []
+      Rails.logger.info "Building implied markets for  #{brand.brand_key} Total:  #{markets.count}"
+
       markets.each do |o,d|
-        i_m = ImpliedMarkets.new(brand: brand, origin: o, dest: d)
+        i_m = ImpliedMarket.new(brand: brand, origin: o, dest: d)
         imp_markets_array << i_m
       end
 
       imp_markets_array.sort!
-      ImpliedMarkets.import imp_markets_array
+      ImpliedMarket.import imp_markets_array
 
     end
 
@@ -23,7 +25,6 @@ module Oag
 
       # CURRENTLY DOES NOT SUPPORT EMBEDDED SEGMENTS, AS THE SCHEDULE MODEL DOESN'T KNOW THE VIA POINT
       # AND FURTHER MORE YOU CAN End Up with Circle Trip Flights like TR 2771
-
       origins = brand.origins.pluck(:origin_apt).sort
       destinations = brand.destinations.pluck(:dest_apt).sort
 
@@ -31,8 +32,11 @@ module Oag
 
       routes = Set.new
       brand_connections = []
+      total_origins = origins.count
+      Rails.logger.info "BRAND CONNECTIONS (#{brand.brand_key})  #{total_origins} origins."
 
       origins.each_with_index do |origin_code, index|
+        Rails.logger.info "BRAND CONNECTIONS (#{brand.brand_key})  #{index} of #{origins.count} origins."
 
         via_points = brand.current_schedules.departing(origin_code).select(:dest_apt).distinct.pluck(:dest_apt).sort
 

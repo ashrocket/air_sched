@@ -1149,6 +1149,67 @@ ALTER SEQUENCE hubs_id_seq OWNED BY hubs.id;
 
 
 --
+-- Name: implied_direct_flights; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE implied_direct_flights (
+    id integer NOT NULL,
+    brand_id integer,
+    implied_market_id integer
+);
+
+
+--
+-- Name: implied_direct_flights_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE implied_direct_flights_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: implied_direct_flights_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE implied_direct_flights_id_seq OWNED BY implied_direct_flights.id;
+
+
+--
+-- Name: implied_markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE implied_markets (
+    id integer NOT NULL,
+    origin character varying,
+    dest character varying,
+    brand_id integer
+);
+
+
+--
+-- Name: implied_markets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE implied_markets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: implied_markets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE implied_markets_id_seq OWNED BY implied_markets.id;
+
+
+--
 -- Name: interline_cxr_rules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1309,105 +1370,6 @@ CREATE SEQUENCE possible_flights_id_seq
 --
 
 ALTER SEQUENCE possible_flights_id_seq OWNED BY possible_flights.id;
-
-
---
--- Name: potential_branded_carriers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE potential_branded_carriers (
-    id integer NOT NULL,
-    cxr character varying,
-    carrier_name character varying,
-    brand_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: potential_branded_carriers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE potential_branded_carriers_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: potential_branded_carriers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE potential_branded_carriers_id_seq OWNED BY potential_branded_carriers.id;
-
-
---
--- Name: potential_branded_journeys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE potential_branded_journeys (
-    id integer NOT NULL,
-    journey character varying,
-    segments integer,
-    potential_branded_market_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: potential_branded_journeys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE potential_branded_journeys_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: potential_branded_journeys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE potential_branded_journeys_id_seq OWNED BY potential_branded_journeys.id;
-
-
---
--- Name: potential_branded_markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE potential_branded_markets (
-    id integer NOT NULL,
-    origin character varying,
-    dest character varying,
-    brand_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: potential_branded_markets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE potential_branded_markets_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: potential_branded_markets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE potential_branded_markets_id_seq OWNED BY potential_branded_markets.id;
 
 
 --
@@ -1769,6 +1731,20 @@ ALTER TABLE ONLY hubs ALTER COLUMN id SET DEFAULT nextval('hubs_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY implied_direct_flights ALTER COLUMN id SET DEFAULT nextval('implied_direct_flights_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY implied_markets ALTER COLUMN id SET DEFAULT nextval('implied_markets_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY interline_cxr_rules ALTER COLUMN id SET DEFAULT nextval('interline_cxr_rules_id_seq'::regclass);
 
 
@@ -1791,27 +1767,6 @@ ALTER TABLE ONLY oag_schedules ALTER COLUMN id SET DEFAULT nextval('oag_schedule
 --
 
 ALTER TABLE ONLY possible_flights ALTER COLUMN id SET DEFAULT nextval('possible_flights_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY potential_branded_carriers ALTER COLUMN id SET DEFAULT nextval('potential_branded_carriers_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY potential_branded_journeys ALTER COLUMN id SET DEFAULT nextval('potential_branded_journeys_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY potential_branded_markets ALTER COLUMN id SET DEFAULT nextval('potential_branded_markets_id_seq'::regclass);
 
 
 --
@@ -2100,6 +2055,22 @@ ALTER TABLE ONLY hubs
 
 
 --
+-- Name: implied_direct_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY implied_direct_flights
+    ADD CONSTRAINT implied_direct_flights_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: implied_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY implied_markets
+    ADD CONSTRAINT implied_markets_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: interline_cxr_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2129,30 +2100,6 @@ ALTER TABLE ONLY oag_schedules
 
 ALTER TABLE ONLY possible_flights
     ADD CONSTRAINT possible_flights_pkey PRIMARY KEY (id);
-
-
---
--- Name: potential_branded_carriers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY potential_branded_carriers
-    ADD CONSTRAINT potential_branded_carriers_pkey PRIMARY KEY (id);
-
-
---
--- Name: potential_branded_journeys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY potential_branded_journeys
-    ADD CONSTRAINT potential_branded_journeys_pkey PRIMARY KEY (id);
-
-
---
--- Name: potential_branded_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY potential_branded_markets
-    ADD CONSTRAINT potential_branded_markets_pkey PRIMARY KEY (id);
 
 
 --
@@ -2205,6 +2152,13 @@ CREATE INDEX direct_flights_o ON direct_flights USING btree (origin);
 --
 
 CREATE INDEX direct_flights_o_and_d ON direct_flights USING btree (origin, dest);
+
+
+--
+-- Name: imp_mkt__o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX imp_mkt__o_and_d ON implied_markets USING btree (brand_id, origin, dest);
 
 
 --
@@ -2446,27 +2400,6 @@ CREATE INDEX index_possible_flights_on_hub_and_orig_and_dest ON possible_flights
 
 
 --
--- Name: index_potential_branded_carriers_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_potential_branded_carriers_on_brand_id ON potential_branded_carriers USING btree (brand_id);
-
-
---
--- Name: index_potential_branded_journeys_on_potential_branded_market_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_potential_branded_journeys_on_potential_branded_market_id ON potential_branded_journeys USING btree (potential_branded_market_id);
-
-
---
--- Name: index_potential_branded_markets_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_potential_branded_markets_on_brand_id ON potential_branded_markets USING btree (brand_id);
-
-
---
 -- Name: index_report_keys_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2657,14 +2590,6 @@ ALTER TABLE ONLY brands_markets
 
 
 --
--- Name: fk_rails_3b3ff83546; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY potential_branded_journeys
-    ADD CONSTRAINT fk_rails_3b3ff83546 FOREIGN KEY (potential_branded_market_id) REFERENCES potential_branded_markets(id);
-
-
---
 -- Name: fk_rails_3be8df1480; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2705,14 +2630,6 @@ ALTER TABLE ONLY airlines_hosts
 
 
 --
--- Name: fk_rails_b591bed8c7; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY potential_branded_markets
-    ADD CONSTRAINT fk_rails_b591bed8c7 FOREIGN KEY (brand_id) REFERENCES brands(id);
-
-
---
 -- Name: fk_rails_cae2c96be0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2726,14 +2643,6 @@ ALTER TABLE ONLY brand_export_states
 
 ALTER TABLE ONLY brand_data_states
     ADD CONSTRAINT fk_rails_f16518b9c4 FOREIGN KEY (brand_id) REFERENCES brands(id);
-
-
---
--- Name: fk_rails_f8f7da103e; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY potential_branded_carriers
-    ADD CONSTRAINT fk_rails_f8f7da103e FOREIGN KEY (brand_id) REFERENCES brands(id);
 
 
 --
@@ -2831,8 +2740,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000520');
 INSERT INTO schema_migrations (version) VALUES ('20150727000530');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000600');
-
-INSERT INTO schema_migrations (version) VALUES ('20150727000610');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000620');
 

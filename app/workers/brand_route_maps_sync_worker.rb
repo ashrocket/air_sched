@@ -20,7 +20,7 @@ class BrandRouteMapsSyncWorker
     report_key       = options['report_key']
     export_report_id = options['export_report_id']
 
-    Sidekiq::Logging.logger.info "BrandRouteMapsSyncWorker called for  #{brand_key}"
+    Sidekiq::Logging.logger.info "BrandRouteMapsSyncWorker called for  #{brand_key} #{report_key} #{schedule_set_id} #{export_report_id}"
     Rails.logger = Sidekiq::Logging.logger
 
     if lock.acquire!

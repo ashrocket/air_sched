@@ -42,7 +42,7 @@
     - else
       %li.list-group-item.col-sm-4.list-group-item-warning
         %span= @brand.export_state.current_state
-        .pull-right.btn.btn-sm.btn-default= link_to("reset", reset_export_state_admin_brand_path)
+        .pull-right.btn.btn-sm.btn-default= link_to("reset", reset_export_state_admin_brand_path(@brand))
 
   %dt Data State:
   %dd
@@ -52,7 +52,7 @@
     - else
       %li.list-group-item.col-sm-4.list-group-item-warning
         %span= @brand.data_state.current_state
-        .pull-right.btn.btn-sm.btn-default= link_to("reset", reset_data_state_admin_brand_path)
+        .pull-right.btn.btn-sm.btn-default= link_to("reset", reset_data_state_admin_brand_path(@brand))
 
 
   %br

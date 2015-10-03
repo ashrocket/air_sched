@@ -34,10 +34,46 @@ ActiveAdmin.register Brand, as: 'Brands' do
   #     end
   #     f.actions
   # end
+
   index do
+
+
        column :brand_key
        column :name
+
+       column :states do |brand|
+         def state_helper_content(state, state_reset_path)
+             content_tag(:li, class: 'list-group-item list-group-item-warning') do
+               li_content = ""
+               li_content << content_tag(:div, state )
+               li_content << content_tag(:div, class:'btn btn-sm btn-default'){
+                                      link_to("reset", state_reset_path)
+               }
+               li_content.html_safe
+             end
+         end
+         content_tag :ul, class: 'list-group' do
+          content = ""
+            if  brand.export_state.idle?
+             content << content_tag(:li,  'idle', class: 'list-group-item list-group-item-info')
+            else
+              content << state_helper_content(brand.export_state.current_state,
+                                              reset_export_state_admin_brand_path(brand))
+            end
+
+            if  brand.data_state.idle?
+              content <<  content_tag(:li, 'idle', class: 'list-group-item list-group-item-info')
+            else
+              content << state_helper_content(brand.data_state.current_state,
+                                              reset_data_state_admin_brand_path(brand))
+
+            end
+          content.html_safe
+         end
+       end
+
        column :description
+
        column :report_keys do |brand|
          content_tag :ul, class: 'list-group' do
            brand.report_keys.collect{ |rk|
@@ -47,6 +83,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
            }.join.html_safe
          end
        end
+
        column :hosts  do |brand|
          content_tag :ul, class: 'list-group' do
            brand.hosts.collect{ |h|
@@ -65,7 +102,6 @@ ActiveAdmin.register Brand, as: 'Brands' do
 
        actions
   end
-
   member_action :build_connections do
    @brand = Brand.friendly.find(params[:id])
    if @brand.data_state.idle?

@@ -317,7 +317,7 @@ class ScheduleSet < ActiveRecord::Base
 
   end
   def active?
-    report_key.current_schedule_set.eql? self
+    report_key and self.eql? report_key.current_schedule_set
   end
 
   def to_label

@@ -44,7 +44,7 @@ ActiveAdmin.register ScheduleSet  do
       column 'Mail Id' do |report|
         report.msg_id
       end
-      column 'Report Key', :sortable => :report_key do |report|
+      column 'Report Key', :sortable => 'report_keys.code' do |report|
         if report.report_key
           link_to report.report_key.code, admin_report_key_path(report.report_key)
         else
@@ -78,6 +78,10 @@ ActiveAdmin.register ScheduleSet  do
         end
       end
   end
-
+  controller do
+    def scoped_collection
+        ScheduleSet.includes(:report_key)
+    end
+  end
 
 end

@@ -6,51 +6,51 @@
         %i.fa.fa-globe
         Routes
     = render partial: 'search/search_form', locals: {search_form_url: search_url}
+.container
+  .row
 
-.row
 
+    %br
+    .table-responsive.hide
+      %table.table.table-hover.table-striped#to_hub_table
+        %thead
+          %tr
+            %th Eff
+            %th Disc
+            %th From
+            %th To
+            %th Airline
+            %th Flight Number
+            %th Dep Time
+            %th Arr Time
+            %th Freq
+            %th Stops
 
-  %br
-  .table-responsive.hide
-    %table.table.table-hover.table-striped#to_hub_table
-      %thead
-        %tr
-          %th Eff
-          %th Disc
-          %th From
-          %th To
-          %th Airline
-          %th Flight Number
-          %th Dep Time
-          %th Arr Time
-          %th Freq
-          %th Stops
+        %tbody
+          -#%tr
+      -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
 
-      %tbody
-        -#%tr
-    -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
+  .row
 
-.row
+    %br
+    .table-responsive.hide
+      %table.table.table-hover.table-striped#from_hub_table
+        %thead
+          %tr
+            %th Eff
+            %th Disc
+            %th From
+            %th To
+            %th Airline
+            %th Flight Number
+            %th Dep Time
+            %th Arr Time
+            %th Freq
+            %th Stops
 
-  %br
-  .table-responsive.hide
-    %table.table.table-hover.table-striped#from_hub_table
-      %thead
-        %tr
-          %th Eff
-          %th Disc
-          %th From
-          %th To
-          %th Airline
-          %th Flight Number
-          %th Dep Time
-          %th Arr Time
-          %th Freq
-          %th Stops
-
-      %tbody
-        -#%tr
-    -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
+        %tbody
+          -#%tr
+      -#  %td.dataTables_empty{colspan:"6"} Loading OAG messages from Server
 
 %br
 

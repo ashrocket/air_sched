@@ -35,6 +35,29 @@
             No Flight
             %span.flr Optional charges excluded
 
+    - if @search_results[:directs][:rt].count > 0
+      %article.selectFlights.ng-scope{"ng-controller" => "SelectCtrlr", "ng-init" => "setMinTimes(3600000, 2015, 8, 23, 20, 18, 00); init(0, 7);"}
+      %h1.ng-binding{"ng-bind-html" => "(depart | apNameFormat) + ' → ' + (arrive | apNameFormat)"}
+        = @search_results[:req].origin_airport.city
+        %small= "(#{@search_results[:req].origin_airport.name})"
+        → #{@search_results[:req].dest_airport.city}
+        %small= "(#{@search_results[:req].dest_airport.name})"
+      = render partial: "search/best_fare", locals: {flights: @search_results[:directs][:rt], flight_date: @search_results[:req].depart, direction: "ob"}
+      = render partial: "search/non_stop_results", locals: {flights: @search_results[:directs][:rt], flight_date: @search_results[:req].depart, direction: "ob"}
+
+      .hidden.ng-hide{"ng-show" => "selDay().flightList.length === 0"}
+        %p This may be because:
+        %ol
+          %li The travel dates requested are for our next schedule period and the fares/seats are yet not loaded for these dates.
+          %li There may not be a flight scheduled for this day of the week.
+      .hidden.fs11
+        = image_tag("fr/img/ui/soldOut.png", :alt => "Sold out", :height => "25",  :style => "vertical-align:middle;", :width => "25") do
+          \&nbsp;
+          Sold out&nbsp;&nbsp;
+          = image_tag("fr/img/ui/noFlights.png", :alt => "No flights", :height => "25",  :style => "vertical-align:middle;", :width => "25") do
+            \&nbsp;
+            No Flight
+            %span.flr Optional charges excluded
 
 
 -#.row

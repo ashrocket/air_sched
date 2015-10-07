@@ -7,11 +7,12 @@ class PricedFlightSegment
 
 
 
-  attr_accessor :flight_segment, :price
+  attr_accessor :flight_segment, :price, :fare
 
-  def initialize(flight_segment, price = 0.0)
+  def initialize(flight_segment, price = 0.0, fare = nil)
      @flight_segment  = flight_segment
      @price   = price
+     @fare = fare
   end
 
   # TODO: FOr now this is fine, but it's not perform, refactor and use def_delegators, or have all the classes use the flight attribute

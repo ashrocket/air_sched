@@ -1,0 +1,32 @@
+- page_title
+
+.page-header
+  = link_to new_fare_path, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-plus
+    New Fare
+  %h2 Listing Fares
+
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Fbc
+        %th Source
+        %th Base amount
+        %th Origin
+        %th Dest
+        %th
+        %th
+        %th
+
+    %tbody
+      - @fares.each do |fare|
+        %tr
+          %td= fare.fbc
+          %td= fare.source
+          %td= fare.base_amount
+          %td= fare.origin
+          %td= fare.dest
+          %td= link_to 'Show', fare
+          %td= link_to 'Edit', edit_fare_path(fare)
+          %td= link_to 'Destroy', fare, data: { confirm: 'Are you sure?' }, method: :delete

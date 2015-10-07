@@ -2,7 +2,7 @@ Rails.application.config.assets.precompile += %w(emails.css)
 Rails.application.config.assets.precompile += %w(emails.js)
 #Rails.application.config.assets.precompile += %w(jquery/jquery.dataTables.fileSize.js)
 #Rails.application.config.assets.precompile += %w(jquery/jquery.dataTables.datetime-us.js)
-%w( search destinations direct_flights ).each do |controller|
+%w( search destinations direct_flights fares product_code product_code_matches ).each do |controller|
   Rails.application.config.assets.precompile += ["#{controller}.js", "#{controller}.css"]
 end
 
@@ -15,7 +15,7 @@ Rails.application.config.assets.precompile += %w( font-awesome/scss/font-awesome
 # Branded Assets
 
 Rails.application.config.assets.precompile += ['fr/fr.css']
-%w( fr/application fr/search fr/destinations fr/direct_flights ).each do |controller|
+%w( fr/application fr/search fr/destinations fr/direct_flights fares product_codes product_code_matches ).each do |controller|
   Rails.application.config.assets.precompile += ["#{controller}.js", "#{controller}.css"]
 end
 

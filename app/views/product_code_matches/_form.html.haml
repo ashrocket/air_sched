@@ -1,0 +1,30 @@
+= simple_form_for @product_code_match, html: { class: 'form-horizontal' },
+   wrapper: :horizontal_form,
+   wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
+                       radio_buttons: :horizontal_radio_and_checkboxes,
+                       file: :horizontal_file_input,
+                       boolean: :horizontal_boolean }  do |f|
+  -if @product_code_match.errors.any?
+    .alert.alert-danger.alert-dismissable{role: 'alert'}
+      %button.close{type: 'button', data: {dismiss: 'alert'} }
+        %span{aria: {hidden: 'true'} } &times;
+        %span.sr-only Close
+      %h4= "#{pluralize(@product_code_match.errors.count, 'error')} prohibited this Product code match from being saved:"
+
+      %ul
+        - @product_code_match.errors.full_messages.each do |msg|
+          %li= msg
+
+
+
+  .form-inputs
+    = f.input :fare_field_match
+    = f.input :match_expr
+    = f.association :product_code, include_blank: false
+
+  .form-actions.col-sm-offset-3.col-sm-9
+    = f.submit class: 'btn btn-primary'
+
+
+
+

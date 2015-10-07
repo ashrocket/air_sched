@@ -1,0 +1,12 @@
+- page_title
+
+.page-header
+  = link_to product_codes_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to @product_code, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-info-sign
+    Show
+  %h2 Editing Product Code
+
+= render 'form'

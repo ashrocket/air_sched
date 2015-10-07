@@ -1,0 +1,28 @@
+- page_title
+
+.page-header
+  = link_to new_product_code_match_path, class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-plus
+    New Product code match
+  %h2 Listing Product Code Matches
+
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr
+        %th Fare field match
+        %th Match expr
+        %th Product code
+        %th
+        %th
+        %th
+
+    %tbody
+      - @product_code_matches.each do |product_code_match|
+        %tr
+          %td= product_code_match.fare_field_match
+          %td= product_code_match.match_expr
+          %td= product_code_match.product_code.name
+          %td= link_to 'Show', product_code_match
+          %td= link_to 'Edit', edit_product_code_match_path(product_code_match)
+          %td= link_to 'Destroy', product_code_match, data: { confirm: 'Are you sure?' }, method: :delete

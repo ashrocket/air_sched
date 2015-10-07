@@ -44,8 +44,12 @@ class ShoppingService
   def price_flight_segments(segments)
     mock_prices = [45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.00, 100.00]
     mock_cents = [0.00, 0.49,0.99]
+
+    anyfare = Fare.find_by(fbc: 'ANYANY')
+
     segments.map! do |flight_segment|
-        PricedFlightSegment.new(flight_segment, mock_prices.sample + mock_cents.sample)
+      PricedFlightSegment.new(flight_segment, anyfare.base_amount,  anyfare)
+      # PricedFlightSegment.new(flight_segment, mock_prices.sample + mock_cents.sample)
     end
   end
 

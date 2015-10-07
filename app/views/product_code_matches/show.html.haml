@@ -1,0 +1,17 @@
+- page_title
+.page-header
+  = link_to product_code_matches_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_product_code_match_path(@product_code_match), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Product Code Match
+
+%dl.dl-horizontal
+  %dt Fare field match:
+  %dd= @product_code_match.fare_field_match
+  %dt Match expr:
+  %dd= @product_code_match.match_expr
+  %dt Product code:
+  %dd= @product_code_match.product_code.name

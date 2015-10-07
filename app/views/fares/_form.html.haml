@@ -1,0 +1,32 @@
+= simple_form_for @fare, html: { class: 'form-horizontal' },
+   wrapper: :horizontal_form,
+   wrapper_mappings: { check_boxes: :horizontal_radio_and_checkboxes,
+                       radio_buttons: :horizontal_radio_and_checkboxes,
+                       file: :horizontal_file_input,
+                       boolean: :horizontal_boolean }  do |f|
+  -if @fare.errors.any?
+    .alert.alert-danger.alert-dismissable{role: 'alert'}
+      %button.close{type: 'button', data: {dismiss: 'alert'} }
+        %span{aria: {hidden: 'true'} } &times;
+        %span.sr-only Close
+      %h4= "#{pluralize(@fare.errors.count, 'error')} prohibited this Fare from being saved:"
+
+      %ul
+        - @fare.errors.full_messages.each do |msg|
+          %li= msg
+
+
+
+  .form-inputs
+    = f.input :fbc
+    = f.input :source
+    = f.input :base_amount
+    = f.input :origin
+    = f.input :dest
+
+  .form-actions.col-sm-offset-3.col-sm-9
+    = f.submit class: 'btn btn-primary'
+
+
+
+

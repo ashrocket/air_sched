@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  resources :product_code_matches
+  resources :product_codes
+  resources :fares
+
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
 

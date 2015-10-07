@@ -1,0 +1,17 @@
+- page_title
+.page-header
+  = link_to product_codes_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_product_code_path(@product_code), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Product Code
+
+%dl.dl-horizontal
+  %dt Desc:
+  %dd= @product_code.desc
+  %dt Code:
+  %dd= @product_code.code
+  %dt Name:
+  %dd= @product_code.name

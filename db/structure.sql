@@ -13,14 +13,16 @@ SET client_min_messages = warning;
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+-- The following was commented out by rake db:structure:fix_plpgsql
+-- COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
@@ -716,8 +718,7 @@ CREATE TABLE cnx_pairs (
     origin_name character varying,
     dest character varying(4),
     dest_name character varying,
-    origin_airport_id integer,
-    dest_airport_id integer
+    dest_airport_id integer DEFAULT 0
 );
 
 
@@ -755,7 +756,6 @@ CREATE TABLE destinations (
     cxrs2 character varying[] DEFAULT '{}'::character varying[],
     dest character varying,
     dest_code character varying,
-    filtered boolean DEFAULT false NOT NULL,
     eff_days json DEFAULT '[]'::json,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -912,6 +912,41 @@ CREATE SEQUENCE export_smart_route_reports_id_seq
 --
 
 ALTER SEQUENCE export_smart_route_reports_id_seq OWNED BY export_smart_route_reports.id;
+
+
+--
+-- Name: fares; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE fares (
+    id integer NOT NULL,
+    fbc character varying,
+    source character varying,
+    base_amount double precision,
+    origin character varying,
+    dest character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: fares_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE fares_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: fares_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE fares_id_seq OWNED BY fares.id;
 
 
 --
@@ -1286,6 +1321,72 @@ ALTER SEQUENCE potential_branded_markets_id_seq OWNED BY potential_branded_marke
 
 
 --
+-- Name: product_code_matches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE product_code_matches (
+    id integer NOT NULL,
+    fare_field_match character varying,
+    match_expr character varying,
+    product_code_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: product_code_matches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE product_code_matches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: product_code_matches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE product_code_matches_id_seq OWNED BY product_code_matches.id;
+
+
+--
+-- Name: product_codes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE product_codes (
+    id integer NOT NULL,
+    "desc" character varying,
+    code character varying,
+    name character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: product_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE product_codes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: product_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE product_codes_id_seq OWNED BY product_codes.id;
+
+
+--
 -- Name: report_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1552,6 +1653,13 @@ ALTER TABLE ONLY export_smart_route_reports ALTER COLUMN id SET DEFAULT nextval(
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY fares ALTER COLUMN id SET DEFAULT nextval('fares_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY friendly_id_slugs ALTER COLUMN id SET DEFAULT nextval('friendly_id_slugs_id_seq'::regclass);
 
 
@@ -1616,6 +1724,20 @@ ALTER TABLE ONLY potential_branded_journeys ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY potential_branded_markets ALTER COLUMN id SET DEFAULT nextval('potential_branded_markets_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY product_code_matches ALTER COLUMN id SET DEFAULT nextval('product_code_matches_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY product_codes ALTER COLUMN id SET DEFAULT nextval('product_codes_id_seq'::regclass);
 
 
 --
@@ -1841,6 +1963,14 @@ ALTER TABLE ONLY export_smart_route_reports
 
 
 --
+-- Name: fares_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY fares
+    ADD CONSTRAINT fares_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: friendly_id_slugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1918,6 +2048,22 @@ ALTER TABLE ONLY potential_branded_journeys
 
 ALTER TABLE ONLY potential_branded_markets
     ADD CONSTRAINT potential_branded_markets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product_code_matches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY product_code_matches
+    ADD CONSTRAINT product_code_matches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY product_codes
+    ADD CONSTRAINT product_codes_pkey PRIMARY KEY (id);
 
 
 --
@@ -2210,6 +2356,13 @@ CREATE INDEX index_potential_branded_markets_on_brand_id ON potential_branded_ma
 
 
 --
+-- Name: index_product_code_matches_on_product_code_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_product_code_matches_on_product_code_id ON product_code_matches USING btree (product_code_id);
+
+
+--
 -- Name: index_report_keys_on_report_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2284,6 +2437,14 @@ CREATE INDEX oag_origins ON oag_schedules USING btree (report_key_id, eff_date, 
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- Name: fk_rails_0b6fee8468; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY product_code_matches
+    ADD CONSTRAINT fk_rails_0b6fee8468 FOREIGN KEY (product_code_id) REFERENCES product_codes(id);
 
 
 --
@@ -2423,4 +2584,10 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000600');
 INSERT INTO schema_migrations (version) VALUES ('20150727000610');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000620');
+
+INSERT INTO schema_migrations (version) VALUES ('20151007162531');
+
+INSERT INTO schema_migrations (version) VALUES ('20151007170412');
+
+INSERT INTO schema_migrations (version) VALUES ('20151007170422');
 

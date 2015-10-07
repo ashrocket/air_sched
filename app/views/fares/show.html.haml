@@ -1,0 +1,21 @@
+- page_title
+.page-header
+  = link_to fares_path, class: 'btn btn-default' do
+    %span.glyphicon.glyphicon-list-alt
+    Back
+  = link_to edit_fare_path(@fare), class: 'btn btn-primary' do
+    %span.glyphicon.glyphicon-pencil
+    Edit
+  %h2 Show Fare
+
+%dl.dl-horizontal
+  %dt Fbc:
+  %dd= @fare.fbc
+  %dt Source:
+  %dd= @fare.source
+  %dt Base amount:
+  %dd= @fare.base_amount
+  %dt Origin:
+  %dd= @fare.origin
+  %dt Dest:
+  %dd= @fare.dest

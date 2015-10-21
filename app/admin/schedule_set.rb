@@ -44,7 +44,7 @@ ActiveAdmin.register ScheduleSet  do
       column 'Mail Id' do |report|
         report.msg_id
       end
-      column 'Report Key', :sortable => 'report_keys.code' do |report|
+      column 'Report Key', :sortable => ['schedule_set.report_key.code' ] do |report|
         if report.report_key
           link_to report.report_key.code, admin_report_key_path(report.report_key)
         else

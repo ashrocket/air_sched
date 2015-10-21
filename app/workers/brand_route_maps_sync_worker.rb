@@ -32,6 +32,7 @@ class BrandRouteMapsSyncWorker
         else
             active_report =  brand.active_export_report
             active_report =  brand.next_export_report unless active_report
+            export_report_id = active_report.id
         end
 
         if active_report.uninitialized?

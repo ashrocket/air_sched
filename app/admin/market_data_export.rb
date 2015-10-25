@@ -1,5 +1,5 @@
 ActiveAdmin.register ExportMarketDataReport, :as => "Market Exports" do
-  menu priority: 2, :parent => "Reports"
+  menu priority: 4, :parent => "Reports"
   actions :all, :except => [:new]
 
   index do

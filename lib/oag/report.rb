@@ -3,21 +3,7 @@ module Oag
   class Report
 
 
-    def build_implied_markets(brand, origins, destinations)
-      ImpliedMarket.where(brand: brand).delete_all
-      markets = origins.product destinations
-      imp_markets_array = []
-      Rails.logger.info "Building implied markets for  #{brand.brand_key} Total:  #{markets.count}"
 
-      markets.each do |o,d|
-        i_m = ImpliedMarket.new(brand: brand, origin: o, dest: d)
-        imp_markets_array << i_m
-      end
-
-      imp_markets_array.sort!
-      ImpliedMarket.import imp_markets_array
-
-    end
 
     def build_brand_connections(brand)
 
@@ -28,7 +14,6 @@ module Oag
       origins = brand.origins.pluck(:origin_apt).sort
       destinations = brand.destinations.pluck(:dest_apt).sort
 
-      self.build_implied_markets(brand, origins, destinations)
 
       routes = Set.new
       brand_connections = []
@@ -230,7 +215,58 @@ module Oag
     end
 
 
+    # ###############
+    #
+    #  Data Validation Methods
+    #
+    # ###############
 
+    def build_implied_markets(brand, origins, destinations)
+
+        ImpliedMarket.where(brand: brand).destroy_all
+        markets = origins.product destinations
+        imp_markets_array = []
+        Rails.logger.info "Building implied markets for  #{brand.brand_key} Total:  #{markets.count}"
+
+        markets.each do |o,d|
+          i_m = ImpliedMarket.new(brand: brand, origin: o, dest: d)
+          imp_markets_array << i_m unless o == d
+        end
+
+        imp_markets_array.sort!
+        ImpliedMarket.import imp_markets_array
+
+    end
+
+    def build_route_map_validations(brand)
+
+      implied_markets = ImpliedMarket.where(brand: brand)
+
+      tot_implied_markets = implied_markets.count
+      implied_markets.each_with_index do |i_m, idx|
+
+         validator = i_m.create_branded_route_map_validator
+         Rails.logger.info "(#{brand.brand_key}) Building route map validator for market  #{i_m.origin}-#{i_m.dest} #{idx+1} of (#{tot_implied_markets})"
+
+
+           [*1..brand.settings.max_segments].each do |seg_number|
+               validator.route_map_counts[seg_number] =
+                   BrandedMarketRequest.branded(brand).market(i_m.origin, i_m.dest).segments(seg_number).count
+           end
+
+           [*1..brand.settings.max_segments].each do |seg_number|
+               validator.route_map_structures[seg_number] = Set.new
+               bmrs =BrandedMarketRequest.where(brand:brand, origin: i_m.origin, dest: i_m.dest, seg_count: seg_number )
+               bmrs.each do |bmr|
+                 validator.route_map_structures[seg_number] << bmr.branded_route_requests.map{|brr| brr.key}
+               end
+               validator.save
+           end
+
+
+      end
+
+   end
   private
 
     # ###############
@@ -245,11 +281,7 @@ module Oag
                          " #{via_index + 1} of (#{via_points.count})  - #{brand.brand_key}"
      end
 
-    # ###############
-    #
-    #  Data Validation Methods
-    #
-    # ###############
+
 
     def build_potential_markets(brand)
 
@@ -405,9 +437,14 @@ module Oag
                 end
         end
 
+
+       #TODO Make this use less memory
+       total_bmr_count = two_seg_branded_market_requests.count
+       Rails.logger.info "(#{brand.brand_key}) Saving #{total_bmr_count} Two Segment BrandedMarketRequests. "
        ActiveRecord::Base.transaction do
               two_seg_branded_market_requests.values.each{|bmr_list| bmr_list.each{|bmr|  bmr.save}}
        end
+       Rails.logger.info "(#{brand.brand_key}) Saving #{total_bmr_count} Two Segment BrandedMarketSegmentsRequest. "
        ActiveRecord::Base.transaction do
           total_two_seg_markets =  two_seg_branded_market_requests.keys.count
           two_seg_branded_market_requests.keys.each_with_index do |k, two_seg_mkt_idx|
@@ -575,7 +612,7 @@ module Oag
           end
 
 
-
+        #TODO make this use less Memory
         ActiveRecord::Base.transaction do
           three_seg_branded_market_requests.values.each{|bmr_list| bmr_list.each{|bmr|  bmr.save}}
         end

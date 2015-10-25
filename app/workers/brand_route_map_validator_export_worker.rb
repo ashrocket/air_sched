@@ -1,7 +1,7 @@
 # app/workers/brand_route_maps_export_worker.rb
 require 'sidekiq-lock'
 
-class ExportBrandRouteMapValidatorWorker
+class BrandRouteMapValidatorExportWorker
   include Sidekiq::Worker
   include Sidekiq::Lock::Worker
 
@@ -19,8 +19,8 @@ class ExportBrandRouteMapValidatorWorker
     Rails.logger = Sidekiq::Logging.logger
     if lock.acquire!
       begin
-        Sidekiq::Logging.logger.info "ExportBrandRouteMapValidatorWorker checking if Export is Ready for  #{brand_key}"
-        report = ExportRouteValidatorReport.find(report_id)
+        Sidekiq::Logging.logger.info "ExportBrandRouteMapValidatorWorker checking if validator report exists for  #{brand_key}"
+        report = BrandedRouteMapValidatorReport.find(report_id)
         Sidekiq::Logging.logger.info "ExportBrandRouteMapValidatorWorker found report:  #{brand_key}, #{report.id}: #{report.current_state.name}"
 
         if report and not report.exported?
@@ -37,7 +37,7 @@ class ExportBrandRouteMapValidatorWorker
       delay_val = (300..900).to_a.sample
 
       Sidekiq::Logging.logger.info "ExportBrandRouteMapValidatorWorker, busy, delaying #{brand_key} for #{delay_val} seconds."
-      ExportBrandRouteMapValidatorWorker.delay_for(delay_val.seconds).perform_async(brand_key, report_id)
+      BrandRouteMapValidatorExportWorker.delay_for(delay_val.seconds).perform_async(brand_key, report_id)
     end
     #Do Something here with the message
     #

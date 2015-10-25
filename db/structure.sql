@@ -644,13 +644,48 @@ ALTER SEQUENCE branded_market_segments_requests_id_seq OWNED BY branded_market_s
 
 
 --
+-- Name: branded_route_map_validator_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE branded_route_map_validator_reports (
+    id integer NOT NULL,
+    brand_id integer,
+    workflow_state character varying,
+    location character varying,
+    details json DEFAULT '{}'::json,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: branded_route_map_validator_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE branded_route_map_validator_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: branded_route_map_validator_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE branded_route_map_validator_reports_id_seq OWNED BY branded_route_map_validator_reports.id;
+
+
+--
 -- Name: branded_route_map_validators; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE branded_route_map_validators (
     id integer NOT NULL,
-    brand_id integer,
-    possible_route_map_rows character varying[] DEFAULT '{}'::character varying[]
+    implied_market_id integer,
+    route_map_counts json DEFAULT '{}'::json,
+    route_map_structures json DEFAULT '{}'::json
 );
 
 
@@ -1149,36 +1184,6 @@ ALTER SEQUENCE hubs_id_seq OWNED BY hubs.id;
 
 
 --
--- Name: implied_direct_flights; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE implied_direct_flights (
-    id integer NOT NULL,
-    brand_id integer,
-    implied_market_id integer
-);
-
-
---
--- Name: implied_direct_flights_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE implied_direct_flights_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: implied_direct_flights_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE implied_direct_flights_id_seq OWNED BY implied_direct_flights.id;
-
-
---
 -- Name: implied_markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1626,6 +1631,13 @@ ALTER TABLE ONLY branded_market_segments_requests ALTER COLUMN id SET DEFAULT ne
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY branded_route_map_validator_reports ALTER COLUMN id SET DEFAULT nextval('branded_route_map_validator_reports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY branded_route_map_validators ALTER COLUMN id SET DEFAULT nextval('branded_route_map_validators_id_seq'::regclass);
 
 
@@ -1725,13 +1737,6 @@ ALTER TABLE ONLY hosts ALTER COLUMN id SET DEFAULT nextval('hosts_id_seq'::regcl
 --
 
 ALTER TABLE ONLY hubs ALTER COLUMN id SET DEFAULT nextval('hubs_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY implied_direct_flights ALTER COLUMN id SET DEFAULT nextval('implied_direct_flights_id_seq'::regclass);
 
 
 --
@@ -1935,6 +1940,14 @@ ALTER TABLE ONLY branded_market_segments_requests
 
 
 --
+-- Name: branded_route_map_validator_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY branded_route_map_validator_reports
+    ADD CONSTRAINT branded_route_map_validator_reports_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: branded_route_map_validators_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2052,14 +2065,6 @@ ALTER TABLE ONLY hosts
 
 ALTER TABLE ONLY hubs
     ADD CONSTRAINT hubs_pkey PRIMARY KEY (id);
-
-
---
--- Name: implied_direct_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY implied_direct_flights
-    ADD CONSTRAINT implied_direct_flights_pkey PRIMARY KEY (id);
 
 
 --
@@ -2737,9 +2742,7 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000500');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000520');
 
-INSERT INTO schema_migrations (version) VALUES ('20150727000530');
-
 INSERT INTO schema_migrations (version) VALUES ('20150727000600');
 
-INSERT INTO schema_migrations (version) VALUES ('20150727000620');
+INSERT INTO schema_migrations (version) VALUES ('20150727000630');
 

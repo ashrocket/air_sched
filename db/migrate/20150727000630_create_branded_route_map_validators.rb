@@ -1,8 +1,9 @@
 class CreateBrandedRouteMapValidators < ActiveRecord::Migration
   def change
     create_table :branded_route_map_validators do |t|
-      t.references :brand
-      t.string :possible_route_map_rows, array: true, default: []
+      t.references :implied_market
+      t.json :route_map_counts, default: {}
+      t.json :route_map_structures, default: {}
 
     end
 

@@ -1,4 +1,4 @@
-class CreateBrandRouteMapExportReport < ActiveRecord::Migration
+class CreateBrandRouteMapExportReports < ActiveRecord::Migration
   def change
     create_table :brand_route_map_export_reports do |t|
       t.references :brand

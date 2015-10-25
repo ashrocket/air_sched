@@ -1,11 +1,11 @@
 ActiveAdmin.register ImpliedMarket  do
-  menu priority: 0, label: 'Single Markets', :parent => 'Validators'
+  menu priority: 0, label: 'Implied Markets', :parent => 'Validators'
   actions :all, :except => [:new, :edit, :destroy]
 
    filter :brand
    filter :origin, filters: [:cont, :eq, :start, :end]
    filter :dest, filters: [:cont, :eq, :start, :end]
-
+   filter :branded_route_map_validator_route_map_counts_cont, label: 'Counts'
 
 
   # See permitted parameters documentation:
@@ -34,13 +34,18 @@ ActiveAdmin.register ImpliedMarket  do
       column 'Destination' do |mkt|
             mkt.dest
       end
+      column 'Details' do |mkt|
+        link_to '?', admin_branded_route_map_validator_path(mkt.branded_route_map_validator.id)
+      end
       column '0 Stops' do |mkt|
-        count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(1).count
+        count = mkt.branded_route_map_validator.route_map_counts['1']
+        # count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(1).count
         link_to count, admin_direct_flights_path("q[origin_eq]": mkt.origin,
                                                  "q[dest_eq]": mkt.dest)
       end
       column '1 Stops' do |mkt|
-        count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(2).count
+        count = mkt.branded_route_map_validator.route_map_counts['2']
+        # count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(2).count
         link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
                                                           "q[origin_eq]": mkt.origin,
                                                           "q[dest_eq]": mkt.dest,
@@ -48,8 +53,9 @@ ActiveAdmin.register ImpliedMarket  do
 
       end
       column '2 Stops' do |mkt|
-        count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(3).count
-                link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
+        count = mkt.branded_route_map_validator.route_map_counts['3']
+        # count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(3).count
+        link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
                                                                   "q[origin_eq]": mkt.origin,
                                                                   "q[dest_eq]": mkt.dest,
                                                                   "q[seg_count_equals]":3)

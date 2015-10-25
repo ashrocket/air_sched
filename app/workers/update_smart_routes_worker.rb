@@ -15,7 +15,7 @@ class UpdateSmartRoutesWorker
     if lock.acquire!
       begin
         brand = Brand.keyed(brand_key)
-        seg_counts_array = [*1..brand.max_segments]
+        seg_counts_array = [*1..brand.settings.max_segments]
 
         r = Oag::Report.new
         r.build_brand_market_smart_routes(brand, seg_counts_array)

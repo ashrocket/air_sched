@@ -135,7 +135,7 @@ class BrandRouteMapExportReport < ActiveRecord::Base
 
     def confirm_report_keys
       Rails.logger.info "#{brand.name}  Brand: -> confirmed Import Reports are ready, calling BrandRouteMapsExportWorker."
-      brand.export_state.export_route_maps!(self.id)
+      brand.export_state.export_validator_report!(self.id)
     end
 
   

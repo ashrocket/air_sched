@@ -7,7 +7,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
   permit_params :brand_key, :report_keys, :name,  :description,
-                :default_currency, :max_segments,  :active, report_key_ids: [], host_ids: [],
+                :default_currency,  :active, report_key_ids: [], host_ids: [],
                 settings_attributes: [:route_map_filename,
                                       :default_currency,
                                       :max_segments,
@@ -173,6 +173,17 @@ ActiveAdmin.register Brand, as: 'Brands' do
        end
      end
 
+  end
+
+  member_action :validate_route_map do
+     @brand = Brand.friendly.find(params[:id])
+     if @brand.export_state.idle?
+      report = BrandedRouteMapValidatorReport.create(brand: @brand)
+      @brand.export_state.export_validator_report!(report.id)
+      redirect_to :back, notice: 'Beginning to validate Route Maps and Export (this may take a while)...'
+     else
+      redirect_to :back, alert: "Brand is currently busy exporting #{@brand.export_state.curret_state.name} Currently In Progress! - try again later."
+     end
    end
 
   member_action :reset_data_state do
@@ -204,6 +215,10 @@ ActiveAdmin.register Brand, as: 'Brands' do
   action_item(:full_export, only: :show) do
    link_to('Auto Export Route', full_export_route_maps_admin_brand_path(brand), class: 'btn btn-primary btn-med')
   end
+  action_item(:validate, only: :show) do
+     link_to('Validate', validate_route_map_admin_brand_path(brand), class: 'btn btn-primary btn-med')
+  end
+
 
 
 

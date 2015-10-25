@@ -207,6 +207,9 @@ module Oag
 
 
     def brand_route_map_validations_document(brand)
+      # Possible of use?
+      # User.includes(:posts).where('posts.desc = "ruby is awesome"').to_a
+      # http://blog.bigbinary.com/2013/07/01/preload-vs-eager-load-vs-joins-vs-includes.html
 
       csv_string = CSV.generate do |csv|
         csv << ['origin', 'dest', 'segments', 'solution' ]

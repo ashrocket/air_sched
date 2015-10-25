@@ -206,6 +206,21 @@ module Oag
        end
 
 
+    def brand_route_map_validations_document(brand)
+
+      csv_string = CSV.generate do |csv|
+        csv << ['origin', 'dest', 'segments', 'solution' ]
+        implied_markets = ImpliedMarket.where(brand: brand)
+        implied_markets.each do |market|
+          market.branded_route_map_validator.rows.each do |row|
+            csv << row.split(',')
+          end
+        end
+      end
+      csv_string
+    end
+
+
 
     def export_brand_route_maps(brand)
       File.open("#{brand.brand_key.downcase}_route_map.json", 'w') {|f| f.write(
@@ -243,27 +258,25 @@ module Oag
       implied_markets = ImpliedMarket.where(brand: brand)
 
       tot_implied_markets = implied_markets.count
-      implied_markets.each_with_index do |i_m, idx|
+
+
+      Parallel.each_with_index(implied_markets, in_threads:4) do |i_m, idx|
+      # implied_markets.each_with_index do |i_m, idx|
 
          validator = i_m.create_branded_route_map_validator
-         Rails.logger.info "(#{brand.brand_key}) Building route map validator for market  #{i_m.origin}-#{i_m.dest} #{idx+1} of (#{tot_implied_markets})"
-
+         Rails.logger.info "(#{brand.brand_key}) Looking Up Route map validator for market  #{i_m.origin}-#{i_m.dest} #{idx+1} of (#{tot_implied_markets})"
 
            [*1..brand.settings.max_segments].each do |seg_number|
+
                validator.route_map_counts[seg_number] =
-                   BrandedMarketRequest.branded(brand).market(i_m.origin, i_m.dest).segments(seg_number).count
-           end
-
-           [*1..brand.settings.max_segments].each do |seg_number|
+                                BrandedMarketRequest.branded(brand).market(i_m.origin, i_m.dest).segments(seg_number).count
                validator.route_map_structures[seg_number] = Set.new
-               bmrs =BrandedMarketRequest.where(brand:brand, origin: i_m.origin, dest: i_m.dest, seg_count: seg_number )
+               bmrs = BrandedMarketRequest.where(brand:brand, origin: i_m.origin, dest: i_m.dest, seg_count: seg_number )
                bmrs.each do |bmr|
                  validator.route_map_structures[seg_number] << bmr.branded_route_requests.map{|brr| brr.key}
                end
                validator.save
            end
-
-
       end
 
    end
@@ -438,12 +451,52 @@ module Oag
         end
 
 
-       #TODO Make this use less memory
+       # # TODO Method 1
+       # #TODO Make this use less memory
+       # group_size = 5000
+       # total_bmr_count = two_seg_branded_market_requests.count
+       # remaining_count = total_bmr_count
+       # two_seg_branded_market_requests.values.in_groups_of(group_size, false) do |value_group|
+       #   Rails.logger.info "(#{brand.brand_key}) Saving group of #{group_size}, from #{remaining_count} out of #{total_bmr_count} Two Segment BrandedMarketRequests"
+       #   ActiveRecord::Base.transaction do
+       #     value_group.each{|bmr_list| bmr_list.each{|bmr| bmr.save}}
+       #   end
+       #   remaining_count = remaining_count - group_size
+       # end
+       #
+       #
+       #
+       # Rails.logger.info "(#{brand.brand_key}) Building #{total_bmr_count} Two Segment BrandedMarketSegmentsRequest. "
+       # total_two_seg_markets =  two_seg_branded_market_requests.keys.count
+       # bmsrs = []
+       # two_seg_branded_market_requests.keys.each_with_index do |k, two_seg_mkt_idx|
+       #
+       #       Rails.logger.info "(#{brand.brand_key}) Saving 2 Segment Routes for #{k.first}-#{k.last}, #{two_seg_mkt_idx+1} of (#{total_two_seg_markets} markets) "
+       #       bmr_set = two_seg_branded_market_requests[k]
+       #       bmsrs <<    BrandedMarketSegmentsRequest.build(brand: brand, origin: k.first, dest:k.last, segment_count: 2,
+       #                                                 branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
+       # end
+       #
+       # total_bmsrs = bmsrs.count
+       # remaining_count = total_bmsrs
+       #
+       # bmsrs.in_groups_of(group_size, false) do |bmsr_group|
+       #   Rails.logger.info "(#{brand.brand_key}) Importing group of #{group_size} Two Segment BMSRS of #{remaining_count} from (#{total_bmsrs})"
+       #   BrandedMarketSegmentsRequest.import bmsr_group
+       #   remaining_count = remaining_count - group_size
+       # end
+
+
+       # TODO Method 2
+
+
        total_bmr_count = two_seg_branded_market_requests.count
        Rails.logger.info "(#{brand.brand_key}) Saving #{total_bmr_count} Two Segment BrandedMarketRequests. "
        ActiveRecord::Base.transaction do
               two_seg_branded_market_requests.values.each{|bmr_list| bmr_list.each{|bmr|  bmr.save}}
        end
+
+
        Rails.logger.info "(#{brand.brand_key}) Saving #{total_bmr_count} Two Segment BrandedMarketSegmentsRequest. "
        ActiveRecord::Base.transaction do
           total_two_seg_markets =  two_seg_branded_market_requests.keys.count
@@ -872,20 +925,7 @@ module Oag
     end
 
 
-       # def brand_route_map_validator_document(brand)
-       #   brmv = BrandedRouteMapValidator.branded(brand)
-       #   unless brmv.blank?
-       #
-       #     csv_string = CSV.generate do |csv|
-       #          possible_route_map_rows.each do |row|
-       #            csv << row.split (',')
-       #          end
-       #     end
-       #     csv_string
-       #   else
-       #     ''
-       #   end
-       # end
+
 
   #End Class
   end

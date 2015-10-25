@@ -49,7 +49,7 @@ class BrandExportState < ActiveRecord::Base
   end
 
   def export_validator_report(validator_report_id)
-     BrandRouteMapValidatorExportWorker.delay_for(5).perform_async(brand.brand_key, validator_report_id)
+    BrandRouteMapValidatorExportWorker.delay_for(5).perform_async(brand.brand_key, validator_report_id)
   end
 
   def export_markets

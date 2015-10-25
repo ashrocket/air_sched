@@ -58,6 +58,7 @@ class BrandedRouteMapValidatorReport < ActiveRecord::Base
     end
 
 
+
     # TODO: Add Waiting for ReportKey Reports to Complete State, to provide more visibility into the process
     def confirm_route_maps_exported
       Rails.logger.info "Route Map Validation (#{brand.brand_key}) : -> confirming Route Map Export Report is ready and valid finished."
@@ -106,6 +107,7 @@ class BrandedRouteMapValidatorReport < ActiveRecord::Base
       exporter = Oag::RouteMapValidatorExporter.new
       url = exporter.export_to_s3(brand)
       self.location = url.to_s
+      save
       brand.export_state.reset!
       brand.data_state.stats['route_maps_validator_export'] = {'location': self.location, 'updated_at': DateTime.now.in_time_zone }
       brand.save

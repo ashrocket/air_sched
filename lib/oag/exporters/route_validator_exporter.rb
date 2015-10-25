@@ -6,7 +6,7 @@ class RouteMapValidatorExporter
 
   # TODO make this configurable with an App Config Setting or as a Brand attribute
   def filename(brand)
-    "#{brand.brand_key.downcase}_route_map_validator.#{Date.today}.#{DateTime.now.in_time_zone.hour}-#{DateTime.now.in_time_zone.min}.csv"
+    "#{brand.brand_key.downcase}_route_map.#{Date.today}.#{DateTime.now.in_time_zone.hour}-#{DateTime.now.in_time_zone.min}.validator.csv"
   end
 
   def export_to_s3(brand)
@@ -18,8 +18,7 @@ class RouteMapValidatorExporter
 
     stringio = Zip::OutputStream::write_buffer do |zio|
         zio.put_next_entry(filename(brand)) #Filename
-        zio.write('')  #generated content
-        # zio.write(r.brand_route_map_validator_document(brand))  #generated content
+        zio.write(r.brand_route_map_validations_document(brand))  #generated content
     end
     stringio.rewind #reposition buffer pointer to the beginning
 
@@ -36,7 +35,7 @@ class RouteMapValidatorExporter
 
     bucket_obj.put(body: IO.read(zipped_file))
     s3_location  =  bucket_obj.public_url
-
+    File.delete(zipfile_name)
     s3_location
   end
 

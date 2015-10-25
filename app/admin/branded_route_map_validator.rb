@@ -1,6 +1,7 @@
 ActiveAdmin.register BrandedRouteMapValidator do
+  menu priority: 2, label: 'Market Validations', :parent => 'Validators'
+  actions :all, :except => [:new, :edit, :destroy]
   # menu priority: 3, label: 'Validation Reports', parent: 'Reports'
-  actions :all, :except => [:new,:edit]
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters

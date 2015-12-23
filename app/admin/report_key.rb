@@ -2,7 +2,7 @@ ActiveAdmin.register ReportKey do
   menu priority: 3,  :parent => 'Config'
 
 
-  remove_filter :brand_report_keys, :oag_schedules, :schedule_sets, :interline_cxr_rules, :slug, :state
+  remove_filter :brand_report_keys, :oag_schedules, :current_schedules, :schedule_sets, :interline_cxr_rules, :slug, :state
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #

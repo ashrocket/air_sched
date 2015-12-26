@@ -35,16 +35,25 @@ ActiveAdmin.register ImpliedMarket  do
             mkt.dest
       end
       column 'Details' do |mkt|
-        link_to '?', admin_branded_route_map_validator_path(mkt.branded_route_map_validator.id)
+        link_to '?', admin_branded_route_map_validator_path(mkt.branded_route_map_validator.id) if mkt.branded_route_map_validator
       end
       column '0 Stops' do |mkt|
-        count = mkt.branded_route_map_validator.route_map_counts['1']
+        if mkt.branded_route_map_validator
+          count = mkt.branded_route_map_validator.route_map_counts['1']
+        else
+          count = 0
+        end
         # count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(1).count
         link_to count, admin_direct_flights_path("q[origin_eq]": mkt.origin,
                                                  "q[dest_eq]": mkt.dest)
       end
       column '1 Stops' do |mkt|
-        count = mkt.branded_route_map_validator.route_map_counts['2']
+        if mkt.branded_route_map_validator
+          count = mkt.branded_route_map_validator.route_map_counts['2']
+        else
+          count = 0
+        end
+
         # count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(2).count
         link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
                                                           "q[origin_eq]": mkt.origin,
@@ -53,7 +62,11 @@ ActiveAdmin.register ImpliedMarket  do
 
       end
       column '2 Stops' do |mkt|
-        count = mkt.branded_route_map_validator.route_map_counts['3']
+        if mkt.branded_route_map_validator
+          count = mkt.branded_route_map_validator.route_map_counts['3']
+        else
+          count = 0
+        end
         # count = BrandedMarketRequest.branded(mkt.brand).market(mkt.origin, mkt.dest).segments(3).count
         link_to count, admin_branded_market_requests_path("q[brand_id_eq]": mkt.brand.id,
                                                                   "q[origin_eq]": mkt.origin,

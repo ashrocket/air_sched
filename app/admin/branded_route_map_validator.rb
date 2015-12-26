@@ -15,6 +15,26 @@ ActiveAdmin.register BrandedRouteMapValidator do
   #   permitted << :other if resource.something?
   #   permitted
   # end
+  
+  
+  index do
 
+      column 'Brand' do |validator|
+        validator.implied_market.brand.name
+      end
+      column 'Origin' do |validator|
+            validator.implied_market.origin
+      end
+      column 'Destination' do |validator|
+            validator.implied_market.dest
+      end
+      column :route_map_counts
+      column :route_map_structures
+
+
+
+  end
+  
+  
 
 end

@@ -63,6 +63,9 @@ gem 'rails-settings-cached', '0.4.1'
 # Asyn Functionality Background processing
 gem 'aws-sdk', '~> 2.1.14'
 gem 'redis-objects', '~> 0.9'
+gem 'redis'
+
+
 gem 'sidekiq', '3.0.0'
 gem 'sidetiq', '0.6.3'
 gem 'sidekiq-lock', '~> 0.2.0'
@@ -74,7 +77,8 @@ gem 'roo', '~> 2.1.1'
 #
 gem 'exception_handler'
 gem 'seed_dump'
-
+gem "bullet", :group => "development"
+gem 'slack-notifier', '~> 1.5', '>= 1.5.1'
 
 group :development, :test do
     gem 'better_errors'

@@ -126,6 +126,8 @@ module Oag
     def build_brand_smart_routes(brand, seg_counts)
 
       seg_counts.each do |seg_count|
+        Rails.logger.info "Deleting BrandedMarketSegmentsRequest segments with #{brand.name} segs(#{seg_count})"
+
         BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).destroy_all
         # BrandedRouteRequest.branded(brand).destroy_all
         # BrandedMarketRequest.branded(brand).destroy_all
@@ -216,7 +218,7 @@ module Oag
         implied_markets = ImpliedMarket.where(brand: brand)
         implied_markets.each do |market|
           market.branded_route_map_validator.rows.each do |row|
-            csv << row.split(',')
+            csv << row
           end
         end
       end
@@ -262,25 +264,39 @@ module Oag
 
       tot_implied_markets = implied_markets.count
 
+      # Cap the batch to 500 to protect against memory pressure
+      group_size = 500
+      implied_markets_count = implied_markets.count
+      remaining_count = implied_markets_count
+      implied_markets.in_groups_of(group_size, false) do |market_group|
+        Rails.logger.info "(#{brand.brand_key}) Looking Up Route map validator for group of #{group_size}, from #{remaining_count} out of #{implied_markets_count} Implied Markets"
+          curr_group_size = market_group.size
+          Parallel.each_with_index(market_group, in_threads:4) do |i_m, idx|
+          # implied_markets.each_with_index do |i_m, idx|
 
-      Parallel.each_with_index(implied_markets, in_threads:4) do |i_m, idx|
-      # implied_markets.each_with_index do |i_m, idx|
+                validator = i_m.create_branded_route_map_validator
+                Rails.logger.info "(#{brand.brand_key}) Looking Up Route map validator for market  #{i_m.origin}-#{i_m.dest} #{idx+1} of (#{curr_group_size} - #{remaining_count} from #{tot_implied_markets})"
 
-         validator = i_m.create_branded_route_map_validator
-         Rails.logger.info "(#{brand.brand_key}) Looking Up Route map validator for market  #{i_m.origin}-#{i_m.dest} #{idx+1} of (#{tot_implied_markets})"
+                [*1..brand.settings.max_segments].each do |seg_number|
 
-           [*1..brand.settings.max_segments].each do |seg_number|
+                    validator.route_map_counts[seg_number] =
+                                     BrandedMarketRequest.branded(brand).market(i_m.origin, i_m.dest).segments(seg_number).count
+                    validator.route_map_structures[seg_number] = Set.new
+                    bmrs = BrandedMarketRequest.where(brand:brand, origin: i_m.origin, dest: i_m.dest, seg_count: seg_number )
+                    bmrs.each do |bmr|
+                      validator.route_map_structures[seg_number] << bmr.branded_route_requests.map{|brr| brr.key}
+                    end
+                    validator.save
+                end
+          end
 
-               validator.route_map_counts[seg_number] =
-                                BrandedMarketRequest.branded(brand).market(i_m.origin, i_m.dest).segments(seg_number).count
-               validator.route_map_structures[seg_number] = Set.new
-               bmrs = BrandedMarketRequest.where(brand:brand, origin: i_m.origin, dest: i_m.dest, seg_count: seg_number )
-               bmrs.each do |bmr|
-                 validator.route_map_structures[seg_number] << bmr.branded_route_requests.map{|brr| brr.key}
-               end
-               validator.save
-           end
+
+        remaining_count = remaining_count - group_size
       end
+
+
+
+
 
    end
   private
@@ -511,9 +527,98 @@ module Oag
                                                  branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
           end
        end
+     Rails.logger.info " ==== (#{brand.brand_key}) COMPLETED Building and Saving Two Segment Routes "
+
      end
 
 
+    def low_memory_one_stop_market_routes(brand)
+        # redis = Redis.new(host:  '127.0.0.1', port: 6379, db: 10)
+
+        #  1 `Stops
+       one_stop_markets = BrandConnection.branded(brand).select(:origin,:dest).distinct.pluck(:origin, :dest).sort
+
+       one_stop_markets_count = one_stop_markets.count
+       Parallel.each_with_index(one_stop_markets, in_threads: 12) do |market, index|
+           # two_segment_markets.each_with_index do |market, index|
+
+             origin, dest = market
+
+             Rails.logger.info " ==== (#{brand.brand_key}) Building Two Segment mkt requests  for #{origin} #{dest} #{index} of (#{one_stop_markets_count}) "
+
+
+
+
+              connections_for_market = BrandConnection.branded(brand).market(origin,dest)
+
+              uniq_routes =  connections_for_market.to_a.uniq{|c| c.key}
+
+              uniq_routes_requests = Set.new
+              uniq_routes.each do |c|
+                c.to_route_requests.each do |rr|
+                    uniq_routes_requests << rr
+                end
+              end
+              grouped_rrs = uniq_routes_requests.group_by{|mkt_rr| mkt_rr.map{|rr| rr.host_market_key}}
+              branded_market_requests = Set.new
+              grouped_rrs.each do |host_market_key, group|
+                  brr1 =
+                  BrandedRouteRequest.where(
+                  group.first[0].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
+                     .merge(cxrs: group.map{|rr_list| rr_list[0].cxrs}
+                     .flatten.sort.uniq)
+                  ).first_or_create!
+                  brr2 =
+                  BrandedRouteRequest.where(
+                  group.first[1].attributes.deep_symbolize_keys.except(:id, :cxrs, :key)
+                     .merge(cxrs: group.map{|rr_list| rr_list[1].cxrs}
+                     .flatten.sort.uniq)
+                  ).first_or_create!
+
+                  bmrrs_intersection = brr1.branded_market_requests.where(seg_count: 2) & brr2.branded_market_requests.where(seg_count: 2)
+
+                  raise("There should only be 1 Branded Market Request for brr1_id #{brr1.id} brr2_id #{brr2.id}") if bmrrs_intersection.count > 1
+
+                  if bmrrs_intersection.blank?
+                  bmr =  BrandedMarketRequest.new(brand: brand, origin: origin, dest: dest, seg_count: 2)
+                  bmr.branded_route_requests << [brr1,brr2]
+                  bmr.save
+
+                  else
+                   bmr = bmrrs_intersection.first
+
+                  end
+
+
+                  branded_market_requests << bmr
+                  # grouped_rrs[keys] = bmr
+
+              end
+
+             total_one_stop_markets =  branded_market_requests.count
+             Rails.logger.info "(#{brand.brand_key}) Bulk Saving #{total_one_stop_markets} Two Segment Market Requests "
+
+             ActiveRecord::Base.transaction do
+               branded_market_requests.each{ |bmr| bmr.save! }
+             end
+
+
+              # Currently through_market_request is returning nil and compacting into an empty array
+              through_requests = branded_market_requests.map{|bmr| bmr.through_market_request}.compact
+              market_requests = branded_market_requests.to_a + through_requests
+
+              market_requests.compact
+
+              unless  market_requests.blank?
+                  BrandedMarketSegmentsRequest.create(brand: brand,
+                                                   origin: origin, dest:dest, segment_count: 2,
+                                                   branded_market_request_ids: market_requests.map{|bmr| bmr.id} )
+              end
+         end
+
+
+
+     end
     def one_stop_market_routes(brand)
 
         #  1 Stops
@@ -606,7 +711,7 @@ module Oag
 
 
 
-       query_string = 'select b1.origin origin, b1.via as via1, b1.dest as via2, b2.dest as dest,  b1.sched1_cxr as cxr1,
+       query_string = 'select b1.origin as origin, b1.via as via1, b1.dest as via2, b2.dest as dest,  b1.sched1_cxr as cxr1,
               b1.sched2_cxr as cxr2, b2.sched2_cxr as cxr3, b1.brand_id, b2.brand_id
               from brand_connections b1 join
               brand_connections b2
@@ -622,6 +727,9 @@ module Oag
 
 
           three_seg_branded_market_requests = Hash.new { |h, k| h[k] = Set.new }
+          Rails.logger.info "Executing Massive sql query."
+
+          good_ones =  BrandConnection.find_by_sql( ['EXPLAIN ' + query_string, brand.id, brand.id])
           good_ones =  BrandConnection.find_by_sql( [query_string, brand.id, brand.id])
 
           total_good_connections = good_ones.count
@@ -824,8 +932,12 @@ module Oag
 
 
     def build_brand_market_routes(brand, segment_count)
-       BrandedMarketSegmentsRequest.branded(brand)
+      Rails.logger.info "Deleting BrandedMarketSegmentsRequest  with #{brand.name} segs(#{segment_count})"
+
+      BrandedMarketSegmentsRequest.branded(brand)
                                    .where(segment_count: segment_count).destroy_all
+
+      Rails.logger.info "Deleting BrandedMarketRequest  with #{brand.name} segs(#{segment_count})"
 
        market_requests = []
        case segment_count
@@ -842,7 +954,10 @@ module Oag
 
 
          when 3
+
            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 3)
+           Rails.logger.info "Building faster_two_stop_routes for brand #{brand.name}"
+
            market_requests = faster_two_stop_routes(brand)
            # market_requests = two_stop_routes(brand)
          else

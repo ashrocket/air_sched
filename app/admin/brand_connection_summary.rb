@@ -34,5 +34,9 @@ ActiveAdmin.register BrandConnection, :as => "Connections Summary"  do
 
          actions
    end
-
+  controller do
+      def scoped_collection
+           super.includes :brand # prevents N+1 queries to your database
+      end
+   end
 end

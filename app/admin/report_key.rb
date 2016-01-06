@@ -56,11 +56,14 @@ ActiveAdmin.register ReportKey do
     def find_resource
       scoped_collection.friendly.find(params[:id])
     end
+    def scoped_collection
+        super.includes :brands # prevents N+1 queries to your database
+    end
   end
 
   controller do
       # def index
-      #   @hosts = Host.all
+      #   @report_keys = ReportKey.all.includes(:brands)
       #   render :index,  layout: 'active_admin'
       # end
       def edit

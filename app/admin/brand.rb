@@ -20,6 +20,10 @@ ActiveAdmin.register Brand, as: 'Brands' do
     def find_resource
       scoped_collection.friendly.find(params[:id])
     end
+
+    def scoped_collection
+        super.includes :export_state, :data_state, :report_keys, :settings, :hosts # prevents N+1 queries to your database
+    end
   end
 
   # form do |f|

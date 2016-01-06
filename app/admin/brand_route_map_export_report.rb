@@ -4,6 +4,9 @@ ActiveAdmin.register BrandRouteMapExportReport  do
 
 
   controller do
+      def scoped_collection
+                super.includes :brand # prevents N+1 queries to your database
+      end
       def show
         @brand_route_map_export_report = BrandRouteMapExportReport.find(params[:id])
          render :show,  layout: 'active_admin'

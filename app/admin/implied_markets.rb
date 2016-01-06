@@ -25,8 +25,13 @@ ActiveAdmin.register ImpliedMarket  do
 
   index do
 
-      column 'Brand' do |mkt|
-        mkt.brand.name
+
+      column :brand do |mkt|
+          content_tag :ul, class: 'list-group' do
+            content_tag(:li, class: 'list-group-item') do
+               link_to(mkt.brand.name, admin_brand_path(mkt.brand))
+            end
+          end
       end
       column 'Origin' do |mkt|
             mkt.origin
@@ -77,5 +82,14 @@ ActiveAdmin.register ImpliedMarket  do
 
   end
 
+  controller do
 
+    def scoped_collection
+       super.includes :branded_route_map_validator, :brand # prevents N+1 queries to your database
+    end
+    def find_resource
+      ImpliedMarket.where(id: params[:id]).first! # overrides resource retrieval to prevent eager loading
+    end
+
+  end
 end

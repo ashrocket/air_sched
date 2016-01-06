@@ -24,9 +24,8 @@ ActiveAdmin.register Host do
   #       hosts.includes [:brand]
   #     end
   # end
-  def scoped_collection
-    super.includes :brand # prevents N+1 queries to your database
-  end
+
+
 
   index do
     column(:brand, :sortable => :'brands.name'){|host| (host.brand and host.brand.name) ? host.brand.name : nil}
@@ -64,8 +63,10 @@ ActiveAdmin.register Host do
   end
 
   controller do
+
     def scoped_collection
          end_of_association_chain.includes(:brand)
+         super.includes :airlines, :brand # prevents N+1 queries to your database
     end
 
     # def index

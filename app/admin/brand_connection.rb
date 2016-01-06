@@ -21,6 +21,23 @@ ActiveAdmin.register BrandConnection do
   #   permitted << :other if resource.something?
   #   permitted
   # end
+  index do
+    column :brand do |brand_connection|
+        content_tag :ul, class: 'list-group' do
+          content_tag(:li, class: 'list-group-item') do
+             link_to(brand_connection.brand.name, admin_brand_path(brand_connection.brand))
+          end
+        end
+    end
+    BrandConnection.column_names.each do |c|
+          column c.to_sym
+    end
+  end
 
+  controller do
+     def scoped_collection
+          super.includes :brand # prevents N+1 queries to your database
+     end
+  end
 
 end

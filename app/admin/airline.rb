@@ -27,6 +27,9 @@ ActiveAdmin.register Airline do
 
 
   controller do
+    def scoped_collection
+       super.includes :hosts # prevents N+1 queries to your database
+    end
     def edit
       @airline = Airline.find(params[:id])
       render :edit,  layout: 'active_admin'

@@ -20,7 +20,11 @@ ActiveAdmin.register BrandedRouteMapValidator do
   index do
 
       column 'Brand' do |validator|
-        validator.implied_market.brand.name
+          content_tag :ul, class: 'list-group' do
+            content_tag(:li, class: 'list-group-item') do
+               link_to(validator.implied_market.brand.name, admin_brand_path(validator.implied_market.brand))
+            end
+          end
       end
       column 'Origin' do |validator|
             validator.implied_market.origin
@@ -35,6 +39,13 @@ ActiveAdmin.register BrandedRouteMapValidator do
 
   end
   
-  
+  controller do
+    def scoped_collection
+      super.includes  :implied_market, implied_market: [:brand] # prevents N+1 queries to your database
+    end
+    def find_resource
+      BrandedRouteMapValidator.where(id: params[:id]).first! # overrides resource retrieval to prevent eager loading
+    end
+  end
 
 end

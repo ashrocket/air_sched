@@ -20,21 +20,27 @@ ActiveAdmin.register BrandedMarketRequest do
   # end
 
   index do
-         column :brand
-         column :id
-         column :origin
-         column :dest
-         column :seg_count
-         column :details do |bmr|
-           content_tag :ul, class: 'list-group' do
-                bmr.branded_route_requests.collect{ |brr|
-                    content_tag(:li, class: 'list-group-item') do
-                      link_to("#{brr.key}  (#{brr.id})", [:admin,brr])
-                        end
-                      }.join.html_safe
-           end
-         end
-         actions
+      column :brand do |branded_route_map|
+                content_tag :ul, class: 'list-group' do
+                  content_tag(:li, class: 'list-group-item') do
+                     link_to(branded_route_map.brand.name, admin_brand_path(branded_route_map.brand))
+                  end
+                end
+      end
+      column :id
+      column :origin
+      column :dest
+      column :seg_count
+      column :details do |bmr|
+        content_tag :ul, class: 'list-group' do
+            bmr.branded_route_requests.collect{ |brr|
+                content_tag(:li, class: 'list-group-item') do
+                  link_to("#{brr.key}  (#{brr.id})", [:admin,brr])
+                    end
+                  }.join.html_safe
+        end
+      end
+      actions
    end
 
 
@@ -43,6 +49,9 @@ ActiveAdmin.register BrandedMarketRequest do
        #   @hosts = Host.all
        #   render :index,  layout: 'active_admin'
        # end
+       def scoped_collection
+           super.includes :brand, :branded_route_requests # prevents N+1 queries to your database
+       end
        def show
          @branded_market_request = BrandedMarketRequest.find(params[:id])
           render :show,  layout: 'active_admin'

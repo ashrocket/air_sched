@@ -26,7 +26,9 @@ ActiveAdmin.register BrandedRouteMap do
             end
           end
         end
-        column :route_map
+        column :route_map do |branded_route_map|
+          branded_route_map.route_map.keys
+        end
 
         actions
   end
@@ -36,10 +38,13 @@ ActiveAdmin.register BrandedRouteMap do
           #   @hosts = Host.all
           #   render :index,  layout: 'active_admin'
           # end
-          def show
+         def scoped_collection
+               super.includes :brand # prevents N+1 queries to your database
+         end
+         def show
             @branded_route_map = BrandedRouteMap.find(params[:id])
              render :show,  layout: 'active_admin'
-           end
+         end
 
     end
 

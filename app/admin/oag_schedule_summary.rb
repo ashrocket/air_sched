@@ -72,5 +72,10 @@ ActiveAdmin.register OagSchedule, :as => "Schedule Summaries" do
          column :via_apts
          column :mkt
     end
+  controller do
 
+      def scoped_collection
+           super.includes :report_key # prevents N+1 queries to your database
+      end
+  end
 end

@@ -103,6 +103,7 @@ ActiveAdmin.register Brand, as: 'Brands' do
        column :max_segments do |brand|
          brand.settings.max_segments
        end
+       column :active
 
        actions
   end

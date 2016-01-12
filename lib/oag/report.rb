@@ -124,18 +124,21 @@ module Oag
 
 
     def build_brand_smart_routes(brand, seg_counts)
+      Benchmark.bm do |bm|
 
-      seg_counts.each do |seg_count|
-        Rails.logger.info "Deleting BrandedMarketSegmentsRequest segments with #{brand.name} segs(#{seg_count})"
+        seg_counts.each do |seg_count|
+          Rails.logger.info "Deleting BrandedMarketSegmentsRequest segments with #{brand.name} segs(#{seg_count})"
+          bm.report("BenchMark #{segment_count} Segment Destory BMSRs:") {
+              BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).destroy_all
+          }
+          # BrandedRouteRequest.branded(brand).destroy_all
+          # BrandedMarketRequest.branded(brand).destroy_all
 
-        BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).destroy_all
-        # BrandedRouteRequest.branded(brand).destroy_all
-        # BrandedMarketRequest.branded(brand).destroy_all
 
 
+          build_brand_market_routes(bm, brand, seg_count)
 
-        build_brand_market_routes(brand, seg_count)
-
+        end
       end
       counts_array = BrandedMarketSegmentsRequest.branded(brand).pluck('DISTINCT segment_count')
       counts_array.map!{ |c| { segs: c, count: BrandedMarketSegmentsRequest.branded(brand).with_segs(c).count} }
@@ -931,7 +934,7 @@ module Oag
       end
 
 
-    def build_brand_market_routes(brand, segment_count)
+    def build_brand_market_routes(bm, brand, segment_count)
       Rails.logger.info "Deleting BrandedMarketSegmentsRequest  with #{brand.name} segs(#{segment_count})"
 
       BrandedMarketSegmentsRequest.branded(brand)
@@ -942,23 +945,28 @@ module Oag
        market_requests = []
        case segment_count
          when 1
-           BrandedMarketRequest.destroy_all(brand: brand, seg_count: 1)
-
-           market_requests = direct_market_routes(brand)
-
+             bm.report("BenchMark #{segment_count} Segment BMR Destroy:") {            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 1)  }
+             bm.report("BenchMark #{segment_count } Segment Build:") { market_requests = direct_market_routes(brand) }
 
          when 2
-           BrandedMarketRequest.destroy_all(brand: brand, seg_count: 2)
+           bm.report("BenchMark #{segment_count} Segment BMR Destroy:") {
+             BrandedMarketRequest.destroy_all(brand: brand, seg_count: 2)
+           }
+           bm.report("BenchMark #{segment_count } Segment Build:") {
+             market_requests = faster_one_stop_routes(brand)
+           }
            # market_requests = one_stop_market_routes(brand)
-           market_requests = faster_one_stop_routes(brand)
 
 
          when 3
-
-           BrandedMarketRequest.destroy_all(brand: brand, seg_count: 3)
+             bm.report("BenchMark #{segment_count} Segment BMR Destroy:") {
+               BrandedMarketRequest.destroy_all(brand: brand, seg_count: 3)
+             }
+             bm.report("BenchMark #{segment_count } Segment Build:") {
+               market_requests = faster_two_stop_routes(brand)
+             }
            Rails.logger.info "Building faster_two_stop_routes for brand #{brand.name}"
 
-           market_requests = faster_two_stop_routes(brand)
            # market_requests = two_stop_routes(brand)
          else
            "Bad Case"

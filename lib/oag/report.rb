@@ -128,7 +128,7 @@ module Oag
 
         seg_counts.each do |seg_count|
           Rails.logger.info "Deleting BrandedMarketSegmentsRequest segments with #{brand.name} segs(#{seg_count})"
-          bm.report("BenchMark #{segment_count} Segment Destory BMSRs:") {
+          bm.report("BenchMark #{seg_count} Segment Destory BMSRs:") {
               BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).destroy_all
           }
           # BrandedRouteRequest.branded(brand).destroy_all

@@ -9,7 +9,7 @@ default: &default
 
 development:
   <<: *default
-  database: air_sched_development
+  database: <%= ENV['POSTGRES_DB_NAME'] ||  "air_sched_development" %>
 
 
 test:

@@ -6,7 +6,8 @@ module Oag
 
 
     def build_brand_connections(brand)
-
+      Benchmark.bm do |bm|
+      bm.report("BenchMark #{brand.name} Building Branded Connections") {
       filtered_cxrs = []
 
       # CURRENTLY DOES NOT SUPPORT EMBEDDED SEGMENTS, AS THE SCHEDULE MODEL DOESN'T KNOW THE VIA POINT
@@ -87,7 +88,8 @@ module Oag
       total_branded_connections = routes.count
       tot = routes.count
 
-
+      }
+      bm.report("BenchMark #{brand.name} deleting existing Branded Connections") {
       BrandConnection.branded(brand).delete_all
       columns = [
                   :brand_id,
@@ -106,6 +108,9 @@ module Oag
                   :disc,
                   :operating_window
       ]
+      }
+      bm.report("BenchMark #{brand.name} saving new Branded Connections") {
+
       routes_array = routes.to_a
       routes_array.in_groups_of(group_size) do |connection_group|
           BrandConnection.import(columns, connection_group.compact, :validate => false)
@@ -118,7 +123,8 @@ module Oag
       brand.save
       brand.data_state.confirm_connections!
 
-
+      }
+     end
 
     end
 
@@ -128,7 +134,7 @@ module Oag
 
         seg_counts.each do |seg_count|
           Rails.logger.info "Deleting BrandedMarketSegmentsRequest segments with #{brand.name} segs(#{seg_count})"
-          bm.report("BenchMark #{seg_count} Segment Destory BMSRs:") {
+          bm.report("BenchMark #{brand.name}  #{seg_count} Segment Destory BMSRs:") {
               BrandedMarketSegmentsRequest.branded(brand).with_segs(seg_count).destroy_all
           }
           # BrandedRouteRequest.branded(brand).destroy_all
@@ -153,7 +159,7 @@ module Oag
 
     def build_brand_route_maps(brand, seg_counts)
 
-
+      Benchmark.bm do |bm|
       markets = BrandedMarketSegmentsRequest.branded(brand).pluck(:origin, :dest).sort.uniq
 
       market_maps = {}
@@ -161,6 +167,7 @@ module Oag
       Parallel.each_with_index(markets, in_threads: 4) do |mkt,mkt_index|
 
       # markets.each_with_index do |mkt,mkt_index|
+        bm.report("BenchMark #{brand.name} #{mkt} Building Branded RouteMaps") {
 
         origin, dest = mkt
         mkt_key = "#{origin}-#{dest}"
@@ -180,7 +187,7 @@ module Oag
 
 
         market_maps.merge! market_map
-
+        }
       end
 
       branded_route_map = BrandedRouteMap.where(brand: brand).first_or_create!
@@ -196,7 +203,7 @@ module Oag
       brand.data_state.stats['route_maps'] = {'updated_at': DateTime.now.in_time_zone , 'markets': market_maps.keys.count}
       brand.save
       brand.data_state.confirm_route_maps!
-
+      end
 
     end
 
@@ -945,24 +952,24 @@ module Oag
        market_requests = []
        case segment_count
          when 1
-             bm.report("BenchMark #{segment_count} Segment BMR Destroy:") {            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 1)  }
-             bm.report("BenchMark #{segment_count } Segment Build:") { market_requests = direct_market_routes(brand) }
+             bm.report("BenchMark #{brand.name}  #{segment_count} Segment BMR Destroy:") {            BrandedMarketRequest.destroy_all(brand: brand, seg_count: 1)  }
+             bm.report("BenchMark #{brand.name}  #{segment_count } Segment Build:") { market_requests = direct_market_routes(brand) }
 
          when 2
-           bm.report("BenchMark #{segment_count} Segment BMR Destroy:") {
+           bm.report("BenchMark #{brand.name}  #{segment_count} Segment BMR Destroy:") {
              BrandedMarketRequest.destroy_all(brand: brand, seg_count: 2)
            }
-           bm.report("BenchMark #{segment_count } Segment Build:") {
+           bm.report("BenchMark #{brand.name}  #{segment_count } Segment Build:") {
              market_requests = faster_one_stop_routes(brand)
            }
            # market_requests = one_stop_market_routes(brand)
 
 
          when 3
-             bm.report("BenchMark #{segment_count} Segment BMR Destroy:") {
+             bm.report("BenchMark #{brand.name}  #{segment_count} Segment BMR Destroy:") {
                BrandedMarketRequest.destroy_all(brand: brand, seg_count: 3)
              }
-             bm.report("BenchMark #{segment_count } Segment Build:") {
+             bm.report("BenchMark #{brand.name}  #{segment_count } Segment Build:") {
                market_requests = faster_two_stop_routes(brand)
              }
            Rails.logger.info "Building faster_two_stop_routes for brand #{brand.name}"

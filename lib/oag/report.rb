@@ -4,129 +4,143 @@ module Oag
 
 
 
+    def save_routes_for_brand(routes, brand)
+        group_size = 5000
+        total_branded_connections = routes.count
+        tot = routes.count
 
-    def build_brand_connections(brand)
-      Benchmark.bm do |bm|
-      bm.report("BenchMark #{brand.name} Building Branded Connections") {
-      filtered_cxrs = []
-
-      # CURRENTLY DOES NOT SUPPORT EMBEDDED SEGMENTS, AS THE SCHEDULE MODEL DOESN'T KNOW THE VIA POINT
-      # AND FURTHER MORE YOU CAN End Up with Circle Trip Flights like TR 2771
-      origins = brand.origins.pluck(:origin_apt).sort
-      destinations = brand.destinations.pluck(:dest_apt).sort
-
-
-      routes = Set.new
-      brand_connections = []
-      total_origins = origins.count
-      Rails.logger.info "BRAND CONNECTIONS (#{brand.brand_key})  #{total_origins} origins."
-
-      origins.each_with_index do |origin_code, index|
-        Rails.logger.info "BRAND CONNECTIONS (#{brand.brand_key})  #{index} of #{origins.count} origins."
-
-        via_points = brand.current_schedules.departing(origin_code).select(:dest_apt).distinct.pluck(:dest_apt).sort
-
-        # via_points.each_with_index do |via_code, via_index|
-        Parallel.each_with_index(via_points, in_threads:4) do |via_code, via_index|
+        columns = [
+                   :brand_id,
+                   :origin,
+                   :via,
+                   :dest,
+                   :sched1_cxr,
+                   :sched2_cxr,
+                   :sched1_id,
+                   :sched1_eff_dates,
+                   :sched1_operating,
+                   :sched2_id,
+                   :sched2_eff_dates,
+                   :sched2_operating,
+                   :eff,
+                   :disc,
+                   :operating_window
+        ]
 
 
-           log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
-           leg1_scheds = brand.current_schedules.departing(origin_code).arriving(via_code)
-           leg2_scheds = brand.current_schedules.departing(via_code).reject{|sched| sched.dest_apt == origin_code}
 
-           possible_routes = Set.new
-
-            leg1_scheds.each do |sched1|
-              leg2_scheds.each do |sched2|
-                window    = sched1.effective_window(sched2)
-                op_window = sched1.connection_days_of_week(sched2,2)
-                if not window.blank? and not op_window.blank?
-                  # possible_routes <<  BrandConnection.new(brand: brand,
-                  #           origin: origin_code, via: via_code, dest: sched2.dest_apt,
-                  #           sched1_cxr: sched1.airline_code, sched2_cxr: sched2.airline_code,
-                  #           sched1_id: sched1.id,
-                  #           sched1_eff_dates: sched1.effective_dates,
-                  #           sched1_operating: sched1.arr_op_days,
-                  #           sched2_id: sched2.id,
-                  #           sched2_eff_dates: sched2.effective_dates,
-                  #           sched2_operating: sched2.dep_op_days,
-                  #           eff: window[:eff].to_date,
-                  #           disc: window[:disc].to_date,
-                  #           operating_window: op_window )
-                  routes <<  [
-                                brand.id,  # brand
-                                origin_code,  # origin
-                                via_code,  # via
-                                sched2.dest_apt,  # dest
-                                sched1.airline_code,  # sched1_cxr
-                                sched2.airline_code,  # sched2_cxr
-                                sched1.id,  # sched1_id
-                                sched1.effective_dates,  # sched1_eff_dates
-                                sched1.arr_op_days,  # sched1_operating
-                                sched2.id,  # sched2_id
-                                sched2.effective_dates,  # sched2_eff_dates
-                                sched2.dep_op_days,  # sched2_operating
-                                window[:eff].to_date,  # eff
-                                window[:disc].to_date,  # disc
-                                op_window #operating_window
-                                ]
-                end
-              end
-            end
-           # possible_routes.uniq!{|route| [route.dest, route.eff_window, route.operating_window]  }
-           # byebug
-           # routes << possible_routes
-
-        end
-        # byebug
-        # routes < routes_for_origin.compact.flatten(1)
+         routes_array = routes.to_a
+         routes_array.in_groups_of(group_size) do |connection_group|
+             BrandConnection.import(columns, connection_group.compact, :validate => false)
+             # BrandConnection.import(connection_group.compact, :validate => false)
+             Rails.logger.info "Saving brand connections #{connection_group.compact.count} " +
+                               " of #{tot} remaining for #{brand.brand_key}"
+             tot = tot - connection_group.compact.count
+         end
+         brand.data_state.stats['branded_connections'] = {'count': total_branded_connections, 'updated_at': DateTime.now.in_time_zone }
+         brand.save
+         brand.data_state.confirm_connections!
       end
-      # byebug
-      # routes = routes.compact.flatten
 
-      group_size = 5000
-      total_branded_connections = routes.count
-      tot = routes.count
+    def set_routes_for_brand(routes, brand)
+       filtered_cxrs = []
 
-      }
-      bm.report("BenchMark #{brand.name} deleting existing Branded Connections") {
-      BrandConnection.branded(brand).delete_all
-      columns = [
-                  :brand_id,
-                  :origin,
-                  :via,
-                  :dest,
-                  :sched1_cxr,
-                  :sched2_cxr,
-                  :sched1_id,
-                  :sched1_eff_dates,
-                  :sched1_operating,
-                  :sched2_id,
-                  :sched2_eff_dates,
-                  :sched2_operating,
-                  :eff,
-                  :disc,
-                  :operating_window
-      ]
-      }
-      bm.report("BenchMark #{brand.name} saving new Branded Connections") {
+       # CURRENTLY DOES NOT SUPPORT EMBEDDED SEGMENTS, AS THE SCHEDULE MODEL DOESN'T KNOW THE VIA POINT
+       # AND FURTHER MORE YOU CAN End Up with Circle Trip Flights like TR 2771
+       origins = brand.origins.pluck(:origin_apt).sort
+       destinations = brand.destinations.pluck(:dest_apt).sort
 
-      routes_array = routes.to_a
-      routes_array.in_groups_of(group_size) do |connection_group|
-          BrandConnection.import(columns, connection_group.compact, :validate => false)
-          # BrandConnection.import(connection_group.compact, :validate => false)
-          Rails.logger.info "Saving brand connections #{connection_group.compact.count} " +
-                            " of #{tot} remaining for #{brand.brand_key}"
-          tot = tot - connection_group.compact.count
-      end
-      brand.data_state.stats['branded_connections'] = {'count': total_branded_connections, 'updated_at': DateTime.now.in_time_zone }
-      brand.save
-      brand.data_state.confirm_connections!
 
-      }
+       brand_connections = []
+       total_origins = origins.count
+       Rails.logger.info "BRAND CONNECTIONS (#{brand.brand_key})  #{total_origins} origins."
+
+       origins.each_with_index do |origin_code, index|
+       Rails.logger.info "BRAND CONNECTIONS (#{brand.brand_key})  #{index} of #{origins.count} origins."
+
+       via_points = brand.current_schedules.departing(origin_code).select(:dest_apt).distinct.pluck(:dest_apt).sort
+
+       # via_points.each_with_index do |via_code, via_index|
+       Parallel.each_with_index(via_points, in_threads:4) do |via_code, via_index|
+
+
+            log_debug_string(brand, origin_code, index, origins, via_code, via_index, via_points)
+            leg1_scheds = brand.current_schedules.departing(origin_code).arriving(via_code)
+            leg2_scheds = brand.current_schedules.departing(via_code).reject{|sched| sched.dest_apt == origin_code}
+
+            possible_routes = Set.new
+
+             leg1_scheds.each do |sched1|
+               leg2_scheds.each do |sched2|
+                 window    = sched1.effective_window(sched2)
+                 op_window = sched1.connection_days_of_week(sched2,2)
+                 if not window.blank? and not op_window.blank?
+                   # possible_routes <<  BrandConnection.new(brand: brand,
+                   #           origin: origin_code, via: via_code, dest: sched2.dest_apt,
+                   #           sched1_cxr: sched1.airline_code, sched2_cxr: sched2.airline_code,
+                   #           sched1_id: sched1.id,
+                   #           sched1_eff_dates: sched1.effective_dates,
+                   #           sched1_operating: sched1.arr_op_days,
+                   #           sched2_id: sched2.id,
+                   #           sched2_eff_dates: sched2.effective_dates,
+                   #           sched2_operating: sched2.dep_op_days,
+                   #           eff: window[:eff].to_date,
+                   #           disc: window[:disc].to_date,
+                   #           operating_window: op_window )
+                 routes <<  [
+                                     brand.id,  # brand
+                                     origin_code,  # origin
+                                     via_code,  # via
+                                     sched2.dest_apt,  # dest
+                                     sched1.airline_code,  # sched1_cxr
+                                     sched2.airline_code,  # sched2_cxr
+                                     sched1.id,  # sched1_id
+                                     sched1.effective_dates,  # sched1_eff_dates
+                                     sched1.arr_op_days,  # sched1_operating
+                                     sched2.id,  # sched2_id
+                                     sched2.effective_dates,  # sched2_eff_dates
+                                     sched2.dep_op_days,  # sched2_operating
+                                     window[:eff].to_date,  # eff
+                                     window[:disc].to_date,  # disc
+                                     op_window #operating_window
+                                     ]
+                     end
+                   end
+                   end
+                  # possible_routes.uniq!{|route| [route.dest, route.eff_window, route.operating_window]  }
+                  # byebug
+                  # routes << possible_routes
+
+               end
+               # byebug
+               # routes < routes_for_origin.compact.flatten(1)
+             end
+             # byebug
+             # routes = routes.compact.flatten
+       return routes
+
      end
 
-    end
+
+
+    def build_brand_connections(brand)
+      routes = Set.new
+
+      Benchmark.bm do |bm|
+
+      bm.report("BenchMark #{brand.name} Building Branded Connections") {
+        set_routes_for_brand(routes, brand)
+      }
+      bm.report("BenchMark #{brand.name} deleting existing Branded Connections") {
+
+        BrandConnection.branded(brand).delete_all
+      }
+      bm.report("BenchMark #{brand.name} saving new Branded Connections") {
+        save_routes_for_brand(routes, brand)
+      }
+      end # Benchmark End
+
+      end
 
 
     def build_brand_smart_routes(brand, seg_counts)

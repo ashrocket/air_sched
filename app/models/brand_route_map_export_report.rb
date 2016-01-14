@@ -253,6 +253,7 @@ class BrandRouteMapExportReport < ActiveRecord::Base
 
     def use_latest_valid_keys
          schedule_report_keys.each do |schedule_key|
+           # TODO: protect against empty key
            if schedule_report_keys[schedule_key]['status'].eql? 'pending'
              report_key = ReportKey.find_by(code: rk_code)
              schedule_report_keys[schedule_key]['status'] = 'ready'

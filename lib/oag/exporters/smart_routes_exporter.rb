@@ -1,5 +1,6 @@
 require 'zip'
 require 'aws-sdk'
+require 'tmpdir'
 module Oag
 
 class SmartRoutesExporter
@@ -23,8 +24,8 @@ class SmartRoutesExporter
     end
     stringio.rewind #reposition buffer pointer to the beginning
 
-
-    zipped_file = File.new(zipfile_name,"w+")
+    zipped_file = File.new(File.join(Dir.tmpdir, zipfile_name), "w+")
+    # zipped_file = File.new(zipfile_name,"w+")
     zipped_file.write(stringio.sysread) #write buffer to zipfile
     zipped_file.rewind
 
@@ -37,7 +38,7 @@ class SmartRoutesExporter
     bucket_obj.put(body: IO.read(zipped_file))
     s3_location  =  bucket_obj.public_url
 
-    File.delete(zipfile_name)
+    File.delete(zipped_file)
     s3_location
   end
 

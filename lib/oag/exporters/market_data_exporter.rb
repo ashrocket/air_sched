@@ -1,5 +1,7 @@
 require 'zip'
 require 'aws-sdk'
+require 'tmpdir'
+
 module Oag
 
 class MarketDataExporter
@@ -16,7 +18,8 @@ class MarketDataExporter
     csv_files = {}
     s3_location = ''
     zipfile_name = filename + '.zip'
-    zipped_file = File.new(zipfile_name,"w+")
+    zipped_file = File.new(File.join(Dir.tmpdir, zipfile_name), "w+")
+    # zipped_file = File.new(zipfile_name,"w+")
 
     @export_report_keys.each do |rk|
       report_key = ReportKey.keyed(rk)
@@ -58,6 +61,8 @@ class MarketDataExporter
 
     bucket_obj.put(body: IO.read(zipped_file))
     s3_location  =  bucket_obj.public_url
+
+    File.delete(zipped_file)
 
     s3_location
 

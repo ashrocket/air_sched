@@ -252,8 +252,22 @@ class BrandRouteMapExportReport < ActiveRecord::Base
     end
 
     def use_latest_valid_keys
-         schedule_report_keys.each do |schedule_key|
+         schedule_report_keys.keys.each do |schedule_key|
            # TODO: protect against empty key
+           # TZBRANDTZUO
+           # NoMethodError: undefined method `[]' for nil:NilClass
+           # /home/ec2-user/air_sched/app/models/brand_route_map_export_report.rb:257:in `block in use_latest_valid_keys'
+           # /home/ec2-user/air_sched/app/models/brand_route_map_export_report.rb:255:in `each'
+           # /home/ec2-user/air_sched/app/models/brand_route_map_export_report.rb:255:in `use_latest_valid_keys'
+           # /home/ec2-user/air_sched/app/models/brand_route_map_export_report.rb:115:in `verify_report_keys'
+           unless schedule_report_keys[schedule_key]
+             byebug
+             puts 'Impossibly Missing Schedule Key'
+           end
+           unless schedule_report_keys[schedule_key].has_key 'status'
+             byebug
+             puts 'Missing Schedule Key Status'
+           end
            if schedule_report_keys[schedule_key]['status'].eql? 'pending'
              report_key = ReportKey.find_by(code: rk_code)
              schedule_report_keys[schedule_key]['status'] = 'ready'

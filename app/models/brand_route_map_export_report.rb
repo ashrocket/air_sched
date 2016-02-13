@@ -134,7 +134,7 @@ class BrandRouteMapExportReport < ActiveRecord::Base
     end
 
     def confirm_report_keys
-      Rails.logger.info "#{brand.name}  Brand: -> confirmed Import Reports are ready, calling BrandRouteMapsExportWorker."
+      Rails.logger.info "#{brand.name} brand: -> confirmed Import Reports are ready, calling BrandRouteMapsExportWorker."
       brand.export_state.export_route_maps!(self.id)
     end
 
@@ -261,15 +261,13 @@ class BrandRouteMapExportReport < ActiveRecord::Base
            # /home/ec2-user/air_sched/app/models/brand_route_map_export_report.rb:255:in `use_latest_valid_keys'
            # /home/ec2-user/air_sched/app/models/brand_route_map_export_report.rb:115:in `verify_report_keys'
            unless schedule_report_keys[schedule_key]
-             byebug
-             puts 'Impossibly Missing Schedule Key'
+             raise "Impossibly Missing Schedule Key #{schedule_key}"
            end
-           unless schedule_report_keys[schedule_key].has_key 'status'
-             byebug
-             puts 'Missing Schedule Key Status'
+           unless schedule_report_keys[schedule_key].key? 'status'
+             raise "Missing Schedule Key Status #{schedule_report_keys[schedule_key]}"
            end
            if schedule_report_keys[schedule_key]['status'].eql? 'pending'
-             report_key = ReportKey.find_by(code: rk_code)
+             report_key = ReportKey.find_by(code: schedule_key)
              schedule_report_keys[schedule_key]['status'] = 'ready'
              schedule_report_keys[schedule_key]['schedule_set_id'] = report_key.current_schedule_set_id
            end

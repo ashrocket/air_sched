@@ -32,7 +32,7 @@ class ScheduleImportWorker
       end
     else
       report = ScheduleSet.find_by(id: report_id)
-      dly = (10..180).to_a.sample
+      dly = (2..10).to_a.sample
 
       Sidekiq::Logging.logger.info "Import Worker, busy, check back on  #{report_id} in #{dly} seconds #{report.report_key_code}"
       ScheduleImportWorker.delay_for(dly).perform_async(report_id)

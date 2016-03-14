@@ -2,12 +2,16 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.5.1
+-- Dumped by pg_dump version 9.5.1
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -32,7 +36,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: active_admin_comments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: active_admin_comments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE active_admin_comments (
@@ -68,7 +72,7 @@ ALTER SEQUENCE active_admin_comments_id_seq OWNED BY active_admin_comments.id;
 
 
 --
--- Name: admin_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: admin_users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE admin_users (
@@ -108,7 +112,7 @@ ALTER SEQUENCE admin_users_id_seq OWNED BY admin_users.id;
 
 
 --
--- Name: airlines; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: airlines; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE airlines (
@@ -121,7 +125,7 @@ CREATE TABLE airlines (
 
 
 --
--- Name: airlines_hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: airlines_hosts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE airlines_hosts (
@@ -170,7 +174,7 @@ ALTER SEQUENCE airlines_id_seq OWNED BY airlines.id;
 
 
 --
--- Name: airport_currencies; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: airport_currencies; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE airport_currencies (
@@ -207,7 +211,7 @@ ALTER SEQUENCE airport_currencies_id_seq OWNED BY airport_currencies.id;
 
 
 --
--- Name: airports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: airports; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE airports (
@@ -241,7 +245,7 @@ ALTER SEQUENCE airports_id_seq OWNED BY airports.id;
 
 
 --
--- Name: app_controls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: app_controls; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE app_controls (
@@ -271,7 +275,7 @@ ALTER SEQUENCE app_controls_id_seq OWNED BY app_controls.id;
 
 
 --
--- Name: app_switches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: app_switches; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE app_switches (
@@ -303,7 +307,7 @@ ALTER SEQUENCE app_switches_id_seq OWNED BY app_switches.id;
 
 
 --
--- Name: brand_connections; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_connections; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brand_connections (
@@ -325,7 +329,10 @@ CREATE TABLE brand_connections (
     disc date,
     operating_window integer[] DEFAULT '{}'::integer[],
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    distance_km integer DEFAULT 0,
+    s1_distance_km integer DEFAULT 0,
+    s2_distance_km integer DEFAULT 0
 );
 
 
@@ -349,7 +356,7 @@ ALTER SEQUENCE brand_connections_id_seq OWNED BY brand_connections.id;
 
 
 --
--- Name: brand_data_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_data_states; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brand_data_states (
@@ -382,7 +389,7 @@ ALTER SEQUENCE brand_data_states_id_seq OWNED BY brand_data_states.id;
 
 
 --
--- Name: brand_export_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_export_states; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brand_export_states (
@@ -415,7 +422,7 @@ ALTER SEQUENCE brand_export_states_id_seq OWNED BY brand_export_states.id;
 
 
 --
--- Name: brand_report_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_report_keys; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brand_report_keys (
@@ -445,7 +452,7 @@ ALTER SEQUENCE brand_report_keys_id_seq OWNED BY brand_report_keys.id;
 
 
 --
--- Name: brand_route_map_export_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_route_map_export_reports; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brand_route_map_export_reports (
@@ -481,7 +488,7 @@ ALTER SEQUENCE brand_route_map_export_reports_id_seq OWNED BY brand_route_map_ex
 
 
 --
--- Name: brand_settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_settings; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brand_settings (
@@ -516,7 +523,7 @@ ALTER SEQUENCE brand_settings_id_seq OWNED BY brand_settings.id;
 
 
 --
--- Name: branded_market_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_requests; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_market_requests (
@@ -524,7 +531,8 @@ CREATE TABLE branded_market_requests (
     brand_id integer,
     origin character varying,
     dest character varying,
-    seg_count integer DEFAULT 0
+    seg_count integer DEFAULT 0,
+    distance_km integer DEFAULT 0
 );
 
 
@@ -548,7 +556,7 @@ ALTER SEQUENCE branded_market_requests_id_seq OWNED BY branded_market_requests.i
 
 
 --
--- Name: branded_market_route_maps; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_route_maps; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_market_route_maps (
@@ -580,7 +588,7 @@ ALTER SEQUENCE branded_market_route_maps_id_seq OWNED BY branded_market_route_ma
 
 
 --
--- Name: branded_market_route_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_route_requests; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_market_route_requests (
@@ -611,7 +619,7 @@ ALTER SEQUENCE branded_market_route_requests_id_seq OWNED BY branded_market_rout
 
 
 --
--- Name: branded_market_segments_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_segments_requests; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_market_segments_requests (
@@ -620,7 +628,8 @@ CREATE TABLE branded_market_segments_requests (
     origin character varying,
     dest character varying,
     segment_count integer,
-    branded_market_request_ids integer[] DEFAULT '{}'::integer[]
+    branded_market_request_ids integer[] DEFAULT '{}'::integer[],
+    distance_km integer DEFAULT 0
 );
 
 
@@ -644,7 +653,7 @@ ALTER SEQUENCE branded_market_segments_requests_id_seq OWNED BY branded_market_s
 
 
 --
--- Name: branded_route_map_validator_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_map_validator_reports; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_route_map_validator_reports (
@@ -678,7 +687,7 @@ ALTER SEQUENCE branded_route_map_validator_reports_id_seq OWNED BY branded_route
 
 
 --
--- Name: branded_route_map_validators; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_map_validators; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_route_map_validators (
@@ -709,7 +718,7 @@ ALTER SEQUENCE branded_route_map_validators_id_seq OWNED BY branded_route_map_va
 
 
 --
--- Name: branded_route_maps; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_maps; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_route_maps (
@@ -739,7 +748,7 @@ ALTER SEQUENCE branded_route_maps_id_seq OWNED BY branded_route_maps.id;
 
 
 --
--- Name: branded_route_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_requests; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branded_route_requests (
@@ -749,7 +758,8 @@ CREATE TABLE branded_route_requests (
     origin character varying,
     dest character varying,
     cxrs character varying[] DEFAULT '{}'::character varying[],
-    host character varying
+    host character varying,
+    distance_km integer DEFAULT 0
 );
 
 
@@ -773,7 +783,7 @@ ALTER SEQUENCE branded_route_requests_id_seq OWNED BY branded_route_requests.id;
 
 
 --
--- Name: brands; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brands; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brands (
@@ -808,7 +818,7 @@ ALTER SEQUENCE brands_id_seq OWNED BY brands.id;
 
 
 --
--- Name: brands_markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: brands_markets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE brands_markets (
@@ -840,7 +850,7 @@ ALTER SEQUENCE brands_markets_id_seq OWNED BY brands_markets.id;
 
 
 --
--- Name: carriers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: carriers; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE carriers (
@@ -875,7 +885,7 @@ ALTER SEQUENCE carriers_id_seq OWNED BY carriers.id;
 
 
 --
--- Name: city_pairs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: city_pairs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE city_pairs (
@@ -908,7 +918,7 @@ ALTER SEQUENCE city_pairs_id_seq OWNED BY city_pairs.id;
 
 
 --
--- Name: cnx_pairs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: cnx_pairs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE cnx_pairs (
@@ -943,7 +953,7 @@ ALTER SEQUENCE cnx_pairs_id_seq OWNED BY cnx_pairs.id;
 
 
 --
--- Name: destinations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: destinations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE destinations (
@@ -984,7 +994,7 @@ ALTER SEQUENCE destinations_id_seq OWNED BY destinations.id;
 
 
 --
--- Name: direct_flights; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: direct_flights; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE direct_flights (
@@ -992,7 +1002,8 @@ CREATE TABLE direct_flights (
     report_key_id integer,
     origin character varying,
     dest character varying,
-    carriers character varying[] DEFAULT '{}'::character varying[]
+    carriers character varying[] DEFAULT '{}'::character varying[],
+    distance_km integer DEFAULT 0
 );
 
 
@@ -1016,7 +1027,7 @@ ALTER SEQUENCE direct_flights_id_seq OWNED BY direct_flights.id;
 
 
 --
--- Name: export_market_data_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: export_market_data_reports; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE export_market_data_reports (
@@ -1049,7 +1060,7 @@ ALTER SEQUENCE export_market_data_reports_id_seq OWNED BY export_market_data_rep
 
 
 --
--- Name: export_route_validator_reports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: export_route_validator_reports; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE export_route_validator_reports (
@@ -1083,7 +1094,7 @@ ALTER SEQUENCE export_route_validator_reports_id_seq OWNED BY export_route_valid
 
 
 --
--- Name: friendly_id_slugs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: friendly_id_slugs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE friendly_id_slugs (
@@ -1116,7 +1127,7 @@ ALTER SEQUENCE friendly_id_slugs_id_seq OWNED BY friendly_id_slugs.id;
 
 
 --
--- Name: hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hosts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE hosts (
@@ -1149,7 +1160,7 @@ ALTER SEQUENCE hosts_id_seq OWNED BY hosts.id;
 
 
 --
--- Name: hubs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hubs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE hubs (
@@ -1184,7 +1195,7 @@ ALTER SEQUENCE hubs_id_seq OWNED BY hubs.id;
 
 
 --
--- Name: implied_markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: implied_markets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE implied_markets (
@@ -1215,7 +1226,7 @@ ALTER SEQUENCE implied_markets_id_seq OWNED BY implied_markets.id;
 
 
 --
--- Name: interline_cxr_rules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: interline_cxr_rules; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE interline_cxr_rules (
@@ -1252,7 +1263,7 @@ ALTER SEQUENCE interline_cxr_rules_id_seq OWNED BY interline_cxr_rules.id;
 
 
 --
--- Name: markets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: markets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE markets (
@@ -1285,7 +1296,7 @@ ALTER SEQUENCE markets_id_seq OWNED BY markets.id;
 
 
 --
--- Name: oag_schedules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_schedules; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE oag_schedules (
@@ -1321,7 +1332,8 @@ CREATE TABLE oag_schedules (
     via_apts character varying,
     mkt character varying,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    distance_km integer DEFAULT 0
 );
 
 
@@ -1345,7 +1357,7 @@ ALTER SEQUENCE oag_schedules_id_seq OWNED BY oag_schedules.id;
 
 
 --
--- Name: possible_flights; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: possible_flights; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE possible_flights (
@@ -1378,7 +1390,7 @@ ALTER SEQUENCE possible_flights_id_seq OWNED BY possible_flights.id;
 
 
 --
--- Name: report_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: report_keys; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE report_keys (
@@ -1416,7 +1428,7 @@ ALTER SEQUENCE report_keys_id_seq OWNED BY report_keys.id;
 
 
 --
--- Name: schedule_sets; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schedule_sets; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schedule_sets (
@@ -1458,7 +1470,7 @@ ALTER SEQUENCE schedule_sets_id_seq OWNED BY schedule_sets.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schema_migrations (
@@ -1467,7 +1479,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: settings; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE settings (
@@ -1796,7 +1808,7 @@ ALTER TABLE ONLY settings ALTER COLUMN id SET DEFAULT nextval('settings_id_seq':
 
 
 --
--- Name: active_admin_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: active_admin_comments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY active_admin_comments
@@ -1804,7 +1816,7 @@ ALTER TABLE ONLY active_admin_comments
 
 
 --
--- Name: admin_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: admin_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY admin_users
@@ -1812,7 +1824,7 @@ ALTER TABLE ONLY admin_users
 
 
 --
--- Name: airlines_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: airlines_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY airlines_hosts
@@ -1820,7 +1832,7 @@ ALTER TABLE ONLY airlines_hosts
 
 
 --
--- Name: airlines_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: airlines_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY airlines
@@ -1828,7 +1840,7 @@ ALTER TABLE ONLY airlines
 
 
 --
--- Name: airport_currencies_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: airport_currencies_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY airport_currencies
@@ -1836,7 +1848,7 @@ ALTER TABLE ONLY airport_currencies
 
 
 --
--- Name: airports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: airports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY airports
@@ -1844,7 +1856,7 @@ ALTER TABLE ONLY airports
 
 
 --
--- Name: app_controls_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: app_controls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY app_controls
@@ -1852,7 +1864,7 @@ ALTER TABLE ONLY app_controls
 
 
 --
--- Name: app_switches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: app_switches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY app_switches
@@ -1860,7 +1872,7 @@ ALTER TABLE ONLY app_switches
 
 
 --
--- Name: brand_connections_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_connections_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brand_connections
@@ -1868,7 +1880,7 @@ ALTER TABLE ONLY brand_connections
 
 
 --
--- Name: brand_data_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_data_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brand_data_states
@@ -1876,7 +1888,7 @@ ALTER TABLE ONLY brand_data_states
 
 
 --
--- Name: brand_export_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_export_states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brand_export_states
@@ -1884,7 +1896,7 @@ ALTER TABLE ONLY brand_export_states
 
 
 --
--- Name: brand_report_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_report_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brand_report_keys
@@ -1892,7 +1904,7 @@ ALTER TABLE ONLY brand_report_keys
 
 
 --
--- Name: brand_route_map_export_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_route_map_export_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brand_route_map_export_reports
@@ -1900,7 +1912,7 @@ ALTER TABLE ONLY brand_route_map_export_reports
 
 
 --
--- Name: brand_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brand_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brand_settings
@@ -1908,7 +1920,7 @@ ALTER TABLE ONLY brand_settings
 
 
 --
--- Name: branded_market_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_market_requests
@@ -1916,7 +1928,7 @@ ALTER TABLE ONLY branded_market_requests
 
 
 --
--- Name: branded_market_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_market_route_maps
@@ -1924,7 +1936,7 @@ ALTER TABLE ONLY branded_market_route_maps
 
 
 --
--- Name: branded_market_route_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_route_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_market_route_requests
@@ -1932,7 +1944,7 @@ ALTER TABLE ONLY branded_market_route_requests
 
 
 --
--- Name: branded_market_segments_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_market_segments_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_market_segments_requests
@@ -1940,7 +1952,7 @@ ALTER TABLE ONLY branded_market_segments_requests
 
 
 --
--- Name: branded_route_map_validator_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_map_validator_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_route_map_validator_reports
@@ -1948,7 +1960,7 @@ ALTER TABLE ONLY branded_route_map_validator_reports
 
 
 --
--- Name: branded_route_map_validators_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_map_validators_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_route_map_validators
@@ -1956,7 +1968,7 @@ ALTER TABLE ONLY branded_route_map_validators
 
 
 --
--- Name: branded_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_maps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_route_maps
@@ -1964,7 +1976,7 @@ ALTER TABLE ONLY branded_route_maps
 
 
 --
--- Name: branded_route_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branded_route_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branded_route_requests
@@ -1972,7 +1984,7 @@ ALTER TABLE ONLY branded_route_requests
 
 
 --
--- Name: brands_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brands_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brands_markets
@@ -1980,7 +1992,7 @@ ALTER TABLE ONLY brands_markets
 
 
 --
--- Name: brands_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: brands_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY brands
@@ -1988,7 +2000,7 @@ ALTER TABLE ONLY brands
 
 
 --
--- Name: carriers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: carriers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY carriers
@@ -1996,7 +2008,7 @@ ALTER TABLE ONLY carriers
 
 
 --
--- Name: city_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: city_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY city_pairs
@@ -2004,7 +2016,7 @@ ALTER TABLE ONLY city_pairs
 
 
 --
--- Name: cnx_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: cnx_pairs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY cnx_pairs
@@ -2012,7 +2024,7 @@ ALTER TABLE ONLY cnx_pairs
 
 
 --
--- Name: destinations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: destinations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY destinations
@@ -2020,7 +2032,7 @@ ALTER TABLE ONLY destinations
 
 
 --
--- Name: direct_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: direct_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY direct_flights
@@ -2028,7 +2040,7 @@ ALTER TABLE ONLY direct_flights
 
 
 --
--- Name: export_market_data_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: export_market_data_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY export_market_data_reports
@@ -2036,7 +2048,7 @@ ALTER TABLE ONLY export_market_data_reports
 
 
 --
--- Name: export_route_validator_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: export_route_validator_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY export_route_validator_reports
@@ -2044,7 +2056,7 @@ ALTER TABLE ONLY export_route_validator_reports
 
 
 --
--- Name: friendly_id_slugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: friendly_id_slugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY friendly_id_slugs
@@ -2052,7 +2064,7 @@ ALTER TABLE ONLY friendly_id_slugs
 
 
 --
--- Name: hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY hosts
@@ -2060,7 +2072,7 @@ ALTER TABLE ONLY hosts
 
 
 --
--- Name: hubs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hubs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY hubs
@@ -2068,7 +2080,7 @@ ALTER TABLE ONLY hubs
 
 
 --
--- Name: implied_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: implied_markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY implied_markets
@@ -2076,7 +2088,7 @@ ALTER TABLE ONLY implied_markets
 
 
 --
--- Name: interline_cxr_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: interline_cxr_rules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY interline_cxr_rules
@@ -2084,7 +2096,7 @@ ALTER TABLE ONLY interline_cxr_rules
 
 
 --
--- Name: markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: markets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY markets
@@ -2092,7 +2104,7 @@ ALTER TABLE ONLY markets
 
 
 --
--- Name: oag_schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY oag_schedules
@@ -2100,7 +2112,7 @@ ALTER TABLE ONLY oag_schedules
 
 
 --
--- Name: possible_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: possible_flights_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY possible_flights
@@ -2108,7 +2120,7 @@ ALTER TABLE ONLY possible_flights
 
 
 --
--- Name: report_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: report_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY report_keys
@@ -2116,7 +2128,7 @@ ALTER TABLE ONLY report_keys
 
 
 --
--- Name: schedule_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: schedule_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY schedule_sets
@@ -2124,7 +2136,7 @@ ALTER TABLE ONLY schedule_sets
 
 
 --
--- Name: settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY settings
@@ -2132,455 +2144,490 @@ ALTER TABLE ONLY settings
 
 
 --
--- Name: cnx_pairs_o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: bc_dest_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX bc_dest_index ON brand_connections USING hash (dest);
+
+
+--
+-- Name: bc_origin_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX bc_origin_index ON brand_connections USING hash (origin);
+
+
+--
+-- Name: bc_sched1_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX bc_sched1_id_index ON brand_connections USING hash (sched1_id);
+
+
+--
+-- Name: bc_sched2_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX bc_sched2_id_index ON brand_connections USING hash (sched2_id);
+
+
+--
+-- Name: brand_connections_brand_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX brand_connections_brand_id_index ON brand_connections USING hash (brand_id);
+
+
+--
+-- Name: cnx_pairs_o_and_d; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX cnx_pairs_o_and_d ON cnx_pairs USING btree (report_key_id, origin, dest, origin_name, dest_name);
 
 
 --
--- Name: direct_flights_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: direct_flights_d; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX direct_flights_d ON direct_flights USING btree (dest);
 
 
 --
--- Name: direct_flights_o; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: direct_flights_o; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX direct_flights_o ON direct_flights USING btree (origin);
 
 
 --
--- Name: direct_flights_o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: direct_flights_o_and_d; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX direct_flights_o_and_d ON direct_flights USING btree (origin, dest);
 
 
 --
--- Name: imp_mkt__o_and_d; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: imp_mkt__o_and_d; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX imp_mkt__o_and_d ON implied_markets USING btree (brand_id, origin, dest);
 
 
 --
--- Name: index_active_admin_comments_on_author_type_and_author_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_admin_comments_on_author_type_and_author_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_admin_comments_on_author_type_and_author_id ON active_admin_comments USING btree (author_type, author_id);
 
 
 --
--- Name: index_active_admin_comments_on_namespace; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_admin_comments_on_namespace; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_admin_comments_on_namespace ON active_admin_comments USING btree (namespace);
 
 
 --
--- Name: index_active_admin_comments_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_active_admin_comments_on_resource_type_and_resource_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_active_admin_comments_on_resource_type_and_resource_id ON active_admin_comments USING btree (resource_type, resource_id);
 
 
 --
--- Name: index_admin_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_admin_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_admin_users_on_email ON admin_users USING btree (email);
 
 
 --
--- Name: index_admin_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_admin_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_admin_users_on_reset_password_token ON admin_users USING btree (reset_password_token);
 
 
 --
--- Name: index_airlines_hosts_on_airline_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_airlines_hosts_on_airline_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_airlines_hosts_on_airline_id ON airlines_hosts USING btree (airline_id);
 
 
 --
--- Name: index_airlines_hosts_on_host_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_airlines_hosts_on_host_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_airlines_hosts_on_host_id ON airlines_hosts USING btree (host_id);
 
 
 --
--- Name: index_airlines_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_airlines_on_code; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_airlines_on_code ON airlines USING btree (code);
 
 
 --
--- Name: index_airlines_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_airlines_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_airlines_on_slug ON airlines USING btree (slug);
 
 
 --
--- Name: index_airports_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_airports_on_code; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_airports_on_code ON airports USING btree (code);
 
 
 --
--- Name: index_airports_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_airports_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_airports_on_slug ON airports USING btree (slug);
 
 
 --
--- Name: index_app_controls_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_app_controls_on_brand_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_app_controls_on_brand_id ON app_controls USING btree (brand_id);
 
 
 --
--- Name: index_app_controls_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_app_controls_on_report_key_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_app_controls_on_report_key_id ON app_controls USING btree (report_key_id);
 
 
 --
--- Name: index_brand_data_states_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brand_data_states_on_brand_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brand_data_states_on_brand_id ON brand_data_states USING btree (brand_id);
 
 
 --
--- Name: index_brand_export_states_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brand_export_states_on_brand_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brand_export_states_on_brand_id ON brand_export_states USING btree (brand_id);
 
 
 --
--- Name: index_brand_report_keys_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brand_report_keys_on_brand_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brand_report_keys_on_brand_id ON brand_report_keys USING btree (brand_id);
 
 
 --
--- Name: index_brand_report_keys_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brand_report_keys_on_report_key_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brand_report_keys_on_report_key_id ON brand_report_keys USING btree (report_key_id);
 
 
 --
--- Name: index_brand_settings_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brand_settings_on_brand_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brand_settings_on_brand_id ON brand_settings USING btree (brand_id);
 
 
 --
--- Name: index_branded_route_requests_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_branded_route_requests_on_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_branded_route_requests_on_key ON branded_route_requests USING btree (key);
 
 
 --
--- Name: index_brands_markets_on_brand_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brands_markets_on_brand_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brands_markets_on_brand_id ON brands_markets USING btree (brand_id);
 
 
 --
--- Name: index_brands_markets_on_market_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brands_markets_on_market_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_brands_markets_on_market_id ON brands_markets USING btree (market_id);
 
 
 --
--- Name: index_brands_on_brand_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brands_on_brand_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_brands_on_brand_key ON brands USING btree (brand_key);
 
 
 --
--- Name: index_brands_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_brands_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_brands_on_slug ON brands USING btree (slug);
 
 
 --
--- Name: index_carriers_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_carriers_on_code; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_carriers_on_code ON carriers USING btree (code);
 
 
 --
--- Name: index_carriers_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_carriers_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_carriers_on_slug ON carriers USING btree (slug);
 
 
 --
--- Name: index_city_pairs_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_city_pairs_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_city_pairs_on_hub_and_orig_and_dest ON city_pairs USING btree (hub, orig, dest);
 
 
 --
--- Name: index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_friendly_id_slugs_on_slug_and_sluggable_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type ON friendly_id_slugs USING btree (slug, sluggable_type);
 
 
 --
--- Name: index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope ON friendly_id_slugs USING btree (slug, sluggable_type, scope);
 
 
 --
--- Name: index_friendly_id_slugs_on_sluggable_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_friendly_id_slugs_on_sluggable_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_friendly_id_slugs_on_sluggable_id ON friendly_id_slugs USING btree (sluggable_id);
 
 
 --
--- Name: index_friendly_id_slugs_on_sluggable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_friendly_id_slugs_on_sluggable_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_friendly_id_slugs_on_sluggable_type ON friendly_id_slugs USING btree (sluggable_type);
 
 
 --
--- Name: index_hubs_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_hubs_on_code; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_hubs_on_code ON hubs USING btree (code);
 
 
 --
--- Name: index_hubs_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_hubs_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_hubs_on_slug ON hubs USING btree (slug);
 
 
 --
--- Name: index_interline_cxr_rules_on_report_key_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_interline_cxr_rules_on_report_key_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_interline_cxr_rules_on_report_key_id ON interline_cxr_rules USING btree (report_key_id);
 
 
 --
--- Name: index_possible_flights_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_possible_flights_on_hub_and_orig_and_dest; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_possible_flights_on_hub_and_orig_and_dest ON possible_flights USING btree (hub, orig, dest);
 
 
 --
--- Name: index_report_keys_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_report_keys_on_code; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_report_keys_on_code ON report_keys USING btree (code);
 
 
 --
--- Name: index_report_keys_on_slug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_report_keys_on_slug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_report_keys_on_slug ON report_keys USING btree (slug);
 
 
 --
--- Name: index_settings_on_thing_type_and_thing_id_and_var; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_settings_on_thing_type_and_thing_id_and_var; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_settings_on_thing_type_and_thing_id_and_var ON settings USING btree (thing_type, thing_id, var);
 
 
 --
--- Name: oag_departures; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_departures; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_departures ON oag_schedules USING btree (report_key_id, eff_date, disc_date, origin_apt, dep_time_local);
 
 
 --
--- Name: oag_disc_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_disc_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_disc_date ON oag_schedules USING btree (report_key_id, disc_date);
 
 
 --
--- Name: oag_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_eff_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_eff_date ON oag_schedules USING btree (report_key_id, eff_date);
 
 
 --
--- Name: oag_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_eff_disc_dates; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_eff_disc_dates ON oag_schedules USING btree (report_key_id, eff_date, disc_date);
 
 
 --
--- Name: oag_flight_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_flight_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_flight_id ON oag_schedules USING btree (report_key_id, airline_code, flight_num);
 
 
 --
--- Name: oag_flight_id_time; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_flight_id_time; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_flight_id_time ON oag_schedules USING btree (report_key_id, dep_time_local, flight_num);
 
 
 --
--- Name: oag_keyed_airports; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_keyed_airports; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_keyed_airports ON oag_schedules USING btree (report_key_id, origin_apt, dest_apt);
 
 
 --
--- Name: oag_keyed_dests; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_keyed_dests; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_keyed_dests ON oag_schedules USING btree (report_key_id, dest_apt);
 
 
 --
--- Name: oag_keyed_mkts; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_keyed_mkts; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_keyed_mkts ON oag_schedules USING btree (report_key_id, mkt);
 
 
 --
--- Name: oag_keyed_origins; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_keyed_origins; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_keyed_origins ON oag_schedules USING btree (report_key_id, origin_apt);
 
 
 --
--- Name: oag_sched_rk_cs; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sched_rk_cs; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sched_rk_cs ON oag_schedules USING btree (report_key_id);
 
 
 --
--- Name: oag_sset; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset ON oag_schedules USING btree (schedule_set_id);
 
 
 --
--- Name: oag_sset_airports; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_airports; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_airports ON oag_schedules USING btree (schedule_set_id, origin_apt, dest_apt);
 
 
 --
--- Name: oag_sset_departures; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_departures; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_departures ON oag_schedules USING btree (schedule_set_id, eff_date, disc_date, origin_apt, dep_time_local);
 
 
 --
--- Name: oag_sset_dests; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_dests; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_dests ON oag_schedules USING btree (schedule_set_id, dest_apt);
 
 
 --
--- Name: oag_sset_disc_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_disc_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_disc_date ON oag_schedules USING btree (schedule_set_id, disc_date);
 
 
 --
--- Name: oag_sset_eff_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_eff_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_eff_date ON oag_schedules USING btree (schedule_set_id, eff_date);
 
 
 --
--- Name: oag_sset_eff_disc_dates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_eff_disc_dates; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_eff_disc_dates ON oag_schedules USING btree (schedule_set_id, eff_date, disc_date);
 
 
 --
--- Name: oag_sset_flight_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_flight_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_flight_id ON oag_schedules USING btree (schedule_set_id, airline_code, flight_num);
 
 
 --
--- Name: oag_sset_flight_id_time; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_flight_id_time; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_flight_id_time ON oag_schedules USING btree (schedule_set_id, dep_time_local, flight_num);
 
 
 --
--- Name: oag_sset_mkts; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_mkts; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_mkts ON oag_schedules USING btree (schedule_set_id, mkt);
 
 
 --
--- Name: oag_sset_origins; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: oag_sset_origins; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX oag_sset_origins ON oag_schedules USING btree (schedule_set_id, origin_apt);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
@@ -2662,7 +2709,7 @@ ALTER TABLE ONLY brand_settings
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('20140101000000');
 
@@ -2745,4 +2792,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000520');
 INSERT INTO schema_migrations (version) VALUES ('20150727000600');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727000630');
+
+INSERT INTO schema_migrations (version) VALUES ('20160209223433');
 

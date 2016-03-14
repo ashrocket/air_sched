@@ -26,15 +26,15 @@ class BrandedRouteRequest < ActiveRecord::Base
     #disable this for now
     return nil
 
-    if( host.eql? other.host)
-      pr2 = BrandedRouteRequest.where(
-          attributes.deep_symbolize_keys.except(:id, :dest, :cxrs)
-              .merge(dest: other.dest,
-                     cxrs: (cxrs + other.cxrs).sort.uniq)
-      ).first_or_create!
-    else
-      nil
-    end
+    # if( host.eql? other.host)
+    #   pr2 = BrandedRouteRequest.where(
+    #       attributes.deep_symbolize_keys.except(:id, :dest, :cxrs)
+    #           .merge(dest: other.dest,
+    #                  cxrs: (cxrs + other.cxrs).sort.uniq)
+    #   ).first_or_create!
+    # else
+    #   nil
+    # end
 
   end
 

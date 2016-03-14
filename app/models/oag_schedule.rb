@@ -103,6 +103,7 @@ class OagSchedule < ActiveRecord::Base
     end
 
 
+
     def travelling_on(dep_date)
       where('? BETWEEN eff_date and disc_date', dep_date ).operating(dep_date)
     end
@@ -294,6 +295,14 @@ class OagSchedule < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def sum_distance_km sched2
+     if distance_km == 0 || sched2.distance_km == 0
+       0
+     else
+       distance_km + sched2.distance_km
+     end
   end
 
 

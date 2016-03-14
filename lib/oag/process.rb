@@ -112,13 +112,23 @@ module Oag
         DirectFlight.keyed(report.report_key).delete_all
         direct_flight_records = []
 
-        schedules = OagSchedule.keyed(report.report_key).select(:origin_apt, :dest_apt, :airline_code, :mkt_cxrs ).distinct
-        grouped_schedules = schedules.group_by{|flt| [flt.origin_apt, flt.dest_apt] }.map{ |apt_pair,sched_a|
-                                       [apt_pair, (sched_a.map{|sched| sched.airline_code } +
-                                             sched_a.map{|sched| sched.mkt_carriers}.flatten(1)).uniq]}
-        grouped_schedules.sort!
-        grouped_schedules.each do |combo|
-          direct_flight_records << DirectFlight.new(report_key: report.report_key, origin: combo[0][0], dest: combo[0][1], carriers: combo[1])
+
+
+        query_string = '
+        SELECT origin_apt, dest_apt, airline_name,  mkt_cxrs, max(distance_km) as distance_km
+        FROM oag_schedules
+        WHERE op = true
+        AND report_key_id = ?
+        GROUP BY origin_apt, dest_apt, airline_name, mkt_cxrs
+        ORDER BY origin_apt, dest_apt, airline_name, mkt_cxrs'
+
+        schedules =  OagSchedule.find_by_sql( [query_string, report.report_key.id])
+        schedules.each do |sched|
+          direct_flight_records << DirectFlight.new(report_key: report.report_key,
+                  origin: sched.origin_apt,
+                  dest: sched.dest_apt,
+                  carriers: sched.mkt_cxrs,
+                  distance_km:  sched.distance_km)
         end
         DirectFlight.import direct_flight_records
     end

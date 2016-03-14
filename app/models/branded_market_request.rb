@@ -38,22 +38,22 @@ class BrandedMarketRequest < ActiveRecord::Base
       # Disable this for now
       return nil
 
-      brr_list = branded_route_requests.to_a
-      brr_list = shrink_ray(brr_list)
-
-      if brr_list.count != branded_route_requests.count
-
-        bmr = BrandedMarketRequest.joins(:branded_route_requests)
-                            .where(BrandedRouteRequest[:id].in brr_list.map{|brr| [brr.id]})
-                            .where(brand: brand, origin: origin, dest: dest)
-                            .first_or_create!
-
-        bmr.branded_route_requests << brr_list if  bmr.branded_route_requests.blank?
-        return bmr
-
-      else
-        return nil
-      end
+      # brr_list = branded_route_requests.to_a
+      # brr_list = shrink_ray(brr_list)
+      #
+      # if brr_list.count != branded_route_requests.count
+      #
+      #   bmr = BrandedMarketRequest.joins(:branded_route_requests)
+      #                       .where(BrandedRouteRequest[:id].in brr_list.map{|brr| [brr.id]})
+      #                       .where(brand: brand, origin: origin, dest: dest)
+      #                       .first_or_create!
+      #
+      #   bmr.branded_route_requests << brr_list if  bmr.branded_route_requests.blank?
+      #   return bmr
+      #
+      # else
+      #   return nil
+      # end
 
   end
 
@@ -80,6 +80,7 @@ class BrandedMarketRequest < ActiveRecord::Base
           currency: airport_currency(brand, brr.origin),
           origin: brr.origin,
           destination: brr.dest,
+          distance_km: brr.distance_km,
           order: i + 1}
 
     end
@@ -95,6 +96,7 @@ class BrandedMarketRequest < ActiveRecord::Base
                destination: dest,
                leg_count: branded_route_requests.count,
                order: order,
+               distance_km: distance_km,
                journey_legs:  brrs_to_journey_leg
              }
        ]

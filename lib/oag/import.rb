@@ -53,7 +53,8 @@ module Oag
              :duration    => row[:elapsedtime],
              :stops => row[:stops],  :restrictions => row[:restrictions],
              :mkt => row[:routing], :mkt_cxrs => OagSchedule.mkt_cxrs(row),
-             :via_apts => row[:intairports]
+             :via_apts => row[:intairports],
+             :distance_km => row[:distkm].to_i.to_s == row[:distkm] ?  row[:distkm].to_i : 0
 
          }
          if sched[:next_day_arrival]

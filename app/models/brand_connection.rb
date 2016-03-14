@@ -54,18 +54,18 @@ class BrandConnection < ActiveRecord::Base
    def route_cxrs_hash_key
      {o: origin, v: via, d: dest , c1: sched1_cxr, c2: sched2_cxr}
    end
-   def to_pricing_requests
-
-     pr_arr = []
-     rr_arr = self.to_route_requests
-     rr_arr.each do |rr1, rr2|
-        pr1 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr1.id).first_or_create!
-        pr2 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr2.id).first_or_create!
-        pr_arr << [pr1,pr2]
-     end
-     pr_arr
-
-   end
+   # def to_pricing_requests
+   #
+   #   pr_arr = []
+   #   rr_arr = self.to_route_requests
+   #   rr_arr.each do |rr1, rr2|
+   #      pr1 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr1.id).first_or_create!
+   #      pr2 = BrandedPriceRequest.where(eff: eff, disc: disc,operating_window: operating_window, branded_route_request_id: rr2.id).first_or_create!
+   #      pr_arr << [pr1,pr2]
+   #   end
+   #   pr_arr
+   #
+   # end
 
   # def to_market_request
   #    mr_arr = []
@@ -88,23 +88,23 @@ class BrandConnection < ActiveRecord::Base
   #    mr_arr
   #  end
 
-  def to_route_requests
-    rr_arr = []
-    hosts_1 = brand.hosts_for(sched1_cxr).uniq
-    hosts_2 = brand.hosts_for(sched2_cxr).uniq
-
-    hosts_1.each do |host1|
-      hosts_2.each do |host2|
-        rr1 = BrandedRouteRequest.where(brand: brand, origin: origin,  dest: via,
-                cxrs: [sched1_cxr], host: host1.code).first_or_create!
-        rr2 = BrandedRouteRequest.where(brand: brand, origin: via,  dest: dest,
-                cxrs: [sched2_cxr], host: host2.code).first_or_create!
-
-        rr_arr << [rr1,rr2]
-      end
-    end
-    rr_arr
-  end
+  # def to_route_requests
+  #   rr_arr = []
+  #   hosts_1 = brand.hosts_for(sched1_cxr).uniq
+  #   hosts_2 = brand.hosts_for(sched2_cxr).uniq
+  #
+  #   hosts_1.each do |host1|
+  #     hosts_2.each do |host2|
+  #       rr1 = BrandedRouteRequest.where(brand: brand, origin: origin,  dest: via,
+  #               cxrs: [sched1_cxr], host: host1.code).first_or_create!
+  #       rr2 = BrandedRouteRequest.where(brand: brand, origin: via,  dest: dest,
+  #               cxrs: [sched2_cxr], host: host2.code).first_or_create!
+  #
+  #       rr_arr << [rr1,rr2]
+  #     end
+  #   end
+  #   rr_arr
+  # end
 
 
 end

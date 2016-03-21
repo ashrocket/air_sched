@@ -329,7 +329,7 @@ module Oag
 
 
    end
-  private
+  # private
 
     # ###############
     #
@@ -442,68 +442,99 @@ module Oag
      end
 
 
-    def faster_one_stop_routes(brand)
-       query_string = ' SELECT
-          b1.origin        origin,
-          b1.via        AS via,
-          b1.dest       AS dest,
-          b1.sched1_cxr AS cxr1,
-          b1.sched2_cxr AS cxr2,
-          b1.brand_id,
-          max(b1.distance_km) as distance_km
+    def compute_branded_market_request(brand, connection, two_seg_cnx_idx,  total_uniq_connections)
+      Rails.logger.info "(#{brand.brand_key}) Building  2 Segment Routes for #{connection.origin}, #{connection.dest}, #{connection.via}, #{two_seg_cnx_idx+1} of (#{total_uniq_connections} connections) "
+      bmrs = []
+      hostcodes = brand.hostcodes_map
+
+      host_codes = hostcodes[connection.cxr1]
+      rr1_s = host_codes.map{ |host_code|
+        BrandedRouteRequest.where(brand: brand, origin: connection.origin, dest: connection.via, cxrs: [connection.cxr1], host: host_code).first_or_create! do |brr|
+          brr.distance_km = connection.distance_km
+        end
+      }
+      host_codes = hostcodes[connection.cxr2]
+      rr2_s = host_codes.map{ |host_code|
+        BrandedRouteRequest.where(brand: brand, origin: connection.via,  dest: connection.dest, cxrs: [connection.cxr2], host: host_code).first_or_create! do |brr|
+          brr.distance_km = connection.distance_km
+        end
+      }
+
+      rrs_per_host = rr1_s.product rr2_s
+      rrs_per_host.each do |host_rrs|
+        all_branded_market_requests = host_rrs.map{|rr| rr.branded_market_requests.where(seg_count: 2)}
+        bmrrs_intersection = all_branded_market_requests.inject(:&)
+
+        raise("There should only be 1 Branded Market Request for brrs #{host_rrs.map{|rr| rr.id}}") if bmrrs_intersection.count > 1
+
+        if bmrrs_intersection.blank?
+          bmr =  BrandedMarketRequest.new(brand: brand, origin: connection.origin, dest: connection.dest, distance_km: connection.distance_km, seg_count: 2)
+          bmr.branded_route_requests << rrs_per_host
+          bmrs << bmr
+        else
+          bmr = bmrrs_intersection.first
+          bmrs << bmr
+        end
+
+      end
+      bmrs
+    end
+
+    def prepare_faster_one_stop_routes(brand)
+      query_string = '
+        WITH uniq_routes as (
+        SELECT   DISTINCT
+        b1.origin        origin,
+        b1.via        AS via,
+        b1.dest       AS dest,
+        b1.sched1_cxr AS cxr1,
+        b1.sched2_cxr AS cxr2,
+        b1.brand_id,
+        b1.distance_km
         FROM brand_connections b1
-        WHERE
-          b1.brand_id = ?
-        GROUP BY b1.origin, b1.dest, b1.via, b1.sched1_cxr, b1.sched2_cxr, b1.brand_id
+              WHERE
+              b1.brand_id = ?
+              )
+        SELECT
+          origin,
+          via,
+          dest,
+          cxr1,
+          cxr2,
+          brand_id,
+          max(distance_km) as distance_km
+        FROM uniq_routes
+        GROUP BY origin, dest, via, cxr1, cxr2, brand_id
+        ORDER BY 1 ASC, 3 ASC, 2 ASC
+        '
 
-        ORDER BY b1.origin ASC, b1.dest ASC, b1.via ASC'
+      uniq_connections =  BrandConnection.find_by_sql( [query_string, brand.id])
+      uniq_connections
 
-       two_seg_branded_market_requests = Hash.new { |h, k| h[k] = Set.new }
-       good_ones =  BrandConnection.find_by_sql( [query_string, brand.id])
+    end
 
+    def tmp
+    brand = Brand.find(1)
+    two_seg_cnx_idx = 1
+    report = Oag::Report.new
+    uniq_connections = report.prepare_faster_one_stop_routes(brand)
+    two_seg_branded_market_requests = Hash.new { |h, k| h[k] = Set.new }
 
+    connection = uniq_connections.select{|g| g.origin.eql? 'KHH' and g.dest.eql? 'DMK' and g.via.eql? 'SIN'}.first
+    bmrs = report.compute_branded_market_request(brand, connection, two_seg_cnx_idx,  uniq_connections.count)
 
-       total_good_connections = good_ones.count
-       hostcodes = brand.hostcodes_map
+    end
 
-       Parallel.each_with_index(good_ones, in_threads: 8) do |good_rrs, two_seg_cnx_idx|
-       # good_ones.each_with_index do |good_rrs, two_seg_cnx_idx|
-                Rails.logger.info "(#{brand.brand_key}) Building  2 Segment Routes for #{good_rrs.origin}, #{good_rrs.dest}, #{good_rrs.via}, #{two_seg_cnx_idx+1} of (#{total_good_connections} connections) "
+    def faster_one_stop_routes(brand)
+      two_seg_branded_market_requests = Hash.new { |h, k| h[k] = Set.new }
+      uniq_connections = prepare_faster_one_stop_routes(brand)
 
-                host_codes = hostcodes[good_rrs.cxr1]
-                rr1_s = host_codes.map{ |host_code|
-                      BrandedRouteRequest.where(brand: brand, origin: good_rrs.origin, dest: good_rrs.via, cxrs: [good_rrs.cxr1], host: host_code).first_or_create! do |brr|
-                        brr.distance_km = good_rrs.distance_km
-                      end
-                }
-                host_codes = hostcodes[good_rrs.cxr2]
-                rr2_s = host_codes.map{ |host_code|
-                   BrandedRouteRequest.where(brand: brand, origin: good_rrs.via,  dest: good_rrs.dest, cxrs: [good_rrs.cxr2], host: host_code).first_or_create! do |brr|
-                     brr.distance_km = good_rrs.distance_km
-                   end
-                }
+       Parallel.each_with_index(uniq_connections, in_threads: 8) do |connection, two_seg_cnx_idx|
+       # uniq_connections.each_with_index do |connection, two_seg_cnx_idx|
 
+                bmrs = compute_branded_market_request(brand, connection, two_seg_cnx_idx, uniq_connections.count)
+                bmrs.each{|bmr| two_seg_branded_market_requests[[bmr.origin, bmr.dest]] << bmr}
 
-
-                rrs_per_host = rr1_s.product rr2_s
-
-                rrs_per_host.each do |host_rrs|
-                  all_branded_market_requests = host_rrs.map{|rr| rr.branded_market_requests.where(seg_count: 2)}
-                  bmrrs_intersection = all_branded_market_requests.inject(:&)
-
-                  raise("There should only be 1 Branded Market Request for brrs #{host_rrs.map{|rr| rr.id}}") if bmrrs_intersection.count > 1
-
-
-                  if bmrrs_intersection.blank?
-                    bmr =  BrandedMarketRequest.new(brand: brand, origin: good_rrs.origin, dest: good_rrs.dest, distance_km: good_rrs.distance_km, seg_count: 2)
-                    bmr.branded_route_requests << rrs_per_host
-
-                  else
-                    bmr = bmrrs_intersection.first
-                  end
-
-                  two_seg_branded_market_requests[[bmr.origin, bmr.dest, bmr.distance_km]] << bmr
-                end
         end
 
 
@@ -544,6 +575,9 @@ module Oag
 
 
        # TODO Method 2
+       #Todo make this use less Memory
+       #Todo Use Batches and Then Use ActiveRecordImport
+       #Todo Use Batches with Transaction to enable progress Reporting on the Saves.
 
 
        total_bmr_count = two_seg_branded_market_requests.count
@@ -554,15 +588,23 @@ module Oag
 
 
        Rails.logger.info "(#{brand.brand_key}) Saving #{total_bmr_count} Two Segment BrandedMarketSegmentsRequest. "
+
        ActiveRecord::Base.transaction do
           total_two_seg_markets =  two_seg_branded_market_requests.keys.count
           two_seg_branded_market_requests.keys.each_with_index do |k, two_seg_mkt_idx|
              Rails.logger.info "(#{brand.brand_key}) Saving 2 Segment Routes for #{k[0]}-#{k[1]}, #{two_seg_mkt_idx+1} of (#{total_two_seg_markets} markets) "
              bmr_set = two_seg_branded_market_requests[k]
-             BrandedMarketSegmentsRequest.create(brand: brand, origin: k[0], dest:k[1], distance_km: k[2], segment_count: 2,
+             # max_bmr  = bmr_set.
+             BrandedMarketSegmentsRequest.create(brand: brand, origin: k[0], dest:k[1], segment_count: 2,
                                                  branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
           end
        end
+
+      # BrandedRouteRequest.where(brand: brand, origin: connection.via,  dest: connection.dest, cxrs: [connection.cxr2], host: host_code).first_or_create! do |brr|
+      #   brr.distance_km = connection.distance_km
+      # end
+      # }
+
      Rails.logger.info " ==== (#{brand.brand_key}) COMPLETED Building and Saving Two Segment Routes "
 
      end
@@ -751,7 +793,7 @@ module Oag
 
     def faster_two_stop_routes(brand)
 
-       byebug
+       # TODO make this query faster
 
        query_string = 'select b1.origin as origin, b1.via as via1, b1.dest as via2, b2.dest as dest,  b1.sched1_cxr as cxr1,
               b1.sched2_cxr as cxr2, b2.sched2_cxr as cxr3, b1.brand_id, b2.brand_id,
@@ -823,12 +865,14 @@ module Oag
                        bmr = bmrrs_intersection.first
                      end
 
-                     three_seg_branded_market_requests[[bmr.origin, bmr.dest, bmr.distance_km]] << bmr
+                     three_seg_branded_market_requests[[bmr.origin, bmr.dest]] << bmr
                    end
           end
 
 
-        #TODO make this use less Memory
+        #Todo make this use less Memory
+        #Todo Use Batches and Then Use ActiveRecordImport
+        #Todo Use Batches with Transaction to enable progress Reporting on the Saves.
         ActiveRecord::Base.transaction do
           three_seg_branded_market_requests.values.each{|bmr_list| bmr_list.each{|bmr|  bmr.save}}
         end
@@ -839,7 +883,7 @@ module Oag
 
              Rails.logger.info "(#{brand.brand_key}) Saving 3 Segment Routes for #{k[0]}-#{k[1]} , #{three_seg_mkt_idx+1} of (#{total_three_seg_markets} markets) "
              bmr_set = three_seg_branded_market_requests[k]
-             BrandedMarketSegmentsRequest.create(brand: brand, origin: k[0], dest:k[1], distance_km: k[2], segment_count: 3,
+             BrandedMarketSegmentsRequest.create(brand: brand, origin: k[0], dest:k[1], segment_count: 3,
                                                  branded_market_request_ids: bmr_set.map{|bmr| bmr.id} )
           end
         end
@@ -1034,7 +1078,6 @@ module Oag
    end
 
     def branded_market_route_map(brand, origin, dest, seg_counts)
-
 
       bmrm = BrandedMarketRouteMap.find_or_create_by(brand: brand, origin: origin, dest: dest)
 

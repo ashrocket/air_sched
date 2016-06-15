@@ -1,0 +1,15 @@
+ aws ec2 stop-instances --instance-ids i-7ba33cc8 --region us-east-1;
+ sleep 30;
+ aws ec2 modify-instance-attribute --instance-id i-7ba33cc8 --instance-type m4.10xlarge;
+ sleep 10;
+ aws ec2 start-instances --instance-ids i-7ba33cc8 --region us-east-1;
+ sleep 10;
+ ip_address=$(aws ec2 describe-instances --instance-ids i-7ba33cc8  --output text --query 'Reservations[*].Instances[*].PublicIpAddress');
+ sleep 20;
+ ssh -oStrictHostKeyChecking=no -i ~/.ssh/airsched.pem ec2-user@$ip_address -t 'bash -l -c "cd air_sched ; sudo pkill -9 -f rails "';
+ sleep 5;
+ ssh -oStrictHostKeyChecking=no -i ~/.ssh/airsched.pem ec2-user@$ip_address -t 'bash -l -c "cd air_sched ; rails s -b 0.0.0.0 -d"';
+ sleep 5;
+ ssh -oStrictHostKeyChecking=no -i ~/.ssh/airsched.pem ec2-user@$ip_address -t 'bash -l -c "cd air_sched ; sudo pkill -9 -f sidekiq"';
+ sleep 5;
+ ssh -oStrictHostKeyChecking=no -i ~/.ssh/airsched.pem ec2-user@$ip_address -t 'bash -l -c "cd air_sched ; sidekiq -C config/sidekiq.yml -d"';

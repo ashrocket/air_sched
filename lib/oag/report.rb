@@ -513,6 +513,7 @@ module Oag
 
     end
 
+    #Exerpiment to measure performance
     def tmp
     brand = Brand.find(1)
     two_seg_cnx_idx = 1
@@ -522,6 +523,11 @@ module Oag
 
     connection = uniq_connections.select{|g| g.origin.eql? 'KHH' and g.dest.eql? 'DMK' and g.via.eql? 'SIN'}.first
     bmrs = report.compute_branded_market_request(brand, connection, two_seg_cnx_idx,  uniq_connections.count)
+    bmrs.each{|bmr| two_seg_branded_market_requests[[bmr.origin, bmr.dest]] << bmr}
+
+    connection = uniq_connections.select{|g| g.origin.eql? 'KHH' and g.dest.eql? 'DMK' and g.via.eql? 'KIX'}.first
+    bmrs = report.compute_branded_market_request(brand, connection, two_seg_cnx_idx,  uniq_connections.count)
+    bmrs.each{|bmr| two_seg_branded_market_requests[[bmr.origin, bmr.dest]] << bmr}
 
     end
 

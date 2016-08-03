@@ -152,18 +152,27 @@ class ScheduleSet < ActiveRecord::Base
   end
 
   def import_oag_file
-      self.report_key.reset!
-      self.report_key.import_schedule!
-      self.report_key.save
-      self.load_status['schedule_import_time'] = DateTime.now.in_time_zone
-      if large_report?
-        ScheduleLargeImportWorker.delay_for(60).perform_async(self.id)
-        queue_large_oag_file!
-        halt
+      if self.report_key.active
+        self.load_status['report_key_active'] = true
+        self.report_key.reset!
+        self.report_key.import_schedule!
+        self.report_key.save
+        self.load_status['schedule_import_time'] = DateTime.now.in_time_zone
+        if large_report?
+          ScheduleLargeImportWorker.delay_for(60).perform_async(self.id)
+          queue_large_oag_file!
+          halt
+        else
+          processor.import_oag_file(self)
+        end
+        save
       else
-        processor.import_oag_file(self)
+        stash_log "Report rejected due to report key active == false #{report_name}"
+        self.load_status['report_key_active'] = false
+        save
+        reject!
+        halt
       end
-      save
   end
   def import_large_oag_file!
         self.load_status['schedule_import_time'] = DateTime.now.in_time_zone

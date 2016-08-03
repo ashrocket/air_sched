@@ -21,14 +21,12 @@ class ProcessAttachmentWorker
       Sidekiq::Logging.logger.info "Process Attachment Worker, autoload oag => #{AppSwitch.on?('autoload_oag')}"
 
       if report and AppSwitch.on?('autoload_oag')
-
-        report.load_status['autoload_oag'] = true
-        report.save
-        Sidekiq::Logging.logger.info "Process Attachment Worker, Triggering Process Attachment Event => #{message_id} #{report.id}: #{report.report_key_code}"
-        unless report.queued?
-          report.process_attachment!
-        end
-
+          report.load_status['autoload_oag'] = true
+          report.save
+          Sidekiq::Logging.logger.info "Process Attachment Worker, Triggering Process Attachment Event => #{message_id} #{report.id}: #{report.report_key_code}"
+          unless report.queued?
+            report.process_attachment!
+          end
       elsif report
 
           report.load_status['autoload_oag'] = false

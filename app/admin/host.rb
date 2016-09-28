@@ -2,10 +2,11 @@ ActiveAdmin.register Host do
   menu priority: 3,  :parent => 'Config'
   config.sort_order = 'name_asc'
 
-  filter :name, filters: [:cont, :eq, :start, :end]
-  filter :code, filters: [:cont, :eq, :start, :end]
+  filter :name, label: 'Host Name', filters: [:cont, :eq, :start, :end]
+  filter :code, label: 'Host Code', filters: [:cont, :eq, :start, :end]
   filter :airlines
   filter :brand
+  filter :brand_brand_key,:as => :string, filters: [:cont, :eq, :start, :end]
   # filter :name
 
   # See permitted parameters documentation:

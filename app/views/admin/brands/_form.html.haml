@@ -23,7 +23,8 @@
     .form-inputs
       = f.input :brand_key
       = f.input :name
-      = f.association :report_keys, as: :check_boxes, include_hidden: false
+      = f.association :report_keys,
+      :label_method => lambda { |report_key| "#{report_key.name} (#{report_key.code})" }, as: :check_boxes, include_hidden: false
       -#TODO:  Change the association checkboxes to use Jquey List Boxes
       -#with Add Left or Remove Right
       = f.input :description

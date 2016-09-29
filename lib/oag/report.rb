@@ -442,57 +442,17 @@ module Oag
      end
 
 
-
-    def safe_build_brand_route_request(brand, origin, dest, cxrs, host, distance_km)
-      brr = nil
-      begin
-        brr = BrandedRouteRequest.where(brand: brand, origin: connection.origin, distance_km: distance_km, dest: connection.via, cxrs: [connection.cxr1], host: host_code).first_or_create!
-
-      rescue ActiveRecord::RecordInvalid => e
-        e.record.errors.details
-        brr = BrandedRouteRequest.where(brand: brand, origin: connection.origin, distance_km: distance_km, dest: connection.via, cxrs: [connection.cxr1], host: host_code).first_or_create!
-        brr
-      ensure
-        brr
-      end
-
-    end
-
-
-    end
-
     def compute_branded_market_request(brand, connection, two_seg_cnx_idx,  total_uniq_connections)
       Rails.logger.info "(#{brand.brand_key}) Building  2 Segment Routes for #{connection.origin}, #{connection.dest}, #{connection.via}, #{two_seg_cnx_idx+1} of (#{total_uniq_connections} connections) "
       bmrs = []
       hostcodes = brand.hostcodes_map
 
       host_codes = hostcodes[connection.cxr1]
-      rr1_s = []
-      host_codes.each do |host_code|
-        safe_build_brand_route_request
-        brr = safe_build_brand_route_request(brand: brand, origin: connection.origin,
-                                             dest: connection.via,
-                                             cxrs: [connection.cxr1], host: host_code, distance_km: connection.distance_km)
-        if brr.blank?
-          brr = BrandedRouteRequest.create!(brand: brand, origin: connection.origin,
-                                            dest: connection.via, cxrs: [connection.cxr1],
-                                            host: host_code, distance_km: connection.distance_km)
+      rr1_s = host_codes.map{ |host_code|
+        BrandedRouteRequest.where(brand: brand, origin: connection.origin, dest: connection.via, cxrs: [connection.cxr1], host: host_code).first_or_create! do |brr|
+          brr.distance_km = connection.distance_km
         end
-        rr1_s << brr
-
-
-
-      end
-
-
-      # rr1_s = host_codes.map{ |host_code|
-      #
-      #   # byebug if [connection.origin, connection.dest,connection.via] == ['ADA','GIZ''JED'],
-      #   BrandedRouteRequest.where(brand: brand, origin: connection.origin, dest: connection.via, cxrs: [connection.cxr1], host: host_code).first_or_create! do |brr|
-      #
-      #     brr.distance_km = connection.distance_km
-      #   end
-      # }
+      }
       host_codes = hostcodes[connection.cxr2]
       rr2_s = host_codes.map{ |host_code|
         BrandedRouteRequest.where(brand: brand, origin: connection.via,  dest: connection.dest, cxrs: [connection.cxr2], host: host_code).first_or_create! do |brr|

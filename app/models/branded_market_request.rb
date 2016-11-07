@@ -3,7 +3,11 @@ class BrandedMarketRequest < ActiveRecord::Base
   # attr_accessor :brand_key, :key, :origin, :dest, :cxrs, :host
   belongs_to :brand
 
-  has_many :branded_market_route_requests, -> { order(:position) }, :dependent => :destroy
+  has_many :branded_market_route_requests, :dependent => :destroy
+  # has_many :branded_market_route_requests, -> { order(:position) }, :dependent => :destroy
+  # has_many :branded_market_route_requests, -> { order(:seg_count) }, :dependent => :destroy
+
+  has_many :branded_market_route_requests, :dependent => :destroy
   has_many :branded_route_requests, through: :branded_market_route_requests
 
 

@@ -1,10 +1,10 @@
- aws ec2 stop-instances --instance-ids i-7ba33cc8 --region us-east-1;
- sleep 30;
- aws ec2 modify-instance-attribute --instance-id i-7ba33cc8 --instance-type m4.large;
+ aws ec2 --profile abb  stop-instances --instance-ids i-7ba33cc8 --region us-east-1;
+ sleep 60;
+ aws ec2 --profile abb  modify-instance-attribute --instance-id i-7ba33cc8 --instance-type m4.large;
  sleep 10;
- aws ec2 start-instances --instance-ids i-7ba33cc8 --region us-east-1;
+ aws ec2 --profile abb  start-instances --instance-ids i-7ba33cc8 --region us-east-1;
  sleep 10;
- ip_address=$(aws ec2 describe-instances --instance-ids i-7ba33cc8  --output text --query 'Reservations[*].Instances[*].PublicIpAddress');
+ ip_address=$(aws ec2 --profile abb  describe-instances --instance-ids i-7ba33cc8  --output text --query 'Reservations[*].Instances[*].PublicIpAddress');
  sleep 20;
  ssh -oStrictHostKeyChecking=no -i ~/.ssh/airsched.pem ec2-user@$ip_address -t 'bash -l -c "cd air_sched ; sudo pkill -9 -f rails "';
  sleep 5;

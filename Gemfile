@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.5'
 gem 'puma', '2.10.2'
 # ORM related gems
-gem 'pg', '~> 0.18.2'
+gem 'pg', '~> 0.19'
 gem 'postgres_ext', '~> 2.4.1'
 
 # Pull from CDN or fallback

@@ -593,9 +593,9 @@ ALTER SEQUENCE branded_market_route_maps_id_seq OWNED BY branded_market_route_ma
 
 CREATE TABLE branded_market_route_requests (
     id integer NOT NULL,
-    "position" integer,
     branded_route_request_id integer,
-    branded_market_request_id integer
+    branded_market_request_id integer,
+    brand_id integer
 );
 
 
@@ -2794,4 +2794,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150727000600');
 INSERT INTO schema_migrations (version) VALUES ('20150727000630');
 
 INSERT INTO schema_migrations (version) VALUES ('20160209223433');
+
+INSERT INTO schema_migrations (version) VALUES ('20161104000010');
 

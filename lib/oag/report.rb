@@ -535,8 +535,8 @@ module Oag
       two_seg_branded_market_requests = Hash.new { |h, k| h[k] = Set.new }
       uniq_connections = prepare_faster_one_stop_routes(brand)
 
-       Parallel.each_with_index(uniq_connections, in_threads: 8) do |connection, two_seg_cnx_idx|
-       # uniq_connections.each_with_index do |connection, two_seg_cnx_idx|
+       # Parallel.each_with_index(uniq_connections, in_threads: 8) do |connection, two_seg_cnx_idx|
+       uniq_connections.each_with_index do |connection, two_seg_cnx_idx|
 
                 bmrs = compute_branded_market_request(brand, connection, two_seg_cnx_idx, uniq_connections.count)
                 bmrs.each{|bmr| two_seg_branded_market_requests[[bmr.origin, bmr.dest]] << bmr}

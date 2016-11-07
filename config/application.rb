@@ -24,6 +24,32 @@ module AirSched
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
 
 
+
+    config.exception_handler = {
+        db:   	false, #-> defaults to :errors if true, else use :table_name
+        email: 	false, #-> need to integrate
+        social: {
+            :twitter 	=> 	'frontlineutils',
+            :facebook 	=> 	'frontline.utilities',
+            :linkedin 	=> 	'frontline-utilities',
+            :youtube 	=>	'frontlineutils',
+            :fusion 	=> 	'frontlineutils',
+            :url => {
+                :facebook 	=> 	'https://facebook.com',
+                :twitter 	=> 	'http://twitter.com',
+                :youtube 	=>	'https://youtube.com/user',
+                :linkedin 	=> 	'https://linkedin.com/company',
+                :fusion 	=> 	'https://frontlinefusion.com',
+            },
+        },
+        layouts: {
+            '400' => nil,
+            '500' => 'exception'
+        },
+    }
+
+
+
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'

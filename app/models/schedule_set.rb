@@ -309,18 +309,36 @@ class ScheduleSet < ActiveRecord::Base
       if File.exist? attachment_path
         update(attachment_status: 'stored',attachment_size: File.stat(attachment_path).size)
       end
-      Zip::InputStream::open(attachment_path) {|io|
-         entry = io.get_next_entry
-         uncompressed_filename   = entry.name.squish.gsub(" ", "_")
-         uncompressed_path       = File.join( File.dirname(attachment_path), uncompressed_filename )
-         File.open(uncompressed_path, 'wb'){|f| f << io.read}
 
-         self.load_status['report_path'] = uncompressed_path
-         self.load_status['report_size'] = File.stat(uncompressed_path).size
-         self.load_status['attachment_status'] =  'uncompressed'
-         save
 
-      }
+      Zip::File.open(attachment_path) do |zip_file|
+          # Handle entries one by one - nope should only be 1 entry
+          entry = zip_file.first
+          # Extract to file/directory/symlink
+          uncompressed_filename   = entry.name.squish.gsub(" ", "_")
+          uncompressed_path       = File.join( File.dirname(attachment_path), uncompressed_filename )
+          entry.extract(uncompressed_path)
+
+          self.load_status['report_path'] = uncompressed_path
+          self.load_status['report_size'] = File.stat(uncompressed_path).size
+          self.load_status['attachment_status'] =  'uncompressed'
+          save
+
+      end
+
+
+      # Zip::InputStream::open(attachment_path) {|io|
+      #    entry = io.get_next_entry
+      #    uncompressed_filename   = entry.name.squish.gsub(" ", "_")
+      #    uncompressed_path       = File.join( File.dirname(attachment_path), uncompressed_filename )
+      #    File.open(uncompressed_path, 'wb'){|f| f << io.read}
+      #
+      #    self.load_status['report_path'] = uncompressed_path
+      #    self.load_status['report_size'] = File.stat(uncompressed_path).size
+      #    self.load_status['attachment_status'] =  'uncompressed'
+      #    save
+      #
+      # }
     end
     save
 
